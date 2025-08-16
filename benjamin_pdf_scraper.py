@@ -4,7 +4,7 @@ import json
 import dateparser
 
 from datamodels.BenjaminEntry import BenjaminEntry
-from data.connector import upsert_entry
+from database.connector import upsert_corpus_entry
 
 
 # Walter Benjamin Basic Data
@@ -135,7 +135,7 @@ def parse_letters_from_pdf(pdf_path):
         entry.scrape_state = 1
         entry.text_raw = cleaned_content
 
-        upsert_entry(entry)
+        upsert_corpus_entry(entry)
 
         extracted_letters.append({
             "receiver": receiver,
@@ -146,10 +146,6 @@ def parse_letters_from_pdf(pdf_path):
     return extracted_letters
 
 if __name__ == "__main__":
-    # --- IMPORTANT ---
-    # Replace "027-040.pdf" with the actual path to your PDF file.
-    pdf_file_path = "027-040.pdf"
-    
     letters = parse_letters_from_pdf("c:/temp/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.pdf")
 
     if letters:

@@ -1,0 +1,1 @@
+sqlacodegen sqlite:///example.db --outfile models.py

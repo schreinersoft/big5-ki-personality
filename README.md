@@ -1,1 +1,1 @@
-# big5-ki-personalit
+# big5-ki-personality
