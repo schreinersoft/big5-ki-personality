@@ -3,8 +3,8 @@ import re
 import json
 import dateparser
 
-from datamodels.BenjaminEntry import BenjaminEntry
-from database.connector import upsert_corpus_entry
+from database.BenjaminEntry import BenjaminEntry
+from database.base import upsert_corpus_entry
 
 
 # Walter Benjamin Basic Data

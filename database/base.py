@@ -46,3 +46,28 @@ def upsert(entry):
           db.commit()
           db.refresh(entry)
           return entry
+
+
+def upsert_corpus_entry(entry):
+    """ Adds or alters a Corpus Entry in the database """
+    entry.generate_hash() # Ensure hash is generated
+
+    with get_session() as db:  # Use SessionLocal to create the session
+      existing_entry = db.query(entry.__class__).filter(entry.__class__.hash == entry.hash).first()
+
+      if existing_entry:
+          # Update existing entry
+          # Use entry.__dict__ to get a dictionary of attributes, excluding SQLAlchemy internal attributes
+          for key, value in entry.__dict__.items():
+              if key != '_sa_instance_state': # Exclude internal SQLAlchemy state
+                  setattr(existing_entry, key, value)
+          db.commit()
+          db.refresh(existing_entry)
+          return existing_entry
+      else:
+          # Add new entr
+          db.add(entry)
+          db.commit()
+          db.refresh(entry)
+          return entry
+
