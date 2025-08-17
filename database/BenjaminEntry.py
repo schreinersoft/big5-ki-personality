@@ -1,9 +1,9 @@
 import hashlib
 from sqlalchemy import Column, Integer, String
-from base import Base
+from database.base import Base
 
 class BenjaminEntry(Base):
-    __tablename__ = 'benjamin_test'
+    __tablename__ = 'benjamin'
     # Modify 'hash' to be the sole primary key
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     hash = Column(String, unique=True)

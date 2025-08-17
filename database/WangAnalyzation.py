@@ -5,15 +5,15 @@ from sqlalchemy.orm import relationship
 from database.base import Base
 
 
-class LIWCAnalyzation(Base):
-    __tablename__ = 'liwc_analyzation'
+class WangAnalyzation(Base):
+    __tablename__ = 'wang_analyzation'
     # id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     id = Column(Integer, ForeignKey('essays.id'), primary_key=True, nullable=False, unique=True)
-    o_liwc = Column(Double)
-    c_liwc = Column(Double)
-    e_liwc = Column(Double)
-    a_liwc = Column(Double)
-    n_liwc = Column(Double)
+    o_wang = Column(Double)
+    c_wang = Column(Double)
+    e_wang = Column(Double)
+    a_wang = Column(Double)
+    n_wang = Column(Double)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    essay = relationship("Essay", back_populates="liwc_analyzation")
+    essay = relationship("Essay", back_populates="wang_analyzation")

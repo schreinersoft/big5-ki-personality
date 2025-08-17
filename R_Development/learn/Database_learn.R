@@ -29,11 +29,11 @@ employees_tbl %>% select(name) %>% filter(name=="Alice")
 
 dbListTables(con)
 
-essays_test <- tbl(con, "essays_test")
+essays <- tbl(con, "essays")
 
-glimpse(essays_test)
+glimpse(essays)
 
-banjamin <- tbl(con, "benjamin_test")
+banjamin <- tbl(con, "benjamin")
 glimpse(banjamin)
 
 banjamin$text_raw_len <-  banjamin %>% pull(text_raw) %>% nchar()

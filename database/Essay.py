@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from base import Base
+from database.base import Base
 
 # The complete original Essay data (will be populated by R script)
 
@@ -17,3 +17,4 @@ class Essay(Base):
     n_binary = Column(Integer)
 
     liwc_analyzation = relationship("LIWCAnalyzation", back_populates="essay", cascade="all, delete-orphan")
+    wang_analyzation = relationship("WangAnalyzation", back_populates="essay", cascade="all, delete-orphan")
