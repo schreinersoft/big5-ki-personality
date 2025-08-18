@@ -1,6 +1,8 @@
 if __name__ == "__main__":
     from database.LIWCAnalyzation import LIWCAnalyzation
     from database.WangAnalyzation import WangAnalyzation
+    from database.MinejAnalyzation import MinejAnalyzation
+    from database.OpenAIAnalyzation import OpenAIAnalyzation
     from database.Essay import Essay
     from database.BenjaminEntry import BenjaminEntry
     from database.base import get_session, create_tables, upsert

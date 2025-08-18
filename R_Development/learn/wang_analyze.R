@@ -2,9 +2,25 @@ library("tidyverse")
 
 essays <- tbl(con, "essays")
 wang <- tbl(con, "wang_analyzation")
-wang_joined <- left_join(essays, wang, by = c("id" = "id"))
+wang_joined <- left_join(essays, wang, by = c("id" = "essay_id"))
 wang_truncated <- wang_joined %>% filter(classification_type == "truncated")
 wang_sliding <- wang_joined %>% filter(classification_type == "slidingWindow")
+
+
+wang_joined %>% 
+  select(n_binary) %>% 
+  pull()
+
+
+wang_sliding %>% 
+#  filter(n_wang < 0.125) %>% 
+  ggplot(aes(x = n_wang)) +
+  geom_density() +
+  geom_histogram() +
+  labs(title = "Sliding Window",
+       x = "Neurotizismus", y = "Values") +
+  theme_minimal()
+
 
 
 wang_joined %>% filter(c_binary == "1") %>% 
@@ -14,8 +30,8 @@ wang_joined %>% filter(c_binary == "1") %>%
   theme_minimal()
 
 # Gute Visualisierung nach binary!
-wang_sliding %>% 
-  filter(n_wang < 0.125) %>% 
+wang_truncated %>% 
+  filter(n_wang > 0.24) %>% 
   ggplot(aes(x = n_binary, y = n_wang, group = n_binary, fill=n_binary)) +
   geom_violin() +
   geom_jitter(width=0.1,alpha=0.5)+
@@ -23,8 +39,19 @@ wang_sliding %>%
        x = "Neurotizismus", y = "Values") +
   theme_minimal()
 
+# Gute Visualisierung nach binary!
+wang_truncated %>% 
+  #filter(a_wang > 0.24) %>% 
+  ggplot(aes(x = a_binary, y = a_wang, group = a_binary, fill=a_binary)) +
+  geom_violin() +
+  geom_jitter(width=0.1,alpha=0.5)+
+  labs(title = "Sliding Window",
+       x = "Agreeableness", y = "Values") +
+  theme_minimal()
+
+
 wang_joined %>% 
-  filter(n_wang < 0.125) %>%
+#  filter(n_wang < 0.125) %>%
   filter(n_binary=="0") %>% 
   ggplot(aes(x = classification_type, y = n_wang, group = classification_type, fill=classification_type)) +
   geom_violin() +
@@ -98,6 +125,15 @@ wang_truncated %>%
     sd = sd(n_wang),
     n=n()
   )
+
+wang_truncated %>%
+  group_by(a_binary) %>%
+  summarise(
+    mean = mean(a_wang),
+    sd = sd(a_wang),
+    n=n()
+  )
+
 wang_sliding %>%
   group_by(n_binary) %>%
   summarise(
@@ -128,6 +164,7 @@ model_oneway <- aov(n_wang ~ n_binary, data = wang_sliding)
 summary(model_oneway)
 model_oneway <- aov(n_wang ~ n_binary, data = wang_truncated)
 summary(model_oneway)
+
 
 # Faktorenanalyse
 install.packages("lavaan")  # Install if not already installed

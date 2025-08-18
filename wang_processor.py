@@ -2,6 +2,9 @@ from database.base import get_session
 from database.Essay import Essay
 from database.WangAnalyzation import WangAnalyzation
 from database.LIWCAnalyzation import LIWCAnalyzation
+from database.OpenAIAnalyzation import OpenAIAnalyzation
+from database.MinejAnalyzation import MinejAnalyzation
+
 
 
 import wang_classifier
@@ -33,17 +36,17 @@ def process_wang(batch_size: int, max_num: int):
                 )
                 db.add(new_wang)
 
-                analyzed = wang_classifier.sliding_window_classify(essay.text)
-                new_wang = WangAnalyzation(
-                    essay_id = essay.id,
-                    o_wang = analyzed['O'],
-                    c_wang = analyzed['C'],
-                    e_wang = analyzed['E'],
-                    a_wang = analyzed['A'],
-                    n_wang = analyzed['N'],
-                    classification_type = "slidingWindow"
-                )
-                db.add(new_wang)
+                # analyzed = wang_classifier.classify_sliding_windowed(essay.text)
+                # new_wang = WangAnalyzation(
+                #     essay_id = essay.id,
+                #     o_wang = analyzed['O'],
+                #     c_wang = analyzed['C'],
+                #     e_wang = analyzed['E'],
+                #     a_wang = analyzed['A'],
+                #     n_wang = analyzed['N'],
+                #     classification_type = "slidingWindow"
+                # )
+                # db.add(new_wang)
 
                 i+=1
             db.commit()
