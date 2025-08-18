@@ -25,7 +25,7 @@ essays <- essays %>%
 
 # refresh data in table
 dbExecute(con, "DELETE FROM essays")
-dbWriteTable(con, "essays", essays, append = TRUE,row.names = FALSE)
+dbWriteTable(con, "essays", essays, append = TRUE, row.names = FALSE)
 
 essays %>% write_csv("00_cleaned/essays_cleaned.csv")
 

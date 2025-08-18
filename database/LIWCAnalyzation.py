@@ -7,8 +7,8 @@ from database.base import Base
 
 class LIWCAnalyzation(Base):
     __tablename__ = 'liwc_analyzation'
-    # id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    id = Column(Integer, ForeignKey('essays.id'), primary_key=True, nullable=False, unique=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    essay_id = Column(Integer, ForeignKey('essays.id'), nullable=False)
     o_liwc = Column(Double)
     c_liwc = Column(Double)
     e_liwc = Column(Double)

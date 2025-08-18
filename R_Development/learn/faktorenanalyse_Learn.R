@@ -12,3 +12,7 @@ fit <- cfa(model, data = facets)
 
 summary(fit, fit.measures = TRUE, standardized = TRUE)
 
+install.packages("semPlot")
+library(semPlot)
+
+semPaths(fit, "std", layout = "tree", edge.label.cex = 1.2)
