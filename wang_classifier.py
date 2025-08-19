@@ -10,8 +10,7 @@ stride = int(window_size / 2)
 
 def classify_truncated(text: str):
     # Encode the text using the same tokenizer used during training
-    #encoded_input = tokenizer(new_text, return_tensors='pt', padding=True, truncation=True, max_length=64)
-    encoded_input = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=window_size)   # set length to 768
+    encoded_input = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=window_size)
     print(f"Text truncated to {window_size} tokens.")
     model.eval()  # Set the model to evaluation mode
 
@@ -24,10 +23,6 @@ def classify_truncated(text: str):
     predicted_scores = predictions[0].tolist()
 
     trait_names = ["A", "O", "C", "E", "N"]
-
-    # result = {}
-    # for trait, score in zip(trait_names, predicted_scores):
-    #     result[trait] = score
 
     result = {trait_names[i]: predicted_scores[i] for i in range(len(trait_names))}
 

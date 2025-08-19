@@ -14,6 +14,7 @@ class LIWCAnalyzation(Base):
     e_liwc = Column(Double)
     a_liwc = Column(Double)
     n_liwc = Column(Double)
+    liwc_all = Column(String)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     essay = relationship("Essay", back_populates="liwc_analyzation")

@@ -1,7 +1,7 @@
 library(tidyverse)
 library(readr)
 
-essays <- read_csv("00_cleaned/essays_cleaned.csv")
+essays <- read_csv("00_cleaned/essays_cleaned_liwc22.csv")
 
 sum(essays$WC)
 mean(essays$WC)

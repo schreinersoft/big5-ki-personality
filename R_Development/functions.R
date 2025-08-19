@@ -69,7 +69,7 @@ histogramm <- function(data, variable, group=NULL) {
   else {
     data %>% 
       ggplot(aes(x = !!sym(variable), fill=!!sym(group))) +
-      geom_histogram() +
+      geom_histogram(position="dodge") +
       labs(title = "Histogramm",
            x = "Value",
            y = "Density") +
@@ -82,8 +82,7 @@ histogramm_multi <- function(data, variables) {
     select(all_of(variables)) %>% 
     pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
     ggplot(aes(x = value, color = variable, fill = variable)) +
-    geom_histogram() +
-    facet_wrap(~variable, scales = "free") +
+    geom_histogram(position="dodge") +
     labs(title = "Verteilungen OCEAN",
          x = "Value",
          y = "Density") +
