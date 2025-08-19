@@ -55,7 +55,7 @@ Do not output anything else."""
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"TEXT TO EVALUATE: <<<{input_text}>>>"},
         ],
-        service_tier="flex"
+        service_tier="flex",
         #temperature=temperature,
         response_format={ "type": "json_object" }  # ensures JSON output
     )

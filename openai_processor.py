@@ -4,19 +4,19 @@ from database.WangAnalyzation import WangAnalyzation
 from database.LIWCAnalyzation import LIWCAnalyzation
 from database.OpenAIAnalyzation import OpenAIAnalyzation
 from database.MinejAnalyzation import MinejAnalyzation
-
-import json
-
 import openai_classifier
 
 
-def process_openai(batch_size: int, max_num: int, repeats: int=2, temperature: int = 0.3):
+
+
+def process_openai(batch_size: int, max_num: int, repeats: int=2, sleep_mode: bool = False, temperature: int = 0.3):
     i = 0
     with get_session() as db:
         while i < (max_num * repeats):
             essays = db.query(Essay)\
                     .outerjoin(OpenAIAnalyzation)\
                     .filter(OpenAIAnalyzation.essay_id.is_(None))\
+                    .filter(Essay.id < 10)\
                     .limit(batch_size)\
                     .all()
 
@@ -82,6 +82,7 @@ def process_openai(batch_size: int, max_num: int, repeats: int=2, temperature: i
                     finally:
                         i+=1
                 db.commit()
+
                 
 if __name__ == "__main__":
-    process_openai(1, 35, repeats=10)
+    process_openai(1, 11, repeats=10)

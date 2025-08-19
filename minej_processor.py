@@ -4,11 +4,11 @@ from database.WangAnalyzation import WangAnalyzation
 from database.MinejAnalyzation import MinejAnalyzation
 from database.LIWCAnalyzation import LIWCAnalyzation
 from database.OpenAIAnalyzation import OpenAIAnalyzation
-
-
 import minej_classifier
 
-def process_minej(batch_size: int, max_num: int):
+import time
+
+def process_minej(batch_size: int, max_num: int, sleep_mode: bool = False):
     i = 0
     with get_session() as db:
         while i < max_num:
@@ -35,6 +35,11 @@ def process_minej(batch_size: int, max_num: int):
                 )
                 db.add(new_minej)
 
+                if sleep_mode:
+                    # let CPU cool down when used over night
+                    time.sleep(5)
+
+
                 analyzed = minej_classifier.classify_sliding_windowed(essay.text)
                 new_minej = MinejAnalyzation(
                     essay_id = essay.id,
@@ -46,9 +51,16 @@ def process_minej(batch_size: int, max_num: int):
                     classification_type = "slidingWindow"
                 )
                 db.add(new_minej)
+                if sleep_mode: 
+                    # let CPU cool down when used over night
+                    
+                    time.sleep(5)
 
                 i+=1
             db.commit()
+            if sleep_mode:
+                # let CPU cool down when used over night
+                time.sleep(10)
                 
 if __name__ == "__main__":
-    process_minej(5, 10000)
+    process_minej(5, 10000, sleep_mode=True)
