@@ -15,7 +15,7 @@ def process_liwc(batch_size: int, max_num: int):
             essays = db.query(Essay)\
                     .outerjoin(LIWCAnalyzation)\
                     .filter(LIWCAnalyzation.essay_id.is_(None))\
-                    .filter(Essay.id <= 50)\
+                    .filter(Essay.id <= 100)\
                     .limit(batch_size)\
                     .all()
 
@@ -40,4 +40,4 @@ def process_liwc(batch_size: int, max_num: int):
 
                 
 if __name__ == "__main__":
-    process_liwc(10, 50)
+    process_liwc(10, 1)
