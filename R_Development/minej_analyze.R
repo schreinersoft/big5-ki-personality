@@ -1,12 +1,39 @@
-library("tidyverse")
+library(tidyverse)
+library(rstatix)
 
 essays <- tbl(con, "essays")
 minej <- tbl(con, "minej_analyzation")
 minej_joined <- left_join(essays, minej, by = c("id" = "essay_id"))
 minej_truncated <- minej_joined %>% filter(classification_type == "truncated")
-minej_sliding <- minej_joined %>% filter(classification_type == "slidingWindow")
+minej_sliding <- minej_joined %>% filter(classification_type == "slidingWindow") %>% show_query()
 
 source("functions.R")
+
+# Tests auf Normalverteilung
+vec <- minej_truncated %>%
+  select(o_minej) %>% 
+  pull(o_minej)
+ks.test(vec, "pnorm", mean(vec), sd(vec))
+
+vec <- minej_truncated %>%
+  select(c_minej) %>% 
+  pull(c_minej)
+ks.test(vec, "pnorm", mean(vec), sd(vec))
+
+vec <- minej_truncated %>%
+  select(e_minej) %>% 
+  pull(e_minej)
+ks.test(vec, "pnorm", mean(vec), sd(vec))
+
+vec <- minej_truncated %>%
+  select(a_minej) %>% 
+  pull(a_minej)
+ks.test(vec, "pnorm", mean(vec), sd(vec))
+
+vec <- minej_truncated %>%
+  select(n_minej) %>% 
+  pull(n_minej)
+ks.test(vec, "pnorm", mean(vec), sd(vec))
 
 # ANOVA der Binärgruppen
 model_oneway <- aov(o_minej ~ o_binary, data = minej_truncated)
@@ -30,20 +57,74 @@ summary(model_oneway)
 model_oneway <- aov(n_minej ~ n_binary, data = minej_sliding)
 summary(model_oneway)
 
+# U-Tests
+# 1. Deskriptive Statistiken
+data <- minej_truncated %>% collect()
+desc_stats <- data %>%
+  group_by(o_binary) %>%
+  collect() %>% 
+  summarise(
+    n = n(),
+    median = median(o_minej),
+    iqr = IQR(o_minej),
+    mean_rank = mean(rank(data$o_minej)[data$o_binary == cur_group()[[1]]])
+  )
+print(desc_stats)
+
+# 2. Wilcoxon-Test
+wilcox_result <- wilcox.test(o_minej ~ o_binary, data = data)
+print(wilcox_result)
+
+# 3. Effektgröße (r)
+n <- nrow(data)
+z_score <- qnorm(wilcox_result$p.value / 2)  # Z-Wert aus p-Wert
+r <- abs(z_score) / sqrt(n)  # Effektgröße r
+
+cat("Effektgröße r:", round(r, 3), "\n")
+
+# Interpretation der Effektgröße
+if (r < 0.3) {
+  cat("Kleiner Effekt\n")
+} else if (r < 0.5) {
+  cat("Mittlerer Effekt\n")
+} else {
+  cat("Großer Effekt\n")
+}
+
+# 4. Interpretation
+cat("\nInterpretation:\n")
+if(wilcox_result$p.value < 0.05) {
+  cat("Signifikanter Unterschied zwischen den Gruppen (p =", 
+      round(wilcox_result$p.value, 4), ")\n")
+} else {
+  cat("Kein signifikanter Unterschied zwischen den Gruppen (p =", 
+      round(wilcox_result$p.value, 4), ")\n")
+}
+
+
+
 
 
 # Vergleiche nach Binärvariable
 # Verteilungen
-minej_joined %>% 
+minej_truncated %>% 
   verteilung("o_minej", "o_binary")  
-minej_joined %>% 
+minej_truncated %>% 
   verteilung("c_minej", "c_binary")  
-minej_joined %>% 
+minej_truncated %>% 
   verteilung("e_minej", "e_binary")  
-minej_joined %>% 
+minej_truncated %>% 
   verteilung("a_minej", "a_binary")  
-minej_joined %>% 
+minej_truncated %>% 
   verteilung("n_minej", "n_binary")  
+
+# Einfacher Q-Q Plot
+minej_truncated %>% 
+  ggplot(aes(sample = e_minej)) +
+  stat_qq() +
+  stat_qq_line(color = "red") +
+  labs(title = "Q-Q Plot", x = "Theoretische Quantile", y = "Stichproben-Quantile")
+
 
 # Violins
 minej_joined %>% 

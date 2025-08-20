@@ -59,20 +59,28 @@ verteilung_multi <- function(data, variables) {
 histogramm <- function(data, variable, group=NULL) {
   if (is.null(group)) {
     data %>% 
-      ggplot(aes(x = !!sym(variable), fill="green")) +
-      geom_histogram() +
+      ggplot(aes(x = !!sym(variable))) +
+      geom_histogram(breaks = seq(0.5, 9.5, by = 1),
+                     bins = 9, 
+                     boundary = 0.5,  # Ensures bins are centered on integers
+                     color = "black", fill = "lightblue") +
       labs(title = "Histogramm",
-           x = "Value",
-           y = "Density") +
+           x = "Wert",
+           y = "Anzahl") +
+      scale_x_continuous(breaks = 1:9) +
       theme_minimal() 
   }
   else {
     data %>% 
       ggplot(aes(x = !!sym(variable), fill=!!sym(group))) +
-      geom_histogram(position="dodge") +
+      geom_histogram(breaks = seq(0.5, 9.5, by = 1),
+                     bins = 9, 
+                     boundary = 0.5,  # Ensures bins are centered on integers
+                     color = "black", fill = "lightblue") +
       labs(title = "Histogramm",
-           x = "Value",
-           y = "Density") +
+           x = "Wert",
+           y = "Anzahl") +
+      scale_x_continuous(breaks = 1:9) +
       theme_minimal() 
   }
 }

@@ -7,4 +7,4 @@ sum(essays$WC)
 mean(essays$WC)
 sd(essays$WC)
 
-dbWriteTable(con, "essays", essays)
+dbWriteTable(con, "essays_liwc", essays)
