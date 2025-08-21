@@ -9,6 +9,7 @@ library(purrr)
 
 source("connect_database.R")
 source("functions.R")
+source("NEO-PI-R-Names.R")
 
 # combine datasets
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
@@ -145,6 +146,15 @@ openai_joined_v3 %>%
 openai_joined_v3 %>% 
   histogramm_multi(n_facets)
 
+
+openai_joined_v3 %>% 
+  histogramm_sechsfach(o_facets)
+openai_joined_v3 %>% 
+  histogramm_sechsfach(c_facets)
+openai_joined_v3 %>% 
+  histogramm_sechsfach(e_facets)
+openai_joined_v3 %>% 
+  histogramm_sechsfach(a_facets)
 openai_joined_v3 %>% 
   histogramm_sechsfach(n_facets)
 

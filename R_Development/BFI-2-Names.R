@@ -1,0 +1,17 @@
+facet_names = c(
+  'of1' = 'Intellectual Curiosity',
+  'of2' = 'Aesthetic Sensitivity',
+  'of3' = 'Creative Imagination',
+  'cf1' = 'Organization',
+  'cf2' = 'Productiveness',
+  'cf3' = 'Responsibility',
+  'ef1' = 'Sociability',
+  'ef2' = 'Assertiveness',
+  'ef3' = 'Energy Level',
+  'af1' = 'Compassion',
+  'af2' = 'Respectfulness',
+  'af3' = 'Trust',
+  'nf1' = 'Anxiety',
+  'nf2' = 'Depression',
+  'nf3' = 'Emotional Volatility'
+)

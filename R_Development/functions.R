@@ -100,6 +100,19 @@ histogramm_sechsfach <- function(data, facets) {
   return((p[[1]] | p[[2]] | p[[3]]) / (p[[4]] | p[[5]] | p[[6]]))
 }
 
+histogramm_dreifach <- function(data, facets) {
+  # Liste für Plots initialisieren
+  p <- list()
+  
+  # Plots erstellen
+  for (i in 1:length(facets)) {
+    p[[i]] <- histogramm(data, facets[i])
+  }
+  
+  # 3x2 Matrix erstellen
+  return((p[[1]] | p[[2]] | p[[3]]))
+}
+
 histogramm_multi <- function(data, variables) {
   data %>% 
     select(all_of(variables)) %>% 
