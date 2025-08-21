@@ -27,9 +27,14 @@ c_facets <- paste0("cf", 1:3)
 e_facets <- paste0("ef", 1:3)
 a_facets <- paste0("af", 1:3)
 n_facets <- paste0("nf", 1:3)
+
+e_facets <- e_facets[e_facets != "ef2"]  # schritt 2
+
 all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
+
+
 
 # Cronbachs alpha der Facetten
 for (facets in facet_list) {
@@ -215,7 +220,9 @@ facets <- llm_analyzation_v1 %>%
   as_tibble()
 
 fit <- cfa(model, data = facets, 
-           estimator = "ML")
+           estimator = "GLS")
+#fit <- cfa(model, data = facets, 
+           #estimator = "ML")
            #,
            #se="bootstrap",
            #bootstrap = 2000) # see CFA.md

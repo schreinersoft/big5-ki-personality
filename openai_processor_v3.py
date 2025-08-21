@@ -30,7 +30,7 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
             essays = db.query(Essay)\
                     .outerjoin(OpenAIAnalyzationV3)\
                     .filter(OpenAIAnalyzationV3.essay_id.is_(None))\
-                    .filter(Essay.id <=50)\
+                    .filter(Essay.id <=250)\
                     .limit(batch_size)\
                     .all()
 
@@ -100,7 +100,7 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
 
                 
 if __name__ == "__main__":
-    process_openai_v3(5, 50, repeats=10, service_tier="default")
+    process_openai_v3(5, 5000, repeats=10, service_tier="flex")
 
 
 
