@@ -31,36 +31,6 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 * Wiederholungen pro Essay: 10
 * Kosten: $1.46 
 * 5 * 6 NEO-PI-R-Facetten
-of1 = 'Fantasy'
-of2 = 'Aesthetics'
-of3 = 'Feelings'
-of4 = 'Actions'
-of5 = 'Ideas'
-of6 = 'Values'
-cf1 = 'Competence'
-cf2 = 'Order'
-cf3 = 'Dutifulness'
-cf4 = 'Achievement striving'
-cf5 = 'Self-Discipline'
-cf6 = 'Deliberation'
-ef1 = 'Warmth'
-ef2 = 'Gregariousness'
-ef3 = 'Assertiveness'
-ef4 = 'Activity'
-ef5 = 'Excitement seeking'
-ef6 = 'Positive emotions'
-af1 = 'Trust'
-af2 = 'Straightforwardness'
-af3 = 'Altruism'
-af4 = 'Compliance'
-af5 = 'Modesty'
-af6 = 'Tender-mindedness'
-nf1 = 'Anxiety'
-nf2 = 'Angry hostility'
-nf3 = 'Depression'
-nf4 = 'Self-consciousness'
-nf5 = 'Impulsiveness'
-nf6 = 'Vulnerability'
 ## Alpha
 O   0.66
 C   0.82
@@ -177,5 +147,65 @@ of3 = 'Feelings'            (geringe korr mit gesamt)
 ## Aktion: Kreuzkorrelation:
 ef1 - af1, af3, af6 > 0.6  -> ef1 entfernen
 ef6 - af1 > 0.6    (wird nochmal drin gelassen)
+## Alpha
+O   0.77
+C   0.82
+E   0.82
+A   0.79
+N   0.83
+## Korrelationsmatrix
+ef6 = 'Positive emotions'  - af1 = 'Trust'  0.7 !
+## CFA
+Estimator ML
+Comparative Fit Index (CFI)                    0.544
+Tucker-Lewis Index (TLI)                       0.471
+                                                                
+Robust Comparative Fit Index (CFI)             0.479
+Robust Tucker-Lewis Index (TLI)                0.406
+
+RMSEA                                          0.213
+
+SRMR                                           0.185
+## Kreuzkorrelationen
+> inspect(fit, "cor.lv")
+        Ofactr Cfactr Efactr Afactr Nfactr
+Ofactor  1.000                            
+Cfactor  0.017  1.000                     
+Efactor  0.026  0.176  1.000              
+Afactor  0.231  0.244  0.419  1.000       
+Nfactor  0.170  0.000 -0.231  0.521  1.000    -> N und A recht stark
+## PCA
+Call: principal(r = facets, nfactors = 5, rotate = "varimax")
+Standardized loadings (pattern matrix) based upon correlation matrix
+      RC4   RC2   RC1   RC3   RC5   h2    u2 com
+of1 -0.25  0.21  0.11  0.74  0.18 0.70 0.295 1.6
+of2 -0.16 -0.09 -0.19  0.87  0.07 0.84 0.161 1.2
+of5  0.20 -0.06  0.01  0.88 -0.21 0.87 0.129 1.2
+of6  0.41  0.26  0.31  0.70  0.04 0.82 0.181 2.4
+cf1  0.79 -0.30  0.15  0.26  0.23 0.85 0.150 1.8
+cf2  0.77 -0.11  0.02 -0.10  0.01 0.61 0.390 1.1
+cf3  0.67  0.32  0.12 -0.49  0.00 0.80 0.195 2.4
+cf4  0.64  0.37  0.18 -0.03  0.25 0.64 0.363 2.2
+cf5  0.88 -0.13  0.17 -0.15 -0.05 0.84 0.163 1.2
+cf6  0.79  0.21  0.09  0.29 -0.12 0.77 0.228 1.5
+ef2  0.03 -0.08  0.46 -0.09  0.73 0.77 0.233 1.7
+ef4  0.19 -0.14  0.09 -0.05  0.85 0.79 0.207 1.2
+ef5 -0.14 -0.06  0.01  0.09  0.88 0.81 0.187 1.1
+ef6  0.13 -0.50  0.50  0.22  0.59 0.91 0.086 3.3   -> sehr hohe kommunalität: raus!
+af1  0.15 -0.41  0.77  0.02  0.28 0.86 0.142 1.9
+af3  0.21  0.40  0.71  0.07  0.19 0.75 0.255 2.0
+af4  0.21  0.19  0.85 -0.21 -0.01 0.85 0.154 1.4
+af6  0.02  0.46  0.73  0.24  0.22 0.85 0.152 2.1
+nf1  0.10  0.94 -0.03 -0.07 -0.01 0.89 0.107 1.0
+nf3 -0.21  0.74  0.01 -0.07 -0.37 0.74 0.263 1.7
+nf4  0.11  0.65  0.38  0.23 -0.16 0.65 0.345 2.1
+nf6  0.00  0.88  0.21  0.13 -0.08 0.84 0.156 1.2
+# Aktion: ef6 raus
+
+
+
+
+
+
 
 

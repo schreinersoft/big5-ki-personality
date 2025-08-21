@@ -26,8 +26,10 @@ a_facets <- paste0("af", 1:6)
 n_facets <- paste0("nf", 1:6)
 
 # Korrekturen!
+o_facets <- o_facets[o_facets != "of3"]
 o_facets <- o_facets[o_facets != "of4"]
 #c_facets <- c_facets[c_facets != ""]
+e_facets <- e_facets[e_facets != "ef1"]
 e_facets <- e_facets[e_facets != "ef3"]
 a_facets <- a_facets[a_facets != "af2"]
 a_facets <- a_facets[a_facets != "af5"]
@@ -251,21 +253,15 @@ llm_analyzation_v3_optimized %>%
     sd = sd(n_llm),
     n=n()
   )
-o_facets <- o_facets[o_facets != "of4"]
-#c_facets <- c_facets[c_facets != ""]
-e_facets <- e_facets[e_facets != "ef3"]
-a_facets <- a_facets[a_facets != "af2"]
-a_facets <- a_facets[a_facets != "af5"]
-n_facets <- n_facets[n_facets != "nf2"]
-n_facets <- n_facets[n_facets != "nf5"]
+
 
 # Faktorenanalyse
 model <- '
-  Ofactor =~ of1 + of2 + of3 +       of5 + of6
+  Ofactor =~ of1 + of2 + of5 + of6
   Cfactor =~ cf1 + cf2 + cf3 + cf4 + cf5 + cf6
-  Efactor =~ ef1 + ef2 +       ef4 + ef5 + ef6
-  Afactor =~ af1 + af3 + af4 +             af6
-  Nfactor =~ nf1 +       nf3 + nf4 +       nf6
+  Efactor =~ ef2 + ef4 + ef5 + ef6
+  Afactor =~ af1 + af3 + af4 + af6
+  Nfactor =~ nf1 + nf3 + nf4 + nf6
 '
 
 facets <- llm_analyzation_v3_optimized %>% 
@@ -273,8 +269,12 @@ facets <- llm_analyzation_v3_optimized %>%
   drop_na() %>% 
   as_tibble()
 
+#fit <- cfa(model, data = facets, 
+#           estimator = "GLS")
 fit <- cfa(model, data = facets, 
-           estimator = "MLR")
+           estimator = "ML")
+
+
 #,
 #se="bootstrap",
 #bootstrap = 2000) # see CFA.md
@@ -287,6 +287,11 @@ inspect(fit, "cor.lv")
 modificationIndices(fit, sort = TRUE)
 residuals(fit, type = "standardized")
 
+# PCA
+pcModel <- principal(facets, nfactors = 5, rotate = "varimax")
+pcModel
+plot(pcModel$values, type = "b")
+
 # ANOVA der Binärgruppen
 model_oneway <- aov(o_llm ~ o_binary, data = llm_analyzation_v3_optimized)
 summary(model_oneway)
@@ -298,7 +303,6 @@ model_oneway <- aov(a_llm ~ a_binary, data = llm_analyzation_v3_optimized)
 summary(model_oneway)
 model_oneway <- aov(n_llm ~ n_binary, data = llm_analyzation_v3_optimized)
 summary(model_oneway)
-
 
 
 
