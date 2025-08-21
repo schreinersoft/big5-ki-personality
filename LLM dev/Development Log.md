@@ -116,10 +116,21 @@ af2 = 'Straightforwardness' rechts-schief, 7 extrem häufig!
 af3 = 'Altruism'            links-schief
 af4 = 'Compliance'
 af5 = 'Modesty'             doppel hoch
-af6 = 'Tender-mindedness'   links-schief
-nf1 = 'Anxiety'
+af6 = 'Tender-mindedness'   rechts-schief
+nf1 = 'Anxiety'             rechts-schief
 nf2 = 'Angry hostility'
 nf3 = 'Depression'
 nf4 = 'Self-consciousness'
-nf5 = 'Impulsiveness'
+nf5 = 'Impulsiveness'       rechts-schief
 nf6 = 'Vulnerability'
+## Aktion: Entfernen von schlechten Variablen (nach Alpha-Analyse)
+of4 = 'Actions'             (negativ gepolt)
+ef3 = 'Assertiveness'       ( -> 0.85)
+af2 = 'Straightforwardness' rechts-schief, 7 extrem häufig! (negativ gepolt)
+nf5 = 'Impulsiveness'       rechts-schief   (negativ gepolt)
+## Alpha optimiert
+O   0.7
+C   0.83
+E   0.85
+A   0.7
+N   0.75

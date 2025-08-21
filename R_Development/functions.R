@@ -66,7 +66,7 @@ histogramm <- function(data, variable, group=NULL) {
                      bins = 9, 
                      boundary = 0.5,  # Ensures bins are centered on integers
                      color = "black", fill = "lightblue") +
-      labs(title = "Histogramm",
+      labs(title = facet_names[variable],
            x = "Wert",
            y = "Anzahl") +
       scale_x_continuous(breaks = 1:9) +
@@ -79,7 +79,7 @@ histogramm <- function(data, variable, group=NULL) {
                      bins = 9, 
                      boundary = 0.5,  # Ensures bins are centered on integers
                      color = "black", fill = "lightblue") +
-      labs(title = "Histogramm",
+      labs(title = facet_names[variable],
            x = "Wert",
            y = "Anzahl") +
       scale_x_continuous(breaks = 1:9) +
