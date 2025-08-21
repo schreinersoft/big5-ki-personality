@@ -3,7 +3,7 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 * Benutzung von mehr Facetten
 * 8-Punkt-Skala gegen Tendenz zur Mitte
 * Auswahl der Facetten je nach Ergebnis: "best of"
-
+* Auch möglichkeit, schlecht messbare Faktoren weg zu lassen! (NEO als Kern?)
 
 
 # Version 1
@@ -11,6 +11,7 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 * Modell: gpt-5-mini-2025-08-07
 * Essays: 1 bis 50
 * Wiederholungen pro Essay: 10
+* Kosten: $1.60 
 * 5 * 3 BFI-2 Facetten
 
 # Version 2
@@ -19,6 +20,7 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 * Essays: 1 bis 50
 * Wiederholungen pro Essay: 5
 * Nutzung einer function
+* Kosten: ca. $0.80 
 - Function-Nutzung unklar innere Funktion: nicht mehr nehmen!
 - Komplett fehlende Normalverteilung und ANOVA-unterschiede. Sehr "chaotisches" Ergebnis: wird verworfen!
 
@@ -27,5 +29,6 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 * Modell: gpt-5-mini-2025-08-07
 * Essays: 1 bis 50
 * Wiederholungen pro Essay: 10
+* Kosten: $1.46 
 * 5 * 6 NEO-PI-R-Facetten
 

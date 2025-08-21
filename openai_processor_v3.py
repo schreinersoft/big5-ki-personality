@@ -38,7 +38,7 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                 print("DONE! All Essays processed.")
                 return
             for essay in essays:
-                print(f"V2: Processing Essay {essay.id}...")
+                print(f"V3: Processing Essay {essay.id}...")
                 for repeat in range(repeats):
                     print(f"{repeat + 1}. Repeat")
                     try:

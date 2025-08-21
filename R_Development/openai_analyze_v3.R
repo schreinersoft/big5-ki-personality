@@ -10,9 +10,9 @@ source("functions.R")
 
 # combine datasets
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
-openai_v2 <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>% collect
+openai_v3 <- tbl(con, "openai_analyzation_v3") %>% select(-updated_at) %>% collect
 # join only rows with values
-openai_joined_v2 <- left_join(essays, openai_v2, by = c("id" = "essay_id")) %>% 
+openai_joined_v3 <- left_join(essays, openai_v3, by = c("id" = "essay_id")) %>% 
   collect() %>% 
   drop_na(of1)
 
@@ -26,14 +26,14 @@ facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
 # Cronbachs alpha der Facetten
 for (facets in facet_list) {
-alpha <- openai_joined_v2 %>% 
+alpha <- openai_joined_v3 %>% 
   select(all_of(facets)) %>% 
   as_tibble() %>% 
   alpha()
 print(alpha)
 }
 
-cor_matrix <- cor(openai_joined_v2[, all_facets], use = "complete.obs")
+cor_matrix <- cor(openai_joined_v3[, all_facets], use = "complete.obs")
 # Round to 2 decimal places
 cor_matrix_rounded <- round(cor_matrix, 2)
 print(cor_matrix_rounded)
@@ -44,14 +44,14 @@ heatmap(cor_matrix,
         main = "Correlation Matrix")
 
 # convert variables to binaries
-openai_joined_v2$o_bin <- ifelse(openai_joined_v2$o_binary == "1", 1, 0)
-openai_joined_v2$c_bin <- ifelse(openai_joined_v2$c_binary == "1", 1, 0)
-openai_joined_v2$e_bin <- ifelse(openai_joined_v2$e_binary == "1", 1, 0)
-openai_joined_v2$a_bin <- ifelse(openai_joined_v2$a_binary == "1", 1, 0)
-openai_joined_v2$n_bin <- ifelse(openai_joined_v2$n_binary == "1", 1, 0)
+openai_joined_v3$o_bin <- ifelse(openai_joined_v3$o_binary == "1", 1, 0)
+openai_joined_v3$c_bin <- ifelse(openai_joined_v3$c_binary == "1", 1, 0)
+openai_joined_v3$e_bin <- ifelse(openai_joined_v3$e_binary == "1", 1, 0)
+openai_joined_v3$a_bin <- ifelse(openai_joined_v3$a_binary == "1", 1, 0)
+openai_joined_v3$n_bin <- ifelse(openai_joined_v3$n_binary == "1", 1, 0)
 
 # create aggregated results of llm calculations
-llm_aggregations <- openai_joined_v2 %>%
+llm_aggregations <- openai_joined_v3 %>%
   group_by(id) %>%
   summarise(of1 = mean(of1, na.rm = TRUE),
             cf1 = mean(cf1, na.rm = TRUE),
@@ -91,63 +91,63 @@ llm_aggregations <- openai_joined_v2 %>%
             .groups = "drop") %>% 
   rename(essay_id = id)
 
-llm_analyzation_v2 <- left_join(llm_aggregations, essays, by = c("essay_id" = "id"))
+llm_analyzation_v3 <- left_join(llm_aggregations, essays, by = c("essay_id" = "id"))
 
 
 
 # Verteilungen Facetten
-histogramm(openai_joined_v2, "of1")
-histogramm(openai_joined_v2, "of2")
-histogramm(openai_joined_v2, "of3")
-histogramm(openai_joined_v2, "of4")
-histogramm(openai_joined_v2, "of5")
-histogramm(openai_joined_v2, "of6")
+histogramm(openai_joined_v3, "of1")
+histogramm(openai_joined_v3, "of2")
+histogramm(openai_joined_v3, "of3")
+histogramm(openai_joined_v3, "of4")
+histogramm(openai_joined_v3, "of5")
+histogramm(openai_joined_v3, "of6")
 
-histogramm(openai_joined_v2, "cf1")
-histogramm(openai_joined_v2, "cf2")
-histogramm(openai_joined_v2, "cf3")
-histogramm(openai_joined_v2, "cf1")
-histogramm(openai_joined_v2, "cf2")
-histogramm(openai_joined_v2, "cf3")
+histogramm(openai_joined_v3, "cf1")
+histogramm(openai_joined_v3, "cf2")
+histogramm(openai_joined_v3, "cf3")
+histogramm(openai_joined_v3, "cf1")
+histogramm(openai_joined_v3, "cf2")
+histogramm(openai_joined_v3, "cf3")
 
-histogramm(openai_joined_v2, "ef1")
-histogramm(openai_joined_v2, "ef2")
-histogramm(openai_joined_v2, "ef3")
-histogramm(openai_joined_v2, "ef1")
-histogramm(openai_joined_v2, "ef2")
-histogramm(openai_joined_v2, "ef3")
+histogramm(openai_joined_v3, "ef1")
+histogramm(openai_joined_v3, "ef2")
+histogramm(openai_joined_v3, "ef3")
+histogramm(openai_joined_v3, "ef1")
+histogramm(openai_joined_v3, "ef2")
+histogramm(openai_joined_v3, "ef3")
 
-histogramm(openai_joined_v2, "af1")
-histogramm(openai_joined_v2, "af2")
-histogramm(openai_joined_v2, "af3")
-histogramm(openai_joined_v2, "af1")
-histogramm(openai_joined_v2, "af2")
-histogramm(openai_joined_v2, "af3")
+histogramm(openai_joined_v3, "af1")
+histogramm(openai_joined_v3, "af2")
+histogramm(openai_joined_v3, "af3")
+histogramm(openai_joined_v3, "af1")
+histogramm(openai_joined_v3, "af2")
+histogramm(openai_joined_v3, "af3")
 
-histogramm(openai_joined_v2, "nf1")
-histogramm(openai_joined_v2, "nf2")
-histogramm(openai_joined_v2, "nf3")
-histogramm(openai_joined_v2, "nf1")
-histogramm(openai_joined_v2, "nf2")
-histogramm(openai_joined_v2, "nf3")
+histogramm(openai_joined_v3, "nf1")
+histogramm(openai_joined_v3, "nf2")
+histogramm(openai_joined_v3, "nf3")
+histogramm(openai_joined_v3, "nf1")
+histogramm(openai_joined_v3, "nf2")
+histogramm(openai_joined_v3, "nf3")
 
-openai_joined_v2 %>% 
+openai_joined_v3 %>% 
   histogramm_multi(o_facets)
-openai_joined_v2 %>% 
+openai_joined_v3 %>% 
   histogramm_multi(c_facets)
-openai_joined_v2 %>% 
+openai_joined_v3 %>% 
   histogramm_multi(e_facets)
-openai_joined_v2 %>% 
+openai_joined_v3 %>% 
   histogramm_multi(a_facets)
-openai_joined_v2 %>% 
+openai_joined_v3 %>% 
   histogramm_multi(n_facets)
 
 
-violinJitter(openai_joined_v2, "nf3","n_binary")
-boxplot(openai_joined_v2, "nf3", "n_binary")
+violinJitter(openai_joined_v3, "nf3","n_binary")
+boxplot(openai_joined_v3, "nf3", "n_binary")
 
 # Verteilungskurven
-ocean <- openai_joined_v2 %>%
+ocean <- openai_joined_v3 %>%
   select(o_openai, c_openai, e_openai, a_openai, n_openai) %>%
   pivot_longer(cols = everything(), 
                names_to = "variable", 
@@ -165,77 +165,77 @@ ocean %>%
   scale_color_brewer(type = "qual", palette = "Set2") +
   scale_fill_brewer(type = "qual", palette = "Set2")
 
-openai_joined_v2 %>% 
+openai_joined_v3 %>% 
   verteilung_multi(c("o_openai", "c_openai", "e_openai", "a_openai", "n_openai"))
 
 # Verteilungen aggregierte LLM Ergebnisse
 # Vergleiche nach Binärvariable
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   verteilung("o_llm", "o_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   verteilung("c_llm", "c_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   verteilung("e_llm", "e_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   verteilung("a_llm", "a_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   verteilung("n_llm", "n_binary")  
 
 # Violins
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   violinJitter("o_llm", "o_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   violinJitter("c_llm", "c_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   violinJitter("e_llm", "e_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   violinJitter("a_llm", "a_binary")  
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   violinJitter("n_llm", "n_binary")  
 
 # Boxplots
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   boxplot("o_llm", "o_binary")
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   boxplot("c_llm", "c_binary")
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   boxplot("e_llm", "e_binary")
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   boxplot("a_llm", "a_binary")
-llm_analyzation_v2 %>% 
+llm_analyzation_v3 %>% 
   boxplot("n_llm", "n_binary")
 
 
 # Numerische Statistiken
-llm_analyzation_v2 %>%
+llm_analyzation_v3 %>%
   group_by(o_binary) %>%
   summarise(
     mean = mean(o_llm),
     sd = sd(o_llm),
     n=n()
   )
-llm_analyzation_v2 %>%
+llm_analyzation_v3 %>%
   group_by(c_binary) %>%
   summarise(
     mean = mean(c_llm),
     sd = sd(c_llm),
     n=n()
   )
-llm_analyzation_v2 %>%
+llm_analyzation_v3 %>%
   group_by(e_binary) %>%
   summarise(
     mean = mean(e_llm),
     sd = sd(e_llm),
     n=n()
   )
-llm_analyzation_v2 %>%
+llm_analyzation_v3 %>%
   group_by(a_binary) %>%
   summarise(
     mean = mean(a_llm),
     sd = sd(a_llm),
     n=n()
   )
-llm_analyzation_v2 %>%
+llm_analyzation_v3 %>%
   group_by(n_binary) %>%
   summarise(
     mean = mean(n_llm),
@@ -253,13 +253,13 @@ model <- '
   Nfactor =~ nf1 + nf2 + nf3 + nf4 + nf5 + nf6
 '
 
-facets <- llm_analyzation_v2 %>% 
+facets <- llm_analyzation_v3 %>% 
   select(all_of(all_facets)) %>% 
   drop_na() %>% 
   as_tibble()
 
 fit <- cfa(model, data = facets, 
-           estimator = "ML")
+           estimator = "MLR")
 #,
 #se="bootstrap",
 #bootstrap = 2000) # see CFA.md
@@ -273,17 +273,16 @@ modificationIndices(fit, sort = TRUE)
 residuals(fit, type = "standardized")
 
 # ANOVA der Binärgruppen
-model_oneway <- aov(o_llm ~ o_binary, data = llm_analyzation_v2)
+model_oneway <- aov(o_llm ~ o_binary, data = llm_analyzation_v3)
 summary(model_oneway)
-model_oneway <- aov(c_llm ~ c_binary, data = llm_analyzation_v2)
+model_oneway <- aov(c_llm ~ c_binary, data = llm_analyzation_v3)
 summary(model_oneway)
-model_oneway <- aov(e_llm ~ e_binary, data = llm_analyzation_v2)
+model_oneway <- aov(e_llm ~ e_binary, data = llm_analyzation_v3)
 summary(model_oneway)
-model_oneway <- aov(a_llm ~ a_binary, data = llm_analyzation_v2)
+model_oneway <- aov(a_llm ~ a_binary, data = llm_analyzation_v3)
 summary(model_oneway)
-model_oneway <- aov(n_llm ~ n_binary, data = llm_analyzation_v2)
+model_oneway <- aov(n_llm ~ n_binary, data = llm_analyzation_v3)
 summary(model_oneway)
-sink()
 
 
 

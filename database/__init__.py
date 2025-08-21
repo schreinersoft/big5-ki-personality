@@ -6,6 +6,8 @@ from .OpenAIAnalyzation import OpenAIAnalyzation
 from .OpenAIAnalyzationV2 import OpenAIAnalyzationV2
 from .OpenAIAnalyzationV3 import OpenAIAnalyzationV3
 from .MinejAnalyzation import MinejAnalyzation
+from .BenjaminEntry import BenjaminEntry
+from .WoolfEntry import WoolfEntry
 
 # Optionally, define what gets imported with import *
 __all__ = [
@@ -17,5 +19,7 @@ __all__ = [
     'OpenAIAnalyzation',
     'OpenAIAnalyzationV2',
     'OpenAIAnalyzationV3',
-    'MinejAnalyzation'
+    'MinejAnalyzation',
+    'BenjaminEntry',
+    'WoolfEntry'
 ]

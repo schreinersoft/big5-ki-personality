@@ -3,6 +3,7 @@ library(psych)
 library(lavaan)
 library(knitr)
 library(semTools)
+library(corrplot)
 
 source("connect_database.R")
 source("functions.R")
@@ -15,33 +16,33 @@ openai_joined <- left_join(essays, openai, by = c("id" = "essay_id")) %>%
   collect() %>% 
   drop_na(of1)
 
-# Cronbachs alpha der Facetten
-Oalpha <- openai_joined %>% 
-  select(of1, of2, of3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Oalpha)
-Calpha <- openai_joined %>% 
-  select(cf1, cf2, cf3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Calpha)
-Ealpha <- openai_joined %>% 
-  select(ef1, ef2, ef3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Ealpha)
-Aalpha <- openai_joined %>% 
-  select(af1, af2, af3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Aalpha)
-Nalpha <- openai_joined %>% 
-  select(nf1, nf2, nf3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Nalpha)
+o_facets <- paste0("of", 1:3)
+c_facets <- paste0("cf", 1:3)
+e_facets <- paste0("ef", 1:3)
+a_facets <- paste0("af", 1:3)
+n_facets <- paste0("nf", 1:3)
+all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
+facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
+# Cronbachs alpha der Facetten
+
+for (facets in facet_list) {
+  alpha <- openai_joined_v3 %>% 
+    select(all_of(facets)) %>% 
+    as_tibble() %>% 
+    alpha()
+  print(alpha)
+}
+
+cor_matrix <- cor(openai_joined[, all_facets], use = "complete.obs")
+# Round to 2 decimal places
+cor_matrix_rounded <- round(cor_matrix, 2)
+print(cor_matrix_rounded)
+corrplot(cor_matrix_rounded, method = "color", type = "upper", 
+         addCoef.col = "black", tl.cex = 0.8)
+heatmap(cor_matrix, 
+        col = colorRampPalette(c("blue", "white", "red"))(100),
+        main = "Correlation Matrix")
 
 # convert variables to binaries
 openai_joined$o_bin <- ifelse(openai_joined$o_binary == "1", 1, 0)
