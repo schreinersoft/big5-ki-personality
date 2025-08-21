@@ -2,16 +2,46 @@ library(tidyverse)
 library(psych)
 library(lavaan)
 library(knitr)
+library(semTools)
+
 
 source("functions.R")
 
 # combine datasets
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
-openai <- tbl(con, "openai_analyzation") %>% select(-updated_at)
+openai <- tbl(con, "openai_analyzation") %>% select(-updated_at) %>% collect
 # collect only rows with values
 openai_joined <- left_join(essays, openai, by = c("id" = "essay_id")) %>% 
   collect() %>% 
   drop_na(of1)
+
+# Cronbachs alpha der Facetten
+Oalpha <- openai_joined %>% 
+  select(of1, of2, of3) %>% 
+  as_tibble() %>% 
+  alpha()
+print(Oalpha)
+Calpha <- openai_joined %>% 
+  select(cf1, cf2, cf3) %>% 
+  as_tibble() %>% 
+  alpha()
+print(Calpha)
+Ealpha <- openai_joined %>% 
+  select(ef1, ef2, ef3) %>% 
+  as_tibble() %>% 
+  alpha()
+print(Ealpha)
+Aalpha <- openai_joined %>% 
+  select(af1, af2, af3) %>% 
+  as_tibble() %>% 
+  alpha()
+print(Aalpha)
+Nalpha <- openai_joined %>% 
+  select(nf1, nf2, nf3) %>% 
+  as_tibble() %>% 
+  alpha()
+print(Nalpha)
+
 
 # convert variables to binaries
 openai_joined$o_bin <- ifelse(openai_joined$o_binary == "1", 1, 0)
@@ -46,46 +76,14 @@ llm_aggregations <- openai_joined %>%
             .groups = "drop") %>% 
             rename(essay_id = id)
 
-llm_analyzations <- left_join(llm_aggregations, essays, by = c("essay_id" = "id"))
+data <- left_join(llm_aggregations, essays, by = c("essay_id" = "id"))
 
-# Cronbachs alpha der Facetten
-Oalpha <- openai_joined %>% 
-  select(of1, of2, of3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Oalpha)
-Calpha <- openai_joined %>% 
-  select(cf1, cf2, cf3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Calpha)
-Ealpha <- openai_joined %>% 
-  select(ef1, ef2, ef3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Ealpha)
-Aalpha <- openai_joined %>% 
-  select(af1, af2, af3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Aalpha)
-Nalpha <- openai_joined %>% 
-  select(nf1, nf2, nf3) %>% 
-  as_tibble() %>% 
-  alpha()
-print(Nalpha)
 
 
 # Verteilungen Facetten
 histogramm(openai_joined, "of1")
-histogramm(llm_analyzations, "of1")
-
 histogramm(openai_joined, "of2")
-histogramm(llm_analyzations, "of1")
-
 histogramm(openai_joined, "of3")
-openai_joined %>% 
-  histogramm_multi(c("of1", "of2", "of3"))
 
 histogramm(openai_joined, "cf1")
 histogramm(openai_joined, "cf2")
@@ -102,6 +100,20 @@ histogramm(openai_joined, "af3")
 histogramm(openai_joined, "nf1")
 histogramm(openai_joined, "nf2")
 histogramm(openai_joined, "nf3")
+
+openai_joined %>% 
+  histogramm_multi(c("of1", "of2", "of3"))
+openai_joined %>% 
+  histogramm_multi(c("cf1", "cf2", "cf3"))
+openai_joined %>% 
+  histogramm_multi(c("ef1", "ef2", "ef3"))
+openai_joined %>% 
+  histogramm_multi(c("af1", "af2", "af3"))
+openai_joined %>% 
+  histogramm_multi(c("nf1", "nf2", "nf3"))
+
+
+
 violinJitter(openai_joined, "nf3","n_binary")
 boxplot(openai_joined, "nf3", "n_binary")
 
@@ -129,72 +141,72 @@ openai_joined %>%
 
 # Verteilungen aggregierte LLM Ergebnisse
 # Vergleiche nach Binärvariable
-llm_analyzations %>% 
+data %>% 
   verteilung("o_llm", "o_binary")  
-llm_analyzations %>% 
+data %>% 
   verteilung("c_llm", "c_binary")  
-llm_analyzations %>% 
+data %>% 
   verteilung("e_llm", "e_binary")  
-llm_analyzations %>% 
+data %>% 
   verteilung("a_llm", "a_binary")  
-llm_analyzations %>% 
+data %>% 
   verteilung("of1_agg", "n_binary")  
 
 # Violins
-llm_analyzations %>% 
+data %>% 
   violinJitter("o_llm", "o_binary")  
-llm_analyzations %>% 
+data %>% 
   violinJitter("c_llm", "c_binary")  
-llm_analyzations %>% 
+data %>% 
   violinJitter("e_llm", "e_binary")  
-llm_analyzations %>% 
+data %>% 
   violinJitter("a_llm", "a_binary")  
-llm_analyzations %>% 
+data %>% 
   violinJitter("n_llm", "n_binary")  
 
 # Boxplots
-llm_analyzations %>% 
+data %>% 
   boxplot("o_llm", "o_binary")
-llm_analyzations %>% 
+data %>% 
   boxplot("c_llm", "c_binary")
-llm_analyzations %>% 
+data %>% 
   boxplot("e_llm", "e_binary")
-llm_analyzations %>% 
+data %>% 
   boxplot("a_llm", "a_binary")
-llm_analyzations %>% 
+data %>% 
   boxplot("n_llm", "n_binary")
 
 
 # Numerische Statistiken
-llm_analyzations %>%
+data %>%
   group_by(o_binary) %>%
   summarise(
     mean = mean(o_llm),
     sd = sd(o_llm),
     n=n()
   )
-llm_analyzations %>%
+data %>%
   group_by(c_binary) %>%
   summarise(
     mean = mean(c_llm),
     sd = sd(c_llm),
     n=n()
   )
-llm_analyzations %>%
+data %>%
   group_by(e_binary) %>%
   summarise(
     mean = mean(e_llm),
     sd = sd(e_llm),
     n=n()
   )
-llm_analyzations %>%
+data %>%
   group_by(a_binary) %>%
   summarise(
     mean = mean(a_llm),
     sd = sd(a_llm),
     n=n()
   )
-llm_analyzations %>%
+data %>%
   group_by(n_binary) %>%
   summarise(
     mean = mean(n_llm),
@@ -202,22 +214,8 @@ llm_analyzations %>%
     n=n()
   )
 
-# ANOVA der Binärgruppen
-model_oneway <- aov(o_llm ~ o_binary, data = llm_analyzations)
-summary(model_oneway)
-model_oneway <- aov(c_llm ~ c_binary, data = llm_analyzations)
-summary(model_oneway)
-model_oneway <- aov(e_llm ~ e_binary, data = llm_analyzations)
-summary(model_oneway)
-model_oneway <- aov(a_llm ~ a_binary, data = llm_analyzations)
-summary(model_oneway)
-model_oneway <- aov(n_llm ~ n_binary, data = llm_analyzations)
-summary(model_oneway)
-
-
 
 # Faktorenanalyse
-
 model <- '
   Ofactor =~ of1 + of2 + of3
   Cfactor =~ cf1 + cf2 + cf3
@@ -226,14 +224,37 @@ model <- '
   Nfactor =~ nf1 + nf2 + nf3
 '
 
-facets <- openai_joined %>% 
+facets <- data %>% 
   select(of1, of2, of3, cf1, cf2, cf3, ef1, ef2, ef3, af1, af2, af3, nf1, nf2, nf3) %>% 
   drop_na() %>% 
   as_tibble()
 
-fit <- cfa(model, data = facets)
-fit
+fit <- cfa(model, data = facets, 
+           estimator = "GLS")
+           #,
+           #se="bootstrap",
+           #bootstrap = 2000) # see CFA.md
 
 summary(fit, fit.measures = TRUE, standardized = TRUE)
+parameterEstimates(fit)
+standardizedSolution(fit)  # -1... +1
+reliability(fit) 
+inspect(fit, "cor.lv")
+modificationIndices(fit, sort = TRUE)
+residuals(fit, type = "standardized")
+
+# ANOVA der Binärgruppen
+model_oneway <- aov(o_llm ~ o_binary, data = data)
+summary(model_oneway)
+model_oneway <- aov(c_llm ~ c_binary, data = data)
+summary(model_oneway)
+model_oneway <- aov(e_llm ~ e_binary, data = data)
+summary(model_oneway)
+model_oneway <- aov(a_llm ~ a_binary, data = data)
+summary(model_oneway)
+model_oneway <- aov(n_llm ~ n_binary, data = data)
+summary(model_oneway)
+
+
 
 

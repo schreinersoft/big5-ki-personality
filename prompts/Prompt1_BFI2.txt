@@ -16,7 +16,6 @@ The features are:
 14. Aesthetic Sensitivity
 15. Creative Imagination
 Your output must ONLY be valid JSON, with no extra commentary or text, in the following format:
-
 {"Sociability": <1-9>,
 "Assertiveness": <1-9>,
 "Energy Level": <1-9>,

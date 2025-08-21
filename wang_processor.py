@@ -1,11 +1,4 @@
-from database.base import get_session
-from database.Essay import Essay
-from database.WangAnalyzation import WangAnalyzation
-from database.LIWCAnalyzation import LIWCAnalyzation
-from database.OpenAIAnalyzation import OpenAIAnalyzation
-from database.MinejAnalyzation import MinejAnalyzation
-
-
+from database import *
 
 import wang_classifier
 

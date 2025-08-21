@@ -1,15 +1,26 @@
 library(tidyverse)
 library(rstatix)
 
-essays <- tbl(con, "essays")
-minej <- tbl(con, "minej_analyzation")
-minej_joined <- left_join(essays, minej, by = c("id" = "essay_id"))
-minej_truncated <- minej_joined %>% filter(classification_type == "truncated")
-minej_sliding <- minej_joined %>% filter(classification_type == "slidingWindow") %>% show_query()
-
+source("connect_minej_truncatedbase.R")
 source("functions.R")
 
+essays <- tbl(con, "essays")  %>% select(-text, -author) %>% collect()
+minej <- tbl(con, "minej_analyzation")  %>% select(-updated_at,) %>% collect
+minej_joined <- left_join(essays, minej, by = c("id" = "essay_id")) %>% 
+  drop_na(o_minej)
+minej_truncated <- minej_joined %>% filter(classification_type == "truncated")
+minej_sliding <- minej_joined %>% filter(classification_type == "slidingWindow")
+
+
+# z-Normalisierung
+minej_truncated$o_minej_z = as_vector(scale(minej_truncated$o_minej))
+minej_truncated$c_minej_z = as_vector(scale(minej_truncated$c_minej))
+minej_truncated$e_minej_z = as_vector(scale(minej_truncated$e_minej))
+minej_truncated$a_minej_z = as_vector(scale(minej_truncated$a_minej))
+minej_truncated$n_minej_z = as_vector(scale(minej_truncated$n_minej))
+
 # Tests auf Normalverteilung
+# --> nur A und E normalverteilt
 vec <- minej_truncated %>%
   select(o_minej) %>% 
   pull(o_minej)
@@ -36,6 +47,7 @@ vec <- minej_truncated %>%
 ks.test(vec, "pnorm", mean(vec), sd(vec))
 
 # ANOVA der Binärgruppen
+# --> truncated alle tests signifikant!
 model_oneway <- aov(o_minej ~ o_binary, data = minej_truncated)
 summary(model_oneway)
 model_oneway <- aov(o_minej ~ o_binary, data = minej_sliding)
@@ -59,24 +71,32 @@ summary(model_oneway)
 
 # U-Tests
 # 1. Deskriptive Statistiken
-data <- minej_truncated %>% collect()
-desc_stats <- data %>%
+desc_stats <- minej_truncated %>%
   group_by(o_binary) %>%
   collect() %>% 
   summarise(
     n = n(),
     median = median(o_minej),
     iqr = IQR(o_minej),
-    mean_rank = mean(rank(data$o_minej)[data$o_binary == cur_group()[[1]]])
+    mean_rank = mean(rank(minej_truncated$o_minej)[minej_truncated$o_binary == cur_group()[[1]]])
   )
 print(desc_stats)
 
 # 2. Wilcoxon-Test
-wilcox_result <- wilcox.test(o_minej ~ o_binary, data = data)
+# --> ebenfalls alle signifikant!
+wilcox_result <- wilcox.test(o_minej ~ o_binary, data = minej_truncated)
+print(wilcox_result)
+wilcox_result <- wilcox.test(c_minej ~ c_binary, data = minej_truncated)
+print(wilcox_result)
+wilcox_result <- wilcox.test(e_minej ~ e_binary, data = minej_truncated)
+print(wilcox_result)
+wilcox_result <- wilcox.test(a_minej ~ a_binary, data = minej_truncated)
+print(wilcox_result)
+wilcox_result <- wilcox.test(n_minej ~ n_binary, data = minej_truncated)
 print(wilcox_result)
 
 # 3. Effektgröße (r)
-n <- nrow(data)
+n <- nrow(minej_truncated)
 z_score <- qnorm(wilcox_result$p.value / 2)  # Z-Wert aus p-Wert
 r <- abs(z_score) / sqrt(n)  # Effektgröße r
 
@@ -107,6 +127,7 @@ if(wilcox_result$p.value < 0.05) {
 
 # Vergleiche nach Binärvariable
 # Verteilungen
+# --> C schief
 minej_truncated %>% 
   verteilung("o_minej", "o_binary")  
 minej_truncated %>% 

@@ -16,11 +16,11 @@ con <- dbConnect(
 )
 
 # Connect to PostgreSQL
-con <- dbConnect(
-  RPostgreSQL::PostgreSQL(),
-  host = "db.schreinersoft.de",
-  port = 65432,
-  dbname = "thesis",
-  user = Sys.getenv("DB_USER"),
-  password = Sys.getenv("DB_PASSWORD")
-)
+#con <- dbConnect(
+#  RPostgreSQL::PostgreSQL(),
+#  host = "db.schreinersoft.de",
+#  port = 65432,
+#  dbname = "thesis",
+#  user = Sys.getenv("DB_USER"),
+#  password = Sys.getenv("DB_PASSWORD")
+#)

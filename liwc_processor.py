@@ -1,9 +1,4 @@
-from database.base import get_session
-from database.Essay import Essay
-from database.WangAnalyzation import WangAnalyzation
-from database.LIWCAnalyzation import LIWCAnalyzation
-from database.OpenAIAnalyzation import OpenAIAnalyzation
-from database.MinejAnalyzation import MinejAnalyzation
+from database import *
 import liwc_classifier
 
 import json
@@ -15,7 +10,7 @@ def process_liwc(batch_size: int, max_num: int):
             essays = db.query(Essay)\
                     .outerjoin(LIWCAnalyzation)\
                     .filter(LIWCAnalyzation.essay_id.is_(None))\
-                    .filter(Essay.id <= 100)\
+                    .filter(Essay.id <= 250)\
                     .limit(batch_size)\
                     .all()
 
@@ -40,4 +35,4 @@ def process_liwc(batch_size: int, max_num: int):
 
                 
 if __name__ == "__main__":
-    process_liwc(10, 1)
+    process_liwc(200, 1)
