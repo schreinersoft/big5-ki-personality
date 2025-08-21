@@ -21,3 +21,4 @@ class Essay(Base):
     minej_analyzation = relationship("MinejAnalyzation", back_populates="essay", cascade="all, delete-orphan")
     openai_analyzation = relationship("OpenAIAnalyzation", back_populates="essay", cascade="all, delete-orphan")    
     openai_analyzation_v2 = relationship("OpenAIAnalyzationV2", back_populates="essay", cascade="all, delete-orphan")    
+    openai_analyzation_v3 = relationship("OpenAIAnalyzationV3", back_populates="essay", cascade="all, delete-orphan")    

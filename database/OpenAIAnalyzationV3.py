@@ -5,15 +5,10 @@ from sqlalchemy.orm import relationship
 from database.base import Base
 
 
-class OpenAIAnalyzationV2(Base):
-    __tablename__ = 'openai_analyzation_v2'
+class OpenAIAnalyzationV3(Base):
+    __tablename__ = 'openai_analyzation_v3'
     id = Column(Integer, primary_key=True, autoincrement=True)
     essay_id = Column(Integer, ForeignKey('essays.id'), nullable=False)
-    o_openai = Column(Double)
-    c_openai = Column(Double)
-    e_openai = Column(Double)
-    a_openai = Column(Double)
-    n_openai = Column(Double)
     of1 = Column(Double)
     of2 = Column(Double)
     of3 = Column(Double)
@@ -51,6 +46,4 @@ class OpenAIAnalyzationV2(Base):
     error_response = Column(String)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    essay = relationship("Essay", back_populates="openai_analyzation_v2")
-
-
+    essay = relationship("Essay", back_populates="openai_analyzation_v3")

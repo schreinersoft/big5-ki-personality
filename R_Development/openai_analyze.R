@@ -4,13 +4,13 @@ library(lavaan)
 library(knitr)
 library(semTools)
 
-
+source("connect_database.R")
 source("functions.R")
 
 # combine datasets
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
 openai <- tbl(con, "openai_analyzation") %>% select(-updated_at) %>% collect
-# collect only rows with values
+# join only rows with values
 openai_joined <- left_join(essays, openai, by = c("id" = "essay_id")) %>% 
   collect() %>% 
   drop_na(of1)
