@@ -22,17 +22,29 @@ c_facets <- paste0("cf", 1:6)
 e_facets <- paste0("ef", 1:6)
 a_facets <- paste0("af", 1:6)
 n_facets <- paste0("nf", 1:6)
+
+# Korrekturen aus Version 3  -> auch in model raus!
+o_facets <- o_facets[o_facets != "of3"]
+o_facets <- o_facets[o_facets != "of4"]
+#c_facets <- c_facets[c_facets != ""]
+e_facets <- e_facets[e_facets != "ef1"]
+e_facets <- e_facets[e_facets != "ef3"]
+a_facets <- a_facets[a_facets != "af2"]
+a_facets <- a_facets[a_facets != "af5"]
+n_facets <- n_facets[n_facets != "nf2"]
+n_facets <- n_facets[n_facets != "nf5"]
+
 all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 
 # Cronbachs alpha der Facetten
 for (facets in facet_list) {
-alpha <- openai_joined_v2 %>% 
-  select(all_of(facets)) %>% 
-  as_tibble() %>% 
-  alpha()
-print(alpha)
+  alpha <- openai_joined_v2 %>% 
+    select(all_of(facets)) %>% 
+    as_tibble() %>% 
+    alpha()
+  print(alpha)
 }
 
 cor_matrix <- cor(openai_joined_v2[, all_facets], use = "complete.obs")
@@ -89,7 +101,7 @@ llm_aggregations <- openai_joined_v2 %>%
             c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
             e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
             a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
-            n_llm = mean(c_across(all_of(n_facets)), nf6, na.rm = TRUE),
+            n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE),
             .groups = "drop") %>% 
   rename(essay_id = id)
 
@@ -221,13 +233,13 @@ llm_analyzation_v2 %>%
   )
 
 
-# Faktorenanalyse
+# Konfirmatorische Faktorenanalyse
 model <- '
-  Ofactor =~ of1 + of2 + of3 + of4 + of5 + of6
+  Ofactor =~ of1 + of2 + of5 + of6
   Cfactor =~ cf1 + cf2 + cf3 + cf4 + cf5 + cf6
-  Efactor =~ ef1 + ef2 + ef3 + ef4 + ef5 + ef6
-  Afactor =~ af1 + af2 + af3 + af4 + af5 + af6
-  Nfactor =~ nf1 + nf2 + nf3 + nf4 + nf5 + nf6
+  Efactor =~ ef2 + ef4 + ef5 + ef6
+  Afactor =~ af1 + af3 + af4 + af6
+  Nfactor =~ nf1 + nf3 + nf4 + nf6
 '
 
 facets <- llm_analyzation_v2 %>% 
@@ -260,7 +272,7 @@ model_oneway <- aov(a_llm ~ a_binary, data = llm_analyzation_v2)
 summary(model_oneway)
 model_oneway <- aov(n_llm ~ n_binary, data = llm_analyzation_v2)
 summary(model_oneway)
-sink()
+
 
 
 

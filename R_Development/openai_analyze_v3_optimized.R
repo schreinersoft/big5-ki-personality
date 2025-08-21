@@ -111,7 +111,7 @@ llm_aggregations <- openai_joined_v3 %>%
             c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
             e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
             a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
-            n_llm = mean(c_across(all_of(n_facets)), nf6, na.rm = TRUE),
+            n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE),
             .groups = "drop") %>% 
   rename(essay_id = id)
 
@@ -256,7 +256,7 @@ llm_analyzation_v3_optimized %>%
   )
 
 
-# Faktorenanalyse
+# Konfirmatorische Faktorenanalyse
 model <- '
   Ofactor =~ of1 + of2 + of5 + of6
   Cfactor =~ cf1 + cf2 + cf3 + cf4 + cf5 + cf6
