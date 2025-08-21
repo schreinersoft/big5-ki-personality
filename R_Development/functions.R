@@ -1,4 +1,6 @@
 library(tidyverse)
+library(patchwork)
+library(purrr)
 
 verteilung <- function(data, variable, group=NULL) {
   if (is.null(group)) {
@@ -85,15 +87,31 @@ histogramm <- function(data, variable, group=NULL) {
   }
 }
 
+histogramm_sechsfach <- function(data, facets) {
+  # Liste für Plots initialisieren
+  p <- list()
+  
+  # Plots erstellen
+  for (i in 1:length(facets)) {
+    p[[i]] <- histogramm(data, facets[i])
+  }
+  
+  # 3x2 Matrix erstellen
+  return((p[[1]] | p[[2]] | p[[3]]) / (p[[4]] | p[[5]] | p[[6]]))
+}
+
 histogramm_multi <- function(data, variables) {
   data %>% 
     select(all_of(variables)) %>% 
     pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
     ggplot(aes(x = value, color = variable, fill = variable)) +
-    geom_histogram(position="dodge") +
+    geom_histogram(position="dodge",breaks = seq(0.5, 9.5, by = 1),
+                   bins = 9, 
+                   boundary = 0.5) +  # Ensures bins are centered on integers) +
     labs(title = "Verteilungen OCEAN",
          x = "Value",
          y = "Density") +
+    scale_x_continuous(breaks = 1:9) +
     theme_minimal()
 }
 

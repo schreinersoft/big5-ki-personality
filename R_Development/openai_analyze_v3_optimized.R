@@ -4,6 +4,8 @@ library(lavaan)
 library(knitr)
 library(semTools)
 library(corrplot)
+library(patchwork)
+library(purrr)
 
 source("connect_database.R")
 source("functions.R")
@@ -106,23 +108,23 @@ histogramm(openai_joined_v3, "of6")
 histogramm(openai_joined_v3, "cf1")
 histogramm(openai_joined_v3, "cf2")
 histogramm(openai_joined_v3, "cf3")
-histogramm(openai_joined_v3, "cf1")
-histogramm(openai_joined_v3, "cf2")
-histogramm(openai_joined_v3, "cf3")
+histogramm(openai_joined_v3, "cf4")
+histogramm(openai_joined_v3, "cf5")
+histogramm(openai_joined_v3, "cf6")
 
 histogramm(openai_joined_v3, "ef1")
 histogramm(openai_joined_v3, "ef2")
 histogramm(openai_joined_v3, "ef3")
-histogramm(openai_joined_v3, "ef1")
-histogramm(openai_joined_v3, "ef2")
-histogramm(openai_joined_v3, "ef3")
+histogramm(openai_joined_v3, "ef4")
+histogramm(openai_joined_v3, "ef5")
+histogramm(openai_joined_v3, "ef6")
 
 histogramm(openai_joined_v3, "af1")
 histogramm(openai_joined_v3, "af2")
 histogramm(openai_joined_v3, "af3")
-histogramm(openai_joined_v3, "af1")
-histogramm(openai_joined_v3, "af2")
-histogramm(openai_joined_v3, "af3")
+histogramm(openai_joined_v3, "af4")
+histogramm(openai_joined_v3, "af5")
+histogramm(openai_joined_v3, "af6")
 
 histogramm(openai_joined_v3, "nf1")
 histogramm(openai_joined_v3, "nf2")
@@ -131,6 +133,7 @@ histogramm(openai_joined_v3, "nf1")
 histogramm(openai_joined_v3, "nf2")
 histogramm(openai_joined_v3, "nf3")
 
+# Mehrfachhistogramme
 openai_joined_v3 %>% 
   histogramm_multi(o_facets)
 openai_joined_v3 %>% 
@@ -142,31 +145,12 @@ openai_joined_v3 %>%
 openai_joined_v3 %>% 
   histogramm_multi(n_facets)
 
+openai_joined_v3 %>% 
+  histogramm_sechsfach(n_facets)
+
 
 violinJitter(openai_joined_v3, "nf3","n_binary")
 boxplot(openai_joined_v3, "nf3", "n_binary")
-
-# Verteilungskurven
-ocean <- openai_joined_v3 %>%
-  select(o_openai, c_openai, e_openai, a_openai, n_openai) %>%
-  pivot_longer(cols = everything(), 
-               names_to = "variable", 
-               values_to = "value")
-# OCEAN gesamt
-ocean %>% 
-  ggplot(aes(x = value, color = variable, fill = variable)) +
-  geom_density(alpha = 0.3) +
-  labs(title = "Density Curves for OpenAI Variables",
-       x = "Value",
-       y = "Density",
-       color = "Variable",
-       fill = "Variable") +
-  theme_minimal() +
-  scale_color_brewer(type = "qual", palette = "Set2") +
-  scale_fill_brewer(type = "qual", palette = "Set2")
-
-openai_joined_v3 %>% 
-  verteilung_multi(c("o_openai", "c_openai", "e_openai", "a_openai", "n_openai"))
 
 # Verteilungen aggregierte LLM Ergebnisse
 # Vergleiche nach Binärvariable
