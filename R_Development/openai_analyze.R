@@ -54,11 +54,12 @@ openai_joined$n_bin <- ifelse(openai_joined$n_binary == "1", 1, 0)
 # create aggregated results of llm calculations
 llm_aggregations <- openai_joined %>%
   group_by(id) %>%
-  summarise(o_llm = mean(c(of1, of2, of3), na.rm = TRUE),
-            c_llm = mean(c(cf1, cf2, cf3), na.rm = TRUE),
-            e_llm = mean(c(ef1, ef2, ef3), na.rm = TRUE),
-            a_llm = mean(c(af1, af2, af3), na.rm = TRUE),
-            n_llm = mean(c(nf1, nf2, nf3), na.rm = TRUE),
+  summarise(
+            o_llm = mean(c_across(all_of(o_facets)), na.rm = TRUE),
+            c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
+            e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
+            a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
+            n_llm = mean(c_across(all_of(n_facets)), nf6, na.rm = TRUE),
             of1 = mean(of1, na.rm = TRUE),
             cf1 = mean(cf1, na.rm = TRUE),
             ef1 = mean(ef1, na.rm = TRUE),
