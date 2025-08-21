@@ -209,7 +209,7 @@ llm_analyzation_v1 %>%
 model <- '
   Ofactor =~ of1 + of2 + of3
   Cfactor =~ cf1 + cf2 + cf3
-  Efactor =~ ef1 + ef2 + ef3
+  Efactor =~ ef1 + ef3
   Afactor =~ af1 + af2 + af3
   Nfactor =~ nf1 + nf2 + nf3
 '
@@ -219,10 +219,10 @@ facets <- llm_analyzation_v1 %>%
   drop_na() %>% 
   as_tibble()
 
-fit <- cfa(model, data = facets, 
-           estimator = "GLS")
 #fit <- cfa(model, data = facets, 
-           #estimator = "ML")
+#           estimator = "GLS")
+fit <- cfa(model, data = facets, 
+           estimator = "ML")
            #,
            #se="bootstrap",
            #bootstrap = 2000) # see CFA.md

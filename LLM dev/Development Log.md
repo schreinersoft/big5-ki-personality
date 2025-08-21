@@ -23,7 +23,7 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 O   0.81
 C   0.83
 E   0.57      -> hui! (vergleiche V3!)    
-A   0.65           (Hinweis: bei 250 Beobachtungen besser!)
+A   0.65           (Hinweis: bei 250 Beobachtungen 0.75!)
 N   0.68
 ### Vergleich Literatur Soto John (2017):
 O   0.88
@@ -94,7 +94,69 @@ für A und N wenig verbesserungspotential!
 bei 250 Werten besser!?
 ## Aktion Schritt 2
 ef2 raus
+## Alpha
+O   0.81
+C   0.83
+E   0.66 
+A   0.65 
+N   0.68
+## CFA
+Estimator                                         ML
+Optimization method                           NLMINB
+Number of model parameters                        38
 
+Number of observations                            50
+
+Model Test User Model:
+                                                    
+Test statistic                               201.039
+Degrees of freedom                                67
+P-value (Chi-square)                           0.000
+
+Model Test Baseline Model:
+
+Test statistic                               468.929
+Degrees of freedom                                91
+P-value                                        0.000
+
+User Model versus Baseline Model:
+
+Comparative Fit Index (CFI)                    0.645   -> besser als v2 + v3 !
+Tucker-Lewis Index (TLI)                       0.518
+
+Loglikelihood and Information Criteria:
+
+Loglikelihood user model (H0)              -1052.333
+Loglikelihood unrestricted model (H1)       -951.814
+                                                    
+Akaike (AIC)                                2180.667
+Bayesian (BIC)                              2253.323
+Sample-size adjusted Bayesian (SABIC)       2134.048
+
+Root Mean Square Error of Approximation:
+
+RMSEA                                          0.200
+90 Percent confidence interval - lower         0.169
+90 Percent confidence interval - upper         0.232
+P-value H_0: RMSEA <= 0.050                    0.000
+P-value H_0: RMSEA >= 0.080                    1.000
+
+Standardized Root Mean Square Residual:
+
+SRMR                                           0.159
+## Kreuzkorrelationen
+> inspect(fit, "cor.lv")
+        Ofactr Cfactr Efactr Afactr Nfactr
+Ofactor  1.000                            
+Cfactor -0.110  1.000                     
+Efactor -0.091  0.276  1.000              
+Afactor -0.177  0.144  0.364  1.000       
+Nfactor  0.047 -0.204 -0.065 -0.426  1.000   -> noch probleme zwischen N und A
+af2 ~ nf2 undn nf3 ~= -0.4 !!
+## Aktion Schritt 3
+af2  -> nein aber das würde alpha stark verringern
+ef1 raus -> nein, besser mit anderen E's aus v3 ergänzen
+FEHLER!
 
 
 
