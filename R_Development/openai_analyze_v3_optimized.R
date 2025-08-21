@@ -25,12 +25,13 @@ e_facets <- paste0("ef", 1:6)
 a_facets <- paste0("af", 1:6)
 n_facets <- paste0("nf", 1:6)
 
-# Korrekturen!
+# Korrekturen!  -> auch in model raus!
 o_facets <- o_facets[o_facets != "of3"]
 o_facets <- o_facets[o_facets != "of4"]
 #c_facets <- c_facets[c_facets != ""]
 e_facets <- e_facets[e_facets != "ef1"]
 e_facets <- e_facets[e_facets != "ef3"]
+#e_facets <- e_facets[e_facets != "ef6"]
 a_facets <- a_facets[a_facets != "af2"]
 a_facets <- a_facets[a_facets != "af5"]
 n_facets <- n_facets[n_facets != "nf2"]
@@ -269,6 +270,8 @@ facets <- llm_analyzation_v3_optimized %>%
   drop_na() %>% 
   as_tibble()
 
+
+# CFA erst ab ca. 200 punkten sinnvoll
 #fit <- cfa(model, data = facets, 
 #           estimator = "GLS")
 fit <- cfa(model, data = facets, 

@@ -146,7 +146,7 @@ Residuals   48  63.06   1.314
 of3 = 'Feelings'            (geringe korr mit gesamt)
 ## Aktion: Kreuzkorrelation:
 ef1 - af1, af3, af6 > 0.6  -> ef1 entfernen
-ef6 - af1 > 0.6    (wird nochmal drin gelassen)
+ef6 - af1 > 0.6    
 ## Alpha
 O   0.77
 C   0.82
@@ -201,8 +201,70 @@ nf3 -0.21  0.74  0.01 -0.07 -0.37 0.74 0.263 1.7
 nf4  0.11  0.65  0.38  0.23 -0.16 0.65 0.345 2.1
 nf6  0.00  0.88  0.21  0.13 -0.08 0.84 0.156 1.2
 # Aktion: ef6 raus
+## Alpha
+O   0.77
+C   0.82
+E   0.77  -> schlechter
+A   0.79
+N   0.83
+## Korrelationsmatrix
+af1 = 'Trust' - ef2 'Gregariousness' .51 !
+## CFA
+Estimator ML
+Comparative Fit Index (CFI)                    0.568
+Tucker-Lewis Index (TLI)                       0.494
+                                                                
+Robust Comparative Fit Index (CFI)             0.479
+Robust Tucker-Lewis Index (TLI)                0.406
 
+RMSEA                                          0.206
 
+SRMR                                           0.182
+## Kreuzkorrelationen
+> inspect(fit, "cor.lv")
+        Ofactr Cfactr Efactr Afactr Nfactr
+Ofactor  1.000                            
+Cfactor  0.035  1.000                     
+Efactor -0.116  0.134  1.000              
+Afactor  0.222  0.244  0.461  1.000       
+Nfactor  0.175 -0.001 -0.076  0.525  1.000    N und A immer noch stark
+## PCA
+Call: principal(r = facets, nfactors = 5, rotate = "varimax")
+Standardized loadings (pattern matrix) based upon correlation matrix
+      RC5   RC2   RC3   RC1   RC4   h2   u2 com
+of1 -0.25  0.22  0.75  0.10  0.17 0.70 0.30 1.6
+of2 -0.16 -0.09  0.87 -0.19  0.07 0.84 0.16 1.2
+of5  0.21 -0.05  0.88  0.00 -0.23 0.87 0.13 1.3
+of6  0.41  0.25  0.70  0.33  0.03 0.83 0.17 2.4
+cf1  0.79 -0.30  0.26  0.15  0.21 0.85 0.15 1.8
+cf2  0.77 -0.10 -0.10  0.02  0.00 0.61 0.39 1.1
+cf3  0.67  0.31 -0.49  0.13  0.01 0.80 0.20 2.4
+cf4  0.64  0.37 -0.03  0.19  0.25 0.64 0.36 2.2
+cf5  0.87 -0.13 -0.15  0.17 -0.05 0.84 0.16 1.2
+cf6  0.79  0.22  0.28  0.08 -0.13 0.77 0.23 1.5
+ef2  0.03 -0.10 -0.08  0.48  0.73 0.78 0.22 1.8
+ef4  0.20 -0.16 -0.04  0.11  0.85 0.80 0.20 1.2
+ef5 -0.14 -0.08  0.10  0.02  0.88 0.81 0.19 1.1
+af1  0.15 -0.41  0.03  0.76  0.25 0.84 0.16 1.9
+af3  0.21  0.38  0.08  0.73  0.18 0.75 0.25 1.9
+af4  0.21  0.18 -0.21  0.85 -0.02 0.84 0.16 1.4
+af6  0.01  0.44  0.24  0.75  0.21 0.86 0.14 2.1
+nf1  0.09  0.95 -0.08 -0.03  0.00 0.91 0.09 1.0
+nf3 -0.22  0.73 -0.08  0.02 -0.35 0.72 0.28 1.7
+nf4  0.11  0.66  0.22  0.36 -0.17 0.66 0.34 2.0
+nf6  0.00  0.89  0.13  0.20 -0.07 0.85 0.15 1.2
+
+                       RC5  RC2  RC3  RC1  RC4
+SS loadings           3.98 3.77 3.21 3.08 2.53
+Proportion Var        0.19 0.18 0.15 0.15 0.12
+Cumulative Var        0.19 0.37 0.52 0.67 0.79
+Proportion Explained  0.24 0.23 0.19 0.19 0.15
+Cumulative Proportion 0.24 0.47 0.66 0.85 1.00
+## Aktion: ef6 wieder rein
+alpha dadurch besser
+
+## Kommentar
+insgesamt spannend, dass das LLM offensichtlich die Bedeutung der Worte versteht
 
 
 
