@@ -15,8 +15,8 @@ client = OpenAI()
 
 def classify(input_text: str, system_prompt: str, service_tier: str = "flex", temperature: int = 0.0) -> dict:
     # Call API
-    attempt = 3
-    while attempt >= 0:
+    attempt = 1
+    while attempt <= 10:
         try:
             response = client.chat.completions.create(
                 model="gpt-5-mini", # !!!XXX
@@ -32,9 +32,9 @@ def classify(input_text: str, system_prompt: str, service_tier: str = "flex", te
             return response, json.loads(json_response)
         except Exception as e:
             print(f"Failed on attempt {attempt}, retrying. Error: {e}")
-            time.sleep(3)
-            attempt -= 1
-    raise
+            time.sleep(attempt * 5)
+            attempt += 1
+    raise(f"Too many retries, aborting.")
 
 def classify_by_function(input_text: str, function: str = "", service_tier: str = "flex", temperature: int = 0.0) -> dict:
     # Call API

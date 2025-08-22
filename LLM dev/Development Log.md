@@ -450,6 +450,25 @@ Insgesamt spannend, dass das LLM offensichtlich die Bedeutung (Seamtnik) der Wor
 
 
 
-
-
+Version 4
+https://ai.google.dev/gemini-api/docs/thinking?hl=de
+* Prompt: Prompt 3: wie Prompt 1, aber mit mehr Facetten
+* Modell: gemini-2.5-flash
+* Essays: 1 bis 50
+* Wiederholungen pro Essay: 5
+* Temperaturen: 0.0, 0.2, 0.4
+* 9-Punkt-Skala
+* Kosten: 
+* 5 * 6 NEO-PI-R-Facetten
+# Temperature = 0.0
+## Alpha
+### 0.0         0.2             0.4
+O   0.51        0.43            0.5     !!!          -of4 jeweils schlechtestes
+C   0.78
+E   0.75
+A   0.52
+N   0.5
+## Kommentar
+Viel extremere Verteilungen! 
+Temperatur scheint einen durchaus großen Unterschied zu machen.
 

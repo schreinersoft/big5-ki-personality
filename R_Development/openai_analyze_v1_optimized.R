@@ -29,6 +29,7 @@ a_facets <- paste0("af", 1:3)
 n_facets <- paste0("nf", 1:3)
 
 e_facets <- e_facets[e_facets != "ef2"]  # schritt 2
+e_facets <- e_facets[e_facets != "ef1"]  # schritt 3
 
 all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
@@ -209,7 +210,7 @@ llm_analyzation_v1 %>%
 model <- '
   Ofactor =~ of1 + of2 + of3
   Cfactor =~ cf1 + cf2 + cf3
-  Efactor =~ ef1 + ef3
+  Efactor =~ ef3
   Afactor =~ af1 + af2 + af3
   Nfactor =~ nf1 + nf2 + nf3
 '

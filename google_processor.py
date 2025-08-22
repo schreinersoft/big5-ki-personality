@@ -1,5 +1,6 @@
 from database import *
-import openai_classifier
+import google_classifier
+from sqlalchemy import exists, and_, not_
 
 
 def make_system_prompt():
@@ -22,28 +23,32 @@ The features are:"""
     json += "}"
     return f"{instruction}\n{numbers}\nYour output must ONLY be valid JSON, with no extra commentary or text, in the following format:\n{json}\nDo not output anything else."
 
-def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tier: str = "flex", temperature: int = 0.0):
+def process_google(batch_size: int, max_num: int, repeats: int=2, temperature: int = 0.0):
     system_prompt = make_system_prompt()
     i = 0
     with get_session() as db:
         while i < (max_num * repeats):
+            # No special imports needed for this approach
+            excluded_essays = db.query(GoogleAnalyzation.essay_id)\
+                   .filter(GoogleAnalyzation.temperature == temperature)\
+                   .subquery()
             essays = db.query(Essay)\
-                    .outerjoin(OpenAIAnalyzationV3)\
-                    .filter(OpenAIAnalyzationV3.essay_id.is_(None))\
-                    .filter(Essay.id <=250)\
+                    .outerjoin(GoogleAnalyzation)\
+                    .filter(Essay.id <=50)\
+                    .filter(~Essay.id.in_(excluded_essays))\
                     .limit(batch_size)\
                     .all()
-
+                    #.filter(GoogleAnalyzation.essay_id.is_(None))\
             if not essays:
                 print("DONE! All Essays processed.")
                 return
             for essay in essays:
-                print(f"V3: Processing Essay {essay.id}...")
+                print(f"V4: Processing Essay {essay.id} with temperature {temperature}...")
                 for repeat in range(repeats):
                     print(f"{repeat + 1}. Repeat")
                     try:
-                        response, result = openai_classifier.classify(input_text=essay.text, system_prompt=system_prompt, temperature=0.0, service_tier=service_tier)
-                        new_openai = OpenAIAnalyzationV3(
+                        response, result = google_classifier.classify(input_text=essay.text, system_prompt=system_prompt, temperature=temperature)
+                        new_openai = GoogleAnalyzation(
                             essay_id = essay.id,
                             of1 = result['Fantasy'],
                             of2 = result['Aesthetics'],
@@ -75,13 +80,14 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                             nf4 = result['Self-consciousness'],
                             nf5 = result['Impulsiveness'],
                             nf6 = result['Vulnerability'],
-                            model = response.model,
+                            model = response.get("model_version"),
                             temperature = temperature,
-                            input_tokens = response.usage.completion_tokens,
-                            output_tokens = response.usage.prompt_tokens,
+                            input_tokens = response['usage_metadata']['prompt_token_count'],
+                            output_tokens = response['usage_metadata']['total_token_count']-response['usage_metadata']['prompt_token_count'],
                         )
                         
                         db.add(new_openai)
+                        db.commit()
                     except KeyError:
                         db.commit()
                         raise
@@ -96,12 +102,15 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                         db.add(new_openai)
                     finally:
                         i+=1
-                db.commit()
+                
 
                 
 if __name__ == "__main__":
-    process_openai_v3(5, 5000, repeats=10) #, service_tier="flex")
-
-
+    process_google(5, 50, repeats=5, temperature=1.0) 
+    process_google(5, 50, repeats=5, temperature=0.8)
+    process_google(5, 50, repeats=5, temperature=0.6)
+    # process_google(5, 50, repeats=5, temperature=0.4) 
+    # process_google(5, 50, repeats=5, temperature=0.2)
+    # process_google(5, 50, repeats=5, temperature=0.0)
 
 
