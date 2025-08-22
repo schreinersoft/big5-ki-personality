@@ -20,6 +20,14 @@ google_joined_v4 <- left_join(essays, google_v4, by = c("id" = "essay_id")) %>%
   collect() %>% 
   drop_na(of1)
 
+
+
+google_v4 %>% 
+  
+
+
+
+
 google_joined_v4$temp.factor <- as.factor(google_joined_v4$temperature)
 
 o_facets <- paste0("of", 1:6)
@@ -36,12 +44,22 @@ all_names <- facet_names[all_facets]
 
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
-temps <- list(0.0, 0.2, 0.4)
+temps <- sort(unique(google_joined_v4$temp.factor))
 
+google_v4$temp.factor <- as.factor(google_v4$temperature)
 
-
-
-
+google_v4 %>% 
+ggplot(aes(x = of6, group=temp.factor, fill=temp.factor)) +
+  geom_histogram(position="dodge",
+                 breaks = seq(0.5, 9.5, by = 1),
+                 bins = 9, 
+                 boundary = 0.5,  # Ensures bins are centered on integers
+                 color = "black") +
+  labs(title = "hist",
+       x = "Wert",
+       y = "Anzahl") +
+  scale_x_continuous(breaks = 1:9) +
+  theme_minimal() 
 
 
 # Cronbachs alpha der Facetten

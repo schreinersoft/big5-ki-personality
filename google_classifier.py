@@ -7,14 +7,14 @@ from openai_processor_v3 import make_system_prompt
 
 client = genai.Client()
 
-def classify(input_text: str = "", system_prompt: str = "", temperature: float = 0.0) -> dict:
+def classify(input_text: str = "", system_prompt: str = "", temperature: float = 0.0, model: str= "gemini-2.5-flash") -> dict:
     # Call API
     attempt = 1
     prompt = f"{system_prompt}\nTEXT TO ANALYZE: {input_text}"
     while attempt <= 10:
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=model,
                 contents=prompt,
                 config={
                     "response_mime_type": "application/json",

@@ -27,13 +27,15 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
     i = 0
     with get_session() as db:
         while i < (max_num * repeats):
+            # essays = db.query(Essay)\
+            #         .outerjoin(OpenAIAnalyzationV3)\
+            #         .filter(OpenAIAnalyzationV3.essay_id.is_(None))\
+            #         .filter(Essay.id <=250)\
+            #         .limit(batch_size)\
+            #         .all()
             essays = db.query(Essay)\
-                    .outerjoin(OpenAIAnalyzationV3)\
-                    .filter(OpenAIAnalyzationV3.essay_id.is_(None))\
-                    .filter(Essay.id <=250)\
-                    .limit(batch_size)\
+                    .filter(Essay.id ==14)\
                     .all()
-
             if not essays:
                 print("DONE! All Essays processed.")
                 return
@@ -100,7 +102,7 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
 
                 
 if __name__ == "__main__":
-    process_openai_v3(5, 5000, repeats=10) #, service_tier="flex")
+    process_openai_v3(1, 1, repeats=150) #, service_tier="flex")
 
 
 

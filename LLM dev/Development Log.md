@@ -471,4 +471,5 @@ N   0.5
 ## Kommentar
 Viel extremere Verteilungen! 
 Temperatur scheint einen durchaus großen Unterschied zu machen.
+Verteilungen werden breiter, aber Mittelwert ändert sich nicht wesentlich
 

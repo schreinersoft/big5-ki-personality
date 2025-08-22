@@ -23,20 +23,23 @@ The features are:"""
     json += "}"
     return f"{instruction}\n{numbers}\nYour output must ONLY be valid JSON, with no extra commentary or text, in the following format:\n{json}\nDo not output anything else."
 
-def process_google(batch_size: int, max_num: int, repeats: int=2, temperature: int = 0.0):
+def process_google(batch_size: int, max_num: int, repeats: int=2, temperature: int = 0.0, model: str="gemini-2.5-flash"):
     system_prompt = make_system_prompt()
     i = 0
     with get_session() as db:
         while i < (max_num * repeats):
-            # No special imports needed for this approach
-            excluded_essays = db.query(GoogleAnalyzation.essay_id)\
-                   .filter(GoogleAnalyzation.temperature == temperature)\
-                   .subquery()
+            # excluded_essays = db.query(GoogleAnalyzation.essay_id)\
+            #        .filter(GoogleAnalyzation.temperature == temperature)\
+            #        .subquery()
+            # essays = db.query(Essay)\
+            #         .outerjoin(GoogleAnalyzation)\
+            #         .filter(Essay.id <=50)\
+            #         .filter(~Essay.id.in_(excluded_essays))\
+            #         .limit(batch_size)\
+            #         .all()
+            #         #.filter(GoogleAnalyzation.essay_id.is_(None))\
             essays = db.query(Essay)\
-                    .outerjoin(GoogleAnalyzation)\
-                    .filter(Essay.id <=50)\
-                    .filter(~Essay.id.in_(excluded_essays))\
-                    .limit(batch_size)\
+                    .filter(Essay.id ==14)\
                     .all()
                     #.filter(GoogleAnalyzation.essay_id.is_(None))\
             if not essays:
@@ -47,7 +50,7 @@ def process_google(batch_size: int, max_num: int, repeats: int=2, temperature: i
                 for repeat in range(repeats):
                     print(f"{repeat + 1}. Repeat")
                     try:
-                        response, result = google_classifier.classify(input_text=essay.text, system_prompt=system_prompt, temperature=temperature)
+                        response, result = google_classifier.classify(input_text=essay.text, system_prompt=system_prompt, temperature=temperature, model=model)
                         new_openai = GoogleAnalyzation(
                             essay_id = essay.id,
                             of1 = result['Fantasy'],
@@ -106,10 +109,10 @@ def process_google(batch_size: int, max_num: int, repeats: int=2, temperature: i
 
                 
 if __name__ == "__main__":
-    process_google(5, 50, repeats=5, temperature=1.0) 
-    process_google(5, 50, repeats=5, temperature=0.8)
-    process_google(5, 50, repeats=5, temperature=0.6)
-    # process_google(5, 50, repeats=5, temperature=0.4) 
+    # process_google(5, 50, repeats=5, temperature=1.0) 
+    # process_google(5, 50, repeats=5, temperature=0.8)
+    #process_google(5, 50, repeats=5, temperature=0.6)
+    process_google(1, 1, repeats=150, temperature=1.0, model="gemini-2.5-flash-lite") 
     # process_google(5, 50, repeats=5, temperature=0.2)
     # process_google(5, 50, repeats=5, temperature=0.0)
 
