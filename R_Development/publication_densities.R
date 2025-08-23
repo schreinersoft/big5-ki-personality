@@ -95,12 +95,12 @@ plots <- list()
 i <- 1
 for (factor in all_factors){
   plots[[i]] <- essays_aggregations %>%
-    verteilung(factor)
+    verteilung_factornames(factor)
   i <- i + 1
 }
-combined_plot <- plots[[1]] | plots[[2]] | plots[[3]] | plots[[4]] | plots[[5]]
+combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
 combined_plot
-ggsave("graphics/density_openai_v1_factors.png", plot = combined_plot, dpi=300, width = 8, height = 8)
+ggsave("graphics/density_openai_v1_factors.png", plot = combined_plot, dpi=300, width = 8, height = 6)
 
 # descriptive statistics of all facets
 desc.stats <- essays_aggregations %>% 
@@ -128,11 +128,19 @@ psych_table <- desc_df %>%
   autofit() %>%
   align(j = 2:7, align = "center", part = "all")
 psych_table
-save_as_docx(psych_table, path = "tables/desc_openai_v1_factors.docx")
+save_as_docx(psych_table, path = "tables/desc_openai_v1_factors.docx")  # !!! ks-werte ergänzen!
 
-
-
-
-
+library(purrr)
+ks.tests <- list()
+i <- 1
+# Kolmogorov-Smirnov-Tests
+for (factor in all_factors){
+vec <- essays_aggregations %>%
+  select(!!sym(factor)) %>% 
+  pull(!!sym(factor))
+ks.tests[[i]] <- ks.test(vec, "pnorm", mean(vec), sd(vec))
+i <- i+1
+}
+ks.tests
 
 
