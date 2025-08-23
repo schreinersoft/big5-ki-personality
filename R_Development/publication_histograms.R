@@ -6,7 +6,7 @@ source("functions.R")
 source("BFI-2-Names.R")
 
 # Hole Messungen
-openai <- tbl(con, "openai_analyzation") %>% 
+data <- tbl(con, "data_analyzation") %>% 
   select(-updated_at) %>% 
   collect()
 
@@ -26,17 +26,17 @@ essay_number <- 42
 plots <- list()
 i <- 1
 for (facets in facets_list){
-  plots[[i]] <- openai %>%
+  plots[[i]] <- data %>%
     filter(essay_id == essay_number) %>% 
     histogramm_dreifach(facets) + plot_annotation(title=paste(facets))
   i <- i + 1
 }
 combined_plot <- (plots[[1]] / plots[[2]] / plots[[3]] / plots[[4]] / plots[[5]])
 combined_plot
-ggsave("graphics/histogramm_essay_42.png", plot = combined_plot, dpi=300, width = 8, height = 8)
+ggsave("graphics/histogramm_openai_v1_essay_42.png", plot = combined_plot, dpi=300, width = 8, height = 8)
 
 # descriptive statistics on one Essay
-desc.stats <- openai %>% 
+desc.stats <- data %>% 
   filter(essay_id==essay_number) %>% 
   select(all_of(all_facets)) %>% 
   describe()
@@ -46,15 +46,9 @@ desc_df <- desc.stats %>%
   rownames_to_column("Variable") %>%
   select(Variable, n, mean, sd, median, min, max) %>%
   mutate(
-    across(c(mean, sd, median, min, max), ~round(.x, 2)),
-    Variable = case_when(
-      Variable == "mpg" ~ "Verbrauch (mpg)",
-      Variable == "hp" ~ "PS", 
-      Variable == "wt" ~ "Gewicht",
-      Variable == "qsec" ~ "1/4 Meile Zeit",
-      TRUE ~ Variable
-    )
+    across(c(mean, sd, median, min, max), ~round(.x, 2))
   )
+
 psych_table <- desc_df %>%
   flextable() %>%
   set_header_labels(
@@ -70,5 +64,5 @@ psych_table <- desc_df %>%
   autofit() %>%
   align(j = 2:7, align = "center", part = "all")
 psych_table
-save_as_docx(psych_table, path = "tables/essay_42_desc.docx")
+save_as_docx(psych_table, path = "tables/desc_openai_v1_essay_42.docx")
 

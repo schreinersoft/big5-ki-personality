@@ -8,25 +8,81 @@ library(patchwork)
 library(purrr)
 
 verteilung <- function(data, variable, group=NULL) {
-  if (is.null(group)) {
+  mean_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    mean(na.rm = TRUE)
+  sd_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    sd(na.rm = TRUE)
+
     data %>% 
-      ggplot(aes(x = !!sym(variable))) +
-      geom_density(fill="green") +
-      labs(title = "Density",
-           x = "Value",
-           y = "Density") +
-      theme_minimal() 
-  }
-  else {
-    data %>% 
-      ggplot(aes(x = !!sym(variable), fill=!!sym(group))) +
-      geom_density(alpha=0.5) +
-      labs(title = "Density",
-           x = "Value",
-           y = "Density") +
-      theme_minimal() 
-  }
+    ggplot(aes(x = !!sym(variable))) +
+    xlim(1, 9) +
+    geom_density(color = "black",
+                 fill = "lightblue") +
+    labs(title = facet_names[variable],
+         #x = "Value",
+         y = "") +
+    stat_function(
+      fun = dnorm,  # Normal distribution function
+      args = list(mean = mean_val, sd = sd_val), 
+      color = "blue", linewidth = 0.5, linetype = "dashed"
+    ) +
+    theme_minimal() 
 }
+
+# suboptimal!
+verteilung_factornames <- function(data, variable, group=NULL) {
+  mean_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    mean(na.rm = TRUE)
+  sd_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    sd(na.rm = TRUE)
+  
+  data %>% 
+    ggplot(aes(x = !!sym(variable))) +
+    xlim(1, 9) +
+    geom_density(color = "black",
+                 fill = "lightblue") +   # XXX factor colors?
+    labs(title = factor_names[variable],
+         #x = "Value",
+         y = "") +
+    stat_function(
+      fun = dnorm,  # Normal distribution function
+      args = list(mean = mean_val, sd = sd_val), 
+      color = "blue", linewidth = 0.5, linetype = "dashed"
+    ) +
+    theme_minimal() 
+}
+
+
+
+verteilung_grouped <- function(data, variable, group) {
+  data %>% 
+    ggplot(aes(x = !!sym(variable), fill=!!sym(group))) +
+    geom_density(alpha=0.5) +
+    labs(title = "Density",
+         x = "Value",
+         y = "Density") +
+    theme_minimal() 
+}
+
+verteilung_dreifach <- function(data, facets) {
+  # Liste für Plots initialisieren
+  p <- list()
+  
+  # Plots erstellen
+  for (i in 1:length(facets)) {
+    p[[i]] <- verteilung(data, facets[i])
+  }
+  
+  # 3x2 Matrix erstellen
+  return((p[[1]] | p[[2]] | p[[3]]))
+}
+
+
+
 violinJitter <- function(data, variable, group=NULL) {
   if (is.null(group)) {
     data %>% 

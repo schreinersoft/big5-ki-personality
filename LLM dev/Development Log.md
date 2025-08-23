@@ -1,6 +1,5 @@
 TODO: 
-- Übersetzungen der Facetten!
-- Interpretation / Ausformulieren der Ergebnisse
+- Übersetzungen der Facetten NO PI R!
 
 Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einzelne ausprobiert werden und bei einer Verbesserung weiterbenutzt werden:
 * Verbesserung des Prompt Templates: Einführungtext besser / anders    -> unnötig
@@ -9,6 +8,7 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 * Auswahl der Facetten je nach Ergebnis: "best of"
 * Auch möglichkeit, schlecht messbare Faktoren weg zu lassen! (NEO als Kern?)
 * Anderes LLM? GPT-5 ? Gemini?
+* Testen mit deutscher Version?
 
 
 # Version 1
