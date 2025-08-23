@@ -9,6 +9,7 @@ liwc <- tbl(con, "liwc_analyzation")  %>% select(-updated_at, -liwc_all) %>% col
 liwc_data <- left_join(essays, liwc, by = c("id" = "essay_id")) %>% 
   drop_na(o_liwc)
 
+
 # z-Normalisierung
 liwc_data$o_liwc_z = as_vector(scale(liwc_data$o_liwc))
 liwc_data$c_liwc_z = as_vector(scale(liwc_data$c_liwc))
@@ -16,7 +17,11 @@ liwc_data$e_liwc_z = as_vector(scale(liwc_data$e_liwc))
 liwc_data$a_liwc_z = as_vector(scale(liwc_data$a_liwc))
 liwc_data$n_liwc_z = as_vector(scale(liwc_data$n_liwc))
 
-
+liwc_data$o_bin_z = ifelse(liwc_data$o_binary == "1", 1, -1)
+liwc_data$c_bin_z = ifelse(liwc_data$c_binary == "1", 1, -1)
+liwc_data$e_bin_z = ifelse(liwc_data$e_binary == "1", 1, -1)
+liwc_data$a_bin_z = ifelse(liwc_data$a_binary == "1", 1, -1)
+liwc_data$n_bin_z = ifelse(liwc_data$n_binary == "1", 1, -1)
 
 # Tests auf Normalverteilung
 # --> alle normalverteilt!
@@ -115,15 +120,15 @@ if(wilcox_result$p.value < 0.05) {
 
 # Vergleiche nach Binärvariable
 # Verteilungen
-data %>% 
+liwc_data %>% 
   verteilung("o_liwc", "o_binary")  
-data %>% 
+liwc_data %>% 
   verteilung("c_liwc", "c_binary")  
-data %>% 
+liwc_data %>% 
   verteilung("e_liwc", "e_binary")  
-data %>% 
+liwc_data %>% 
   verteilung("a_liwc", "a_binary")  
-data %>% 
+liwc_data %>% 
   verteilung("n_liwc", "n_binary")  
 
 # Einfacher Q-Q Plot
@@ -158,21 +163,8 @@ data %>%
 data %>% 
   boxplot("n_liwc", "n_binary")
 
-# Histogramme
-data %>% 
-  histogramm("o_liwc", "o_binary")
-data %>% 
-  histogramm("c_liwc", "c_binary")
-data %>% 
-  histogramm("e_liwc", "e_binary")
-data %>% 
-  histogramm("a_liwc", "a_binary")
-data %>% 
-  histogramm("n_liwc", "n_binary")
-
-
 # OCEAN gesamt
-ocean <- data %>%
+ocean <- liwc_data %>%
   select(o_liwc, c_liwc, e_liwc, a_liwc, n_liwc) %>%
   pivot_longer(cols = everything(), 
                names_to = "variable", 
