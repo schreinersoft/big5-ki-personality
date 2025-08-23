@@ -218,3 +218,5 @@ packrat/src/
 # Temporary files
 *.tmp
 *.temp
+
+~$*

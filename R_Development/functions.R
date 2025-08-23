@@ -1,4 +1,9 @@
 library(tidyverse)
+library(psych)
+library(lavaan)
+library(knitr)
+library(semTools)
+library(corrplot)
 library(patchwork)
 library(purrr)
 
@@ -58,34 +63,56 @@ verteilung_multi <- function(data, variables) {
 }
 
 
-histogramm <- function(data, variable, group=NULL) {
-  if (is.null(group)) {
-    data %>% 
-      ggplot(aes(x = !!sym(variable))) +
-      geom_histogram(breaks = seq(0.5, 9.5, by = 1),
-                     bins = 9, 
-                     boundary = 0.5,  # Ensures bins are centered on integers
-                     color = "black", fill = "lightblue") +
-      labs(title = facet_names[variable],
-           x = "Wert",
-           y = "Anzahl") +
-      scale_x_continuous(breaks = 1:9) +
-      theme_minimal() 
-  }
-  else {
-    data %>% 
-      ggplot(aes(x = !!sym(variable), fill=!!sym(group))) +
-      geom_histogram(breaks = seq(0.5, 9.5, by = 1),
-                     bins = 9, 
-                     boundary = 0.5,  # Ensures bins are centered on integers
-                     color = "black", fill = "lightblue") +
-      labs(title = facet_names[variable],
-           x = "Wert",
-           y = "Anzahl") +
-      scale_x_continuous(breaks = 1:9) +
-      theme_minimal() 
-  }
+histogramm <- function(data, variable) {
+  data %>% 
+    ggplot(aes(x = !!sym(variable))) +
+    geom_histogram(breaks = seq(0.5, 9.5, by = 1),
+                   bins = 9, 
+                   boundary = 0.5,  # Ensures bins are centered on integers
+                   color = "black", fill = "lightblue") +
+    labs(title = facet_names[variable],
+         #x = "Wert",
+         y = "") +
+    scale_x_continuous(breaks = 1:9) +
+    theme_minimal() 
 }
+
+histogramm_with_mean <- function(data, variable) {
+  mean_val <- data %>% pull(!!sym(variable)) %>% mean(na.rm = TRUE)
+  data %>% 
+    ggplot(aes(x = !!sym(variable))) +
+    geom_histogram(breaks = seq(0.5, 9.5, by = 1),
+                   bins = 9, 
+                   boundary = 0.5,  # Ensures bins are centered on integers
+                   color = "black", fill = "lightblue") +
+    geom_vline(aes(xintercept = mean_val), 
+               color = "red", linetype = "dashed", size = 1) +
+    geom_text(aes(x = mean_val, y = Inf, 
+                  label = paste(" ", round(mean_val, 2))),
+              vjust = 1.2, hjust = -0.1, color = "red", size = 4) +
+    labs(title = facet_names[variable],
+         #x = "Wert",
+         y = "") +
+    scale_x_continuous(breaks = 1:9) +
+    theme_minimal() 
+}
+
+
+
+histogramm_grouped <- function(data, variable, group) {
+  data %>% 
+    ggplot(aes(x = !!sym(variable), fill=!!sym(group))) +
+    geom_histogram(breaks = seq(0.5, 9.5, by = 1),
+                   bins = 9, 
+                   boundary = 0.5,  # Ensures bins are centered on integers
+                   color = "black", fill = "lightblue") +
+    labs(title = facet_names[variable],
+         #x = "Wert",
+         y = "") +
+    scale_x_continuous(breaks = 1:9) +
+    theme_minimal() 
+}
+
 
 histogramm_sechsfach <- function(data, facets) {
   # Liste für Plots initialisieren
@@ -112,6 +139,21 @@ histogramm_dreifach <- function(data, facets) {
   # 3x2 Matrix erstellen
   return((p[[1]] | p[[2]] | p[[3]]))
 }
+
+histogramm_fuenffach <- function(data, facets) {
+  # Liste für Plots initialisieren
+  p <- list()
+  
+  # Plots erstellen
+  for (i in 1:length(facets)) {
+    p[[i]] <- histogramm(data, facets[i])
+  }
+  
+  # 3x2 Matrix erstellen
+  return((p[[1]] | p[[2]] | p[[3]] | p[[4]] | p[[5]]))
+}
+
+
 
 histogramm_multi <- function(data, variables) {
   data %>% 
