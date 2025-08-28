@@ -7,6 +7,32 @@ library(corrplot)
 library(patchwork)
 library(purrr)
 
+
+z_verteilung_title <- function(data, variable, title, span) {
+  mean_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    mean(na.rm = TRUE)
+  sd_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    sd(na.rm = TRUE)
+  
+  data %>% 
+    ggplot(aes(x = !!sym(variable))) +
+    xlim(-span, span) +
+    geom_density(color = "black",
+                 fill = "lightblue") +
+    labs(title = title,
+         #x = "Value",
+         y = "") +
+    stat_function(
+      fun = dnorm,  # Normal distribution function
+      args = list(mean = mean_val, sd = sd_val), 
+      color = "blue", linewidth = 0.5, linetype = "dashed"
+    ) +
+    theme_minimal() 
+}
+
+
 verteilung <- function(data, variable, group=NULL) {
   mean_val <- data %>% 
     pull(!!sym(variable)) %>% 

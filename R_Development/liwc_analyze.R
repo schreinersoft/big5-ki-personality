@@ -1,8 +1,11 @@
 library(tidyverse)
 library(rstatix)
+library(psych)
+library(flextable)
 
 source("connect_database.R")
 source("functions.R")
+source("Factor-Names-EN.R")
 
 essays <- tbl(con, "essays")  %>% select(-text, -author) %>% collect()
 liwc <- tbl(con, "liwc_analyzation")  %>% select(-updated_at, -liwc_all) %>% collect
@@ -11,17 +14,17 @@ liwc_data <- left_join(essays, liwc, by = c("id" = "essay_id")) %>%
 
 
 # z-Normalisierung
-liwc_data$o_liwc_z = as_vector(scale(liwc_data$o_liwc))
-liwc_data$c_liwc_z = as_vector(scale(liwc_data$c_liwc))
-liwc_data$e_liwc_z = as_vector(scale(liwc_data$e_liwc))
-liwc_data$a_liwc_z = as_vector(scale(liwc_data$a_liwc))
-liwc_data$n_liwc_z = as_vector(scale(liwc_data$n_liwc))
+liwc_data$o_liwc_z <- as.numeric(scale(liwc_data$o_liwc))
+liwc_data$c_liwc_z <- as.numeric(scale(liwc_data$c_liwc))
+liwc_data$e_liwc_z <- as.numeric(scale(liwc_data$e_liwc))
+liwc_data$a_liwc_z <- as.numeric(scale(liwc_data$a_liwc))
+liwc_data$n_liwc_z <- as.numeric(scale(liwc_data$n_liwc))
 
-liwc_data$o_bin_z = ifelse(liwc_data$o_binary == "1", 1, -1)
-liwc_data$c_bin_z = ifelse(liwc_data$c_binary == "1", 1, -1)
-liwc_data$e_bin_z = ifelse(liwc_data$e_binary == "1", 1, -1)
-liwc_data$a_bin_z = ifelse(liwc_data$a_binary == "1", 1, -1)
-liwc_data$n_bin_z = ifelse(liwc_data$n_binary == "1", 1, -1)
+liwc_data$o_bin_z <- ifelse(liwc_data$o_binary == "1", 1, -1)
+liwc_data$c_bin_z <- ifelse(liwc_data$c_binary == "1", 1, -1)
+liwc_data$e_bin_z <- ifelse(liwc_data$e_binary == "1", 1, -1)
+liwc_data$a_bin_z <- ifelse(liwc_data$a_binary == "1", 1, -1)
+liwc_data$n_bin_z <- ifelse(liwc_data$n_binary == "1", 1, -1)
 
 # Tests auf Normalverteilung
 # --> alle normalverteilt!
@@ -50,184 +53,94 @@ vec <- liwc_data %>%
   pull(n_liwc)
 ks.test(vec, "pnorm", mean(vec), sd(vec))
 
-
-# ANOVA der Binärgruppen
-model_oneway <- aov(o_liwc ~ o_binary, data = liwc_data)
-summary(model_oneway)
-model_oneway <- aov(c_liwc ~ c_binary, data = liwc_data)
-summary(model_oneway)
-model_oneway <- aov(e_liwc ~ e_binary, data = liwc_data)
-summary(model_oneway)
-model_oneway <- aov(a_liwc ~ a_binary, data = liwc_data)
-summary(model_oneway)
-model_oneway <- aov(n_liwc ~ n_binary, data = liwc_data)
-summary(model_oneway)
-
-# U-Tests
-# 1. Deskriptive Statistiken
-desc_stats <- data %>%
-  group_by(o_binary) %>%
-  collect() %>% 
-  summarise(
-    n = n(),
-    median = median(o_liwc),
-    iqr = IQR(o_liwc),
-    mean_rank = mean(rank(data$o_liwc)[data$o_binary == cur_group()[[1]]])
-  )
-print(desc_stats)
-
-# 2. Wilcoxon-Test
-wilcox_result <- wilcox.test(o_liwc ~ o_binary, data = liwc_data)
-print(wilcox_result)
-wilcox_result <- wilcox.test(c_liwc ~ c_binary, data = liwc_data)
-print(wilcox_result)
-wilcox_result <- wilcox.test(e_liwc ~ e_binary, data = liwc_data)
-print(wilcox_result)
-wilcox_result <- wilcox.test(a_liwc ~ a_binary, data = liwc_data)
-print(wilcox_result)
-wilcox_result <- wilcox.test(n_liwc ~ n_binary, data = liwc_data)
-print(wilcox_result)
-
-# 3. Effektgröße (r)
-n <- nrow(data)
-z_score <- qnorm(wilcox_result$p.value / 2)  # Z-Wert aus p-Wert
-r <- abs(z_score) / sqrt(n)  # Effektgröße r
-
-cat("Effektgröße r:", round(r, 3), "\n")
-
-# Interpretation der Effektgröße
-if (r < 0.3) {
-  cat("Kleiner Effekt\n")
-} else if (r < 0.5) {
-  cat("Mittlerer Effekt\n")
-} else {
-  cat("Großer Effekt\n")
-}
-
-# 4. Interpretation
-cat("\nInterpretation:\n")
-if(wilcox_result$p.value < 0.05) {
-  cat("Signifikanter Unterschied zwischen den Gruppen (p =", 
-      round(wilcox_result$p.value, 4), ")\n")
-} else {
-  cat("Kein signifikanter Unterschied zwischen den Gruppen (p =", 
-      round(wilcox_result$p.value, 4), ")\n")
-}
-
-
-
-
-
 # Vergleiche nach Binärvariable
 # Verteilungen
 liwc_data %>% 
-  verteilung("o_liwc", "o_binary")  
+  z_verteilung_title("o_liwc_z", "O", 3)  
 liwc_data %>% 
-  verteilung("c_liwc", "c_binary")  
+  z_verteilung_title("c_liwc_z", "O", 3)  
 liwc_data %>% 
-  verteilung("e_liwc", "e_binary")  
+  z_verteilung_title("e_liwc_z", "O", 3)  
 liwc_data %>% 
-  verteilung("a_liwc", "a_binary")  
+  z_verteilung_title("a_liwc_z", "O", 3)  
 liwc_data %>% 
-  verteilung("n_liwc", "n_binary")  
+  z_verteilung_title("n_liwc_z", "O", 3)  
 
-# Einfacher Q-Q Plot
-data %>% 
-  ggplot(aes(sample = e_liwc)) +
-  stat_qq() +
-  stat_qq_line(color = "red") +
-  labs(title = "Q-Q Plot", x = "Theoretische Quantile", y = "Stichproben-Quantile")
+# analyze OCEAN factors of all liwc data
+plots <- list()
+plots[[1]] <- liwc_data %>% 
+    z_verteilung_title("o_liwc_z", factor_names[1], 3)  
+plots[[2]] <- liwc_data %>% 
+  z_verteilung_title("c_liwc_z", factor_names[2], 3)  
+plots[[3]] <- liwc_data %>% 
+  z_verteilung_title("e_liwc_z", factor_names[3], 3)  
+plots[[4]] <- liwc_data %>% 
+  z_verteilung_title("a_liwc_z", factor_names[4], 3)  
+plots[[5]] <- liwc_data %>% 
+  z_verteilung_title("n_liwc_z", factor_names[5], 3)  
+
+combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
+combined_plot
+ggsave("graphics/density_liwc_factors.png", plot = combined_plot, dpi=300, width = 8, height = 6)
 
 
-# Violins
-data %>% 
-  violinJitter("o_liwc", "o_binary")  
-data %>% 
-  violinJitter("c_liwc", "c_binary")  
-data %>% 
-  violinJitter("e_liwc", "e_binary")  
-data %>% 
-  violinJitter("a_liwc", "a_binary")  
-data %>% 
-  violinJitter("n_liwc", "n_binary")  
+# find out which liwc and binary codings tend to same direction
+liwc_data$o_sametendency <- ifelse(liwc_data$o_liwc_z * liwc_data$o_bin_z > 0, 1, 0)
+liwc_data$c_sametendency <- ifelse(liwc_data$c_liwc_z * liwc_data$c_bin_z > 0, 1, 0)
+liwc_data$e_sametendency <- ifelse(liwc_data$e_liwc_z * liwc_data$e_bin_z > 0, 1, 0)
+liwc_data$a_sametendency <- ifelse(liwc_data$a_liwc_z * liwc_data$a_bin_z > 0, 1, 0)
+liwc_data$n_sametendency <- ifelse(liwc_data$n_liwc_z * liwc_data$n_bin_z > 0, 1, 0)
 
-# Boxplots
-data %>% 
-  boxplot("o_liwc", "o_binary")
-data %>% 
-  boxplot("c_liwc", "c_binary")
-data %>% 
-  boxplot("e_liwc", "e_binary")
-data %>% 
-  boxplot("a_liwc", "a_binary")
-data %>% 
-  boxplot("n_liwc", "n_binary")
+liwc_data <- liwc_data %>% 
+  mutate(sametendency = rowSums(across(ends_with("_sametendency"))))
 
-# OCEAN gesamt
-ocean <- liwc_data %>%
-  select(o_liwc, c_liwc, e_liwc, a_liwc, n_liwc) %>%
-  pivot_longer(cols = everything(), 
-               names_to = "variable", 
-               values_to = "value")
+threshold <- 0.5
 
-ocean %>% 
-  ggplot(aes(x = value, color = variable, fill = variable)) +
-  geom_density(alpha = 0.3) +
-  labs(title = "Density Curves for OpenAI Variables",
-       x = "Value",
-       y = "Density",
-       color = "Variable",
-       fill = "Variable") +
-  theme_minimal() +
-  scale_color_brewer(type = "qual", palette = "Set2") +
-  scale_fill_brewer(type = "qual", palette = "Set2")
+liwc_fit <- liwc_data %>% 
+  filter(
+    (abs(o_liwc_z) > threshold) &
+    (abs(c_liwc_z) > threshold) &
+    (abs(e_liwc_z) > threshold) &
+    (abs(a_liwc_z) > threshold) &
+    (abs(n_liwc_z) > threshold)) %>% 
+  filter(sametendency ==5) # %>% 
+#  group_by(sametendency) %>% 
+#  summarize(n = n()) %>% 
+#  select(n) %>% 
+#  as.numeric()
 
-# Multi View
-data %>% 
-  verteilung_multi(c("o_liwc", "c_liwc", "e_liwc", "a_liwc", "n_liwc"))
 
-liwc_ausreisser <- data %>% filter(n_liwc < 3 && n_binary == "0")
-liwc_ausreisser  
+# calculate euclidian distances
+eucl_dist <- function (x,y) {
+  sqrt((x-y)^2)
+}
 
-# Numerische Statistiken
-data %>%
-  group_by(o_binary) %>%
-  summarise(
-    mean = mean(o_liwc),
-    sd = sd(o_liwc),
-    n=n()
-  )
+liwc_data <- liwc_data %>% 
+  mutate(o_dist = eucl_dist(o_bin_z, o_liwc_z),
+         c_dist = eucl_dist(c_bin_z, o_liwc_z),
+         e_dist = eucl_dist(e_bin_z, o_liwc_z),
+         a_dist = eucl_dist(a_bin_z, o_liwc_z),
+         n_dist = eucl_dist(n_bin_z, o_liwc_z),
+         dist = rowSums(across(ends_with("_dist"))))
 
-data %>%
-  group_by(c_binary) %>%
-  summarise(
-    mean = mean(c_liwc),
-    sd = sd(c_liwc),
-    n=n()
-  )
+describe(liwc_data$dist)
 
-data %>%
-  group_by(e_binary) %>%
-  summarise(
-    mean = mean(e_liwc),
-    sd = sd(e_liwc),
-    n=n()
-  )
+liwc_data %>% 
+  group_by(sametendency) %>% 
+  count()
 
-data %>%
-  group_by(a_binary) %>%
-  summarise(
-    mean = mean(a_liwc),
-    sd = sd(a_liwc),
-    n=n()
-  )
+# Density over all sum of distances
+liwc_data %>% 
+  ggplot(aes(x = dist)) +
+  xlim(0, max(liwc_data$dist)) +
+  geom_density(color = "black",
+               fill = "lightyellow") +
+  labs(title = "Ähnlichkeit der Bewertungen",
+       x = "Euklidische Distanz",
+       y = "Dichte") +
+  theme_minimal() 
 
-data %>%
-  group_by(n_binary) %>%
-  summarise(
-    mean = mean(n_liwc),
-    sd = sd(n_liwc),
-    n=n()
-  )
+# Number of essays by threshold
+threshold <- 
 
 

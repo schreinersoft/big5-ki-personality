@@ -62,6 +62,7 @@ combined_plot <- (plots[[1]] / plots[[2]] / plots[[3]] / plots[[4]] / plots[[5]]
 combined_plot
 ggsave("graphics/density_openai_v1_facets.png", plot = combined_plot, dpi=300, width = 8, height = 8)
 
+
 # descriptive statistics of all facets
 desc.stats <- essays_aggregations %>% 
   select(all_of(all_facets)) %>% 
