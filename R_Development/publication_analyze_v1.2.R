@@ -7,6 +7,9 @@ library(corrplot)
 library(patchwork)
 library(purrr)
 
+# Model version for printing
+modelVersion <- "v1.2"
+
 source("connect_database.R")
 source("functions.R")
 source("BFI-2-Names-EN.R")
@@ -20,9 +23,7 @@ openai <- tbl(con, "openai_analyzation") %>%
 openai_joined <- left_join(essays, openai, by = c("id" = "essay_id")) %>% 
   collect() %>% 
   drop_na(of1)
-facet_table <- openai_joined %>% 
-  select(all_of(all_facets)) %>% 
-  as_tibble()
+
 
 
 o_facets <- paste0("of", 1:3)
@@ -31,16 +32,16 @@ e_facets <- paste0("ef", 1:3)
 a_facets <- paste0("af", 1:3)
 n_facets <- paste0("nf", 1:3)
 
-#e_facets <- e_facets[e_facets != "ef2"]  # schritt 2
-#e_facets <- e_facets[e_facets != "ef1"]  # schritt 3
+e_facets <- e_facets[e_facets != "ef2"]  # schritt 2
+a_facets <- a_facets[a_facets != "af2"]  # schritt 3
 
 all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
-
-# Model version for printing
-modelVersion <- "v1.0"
+facet_table <- openai_joined %>% 
+  select(all_of(all_facets)) %>% 
+  as_tibble()
 
 
 cor_matrix <- cor(openai_joined[, all_facets], use = "complete.obs")
