@@ -37,14 +37,33 @@ summ250 <- essays250 %>%
   summarise(
     n = n(),
     O = sum(o_bin),
-    C = sum(c_bin),
-    E = sum(e_bin),
-    A = sum(a_bin),
-    N = sum(n_bin),
     Op = O / n,
+    C = sum(c_bin),
     Cp = C / n,
+    E = sum(e_bin),
     Ep = E / n,
+    A = sum(a_bin),
     Ap = A / n,
+    N = sum(n_bin),
     Np = N / n,
   )
 summ250
+
+
+psych_table <- summ %>%
+  flextable() %>%
+  set_header_labels(
+    Variable = "Datensatz",
+    n = "N",
+    O = "O",
+    OP = "Op",
+    C = "C",
+    E = "E",
+    A = "A",
+    N = "N"
+  ) %>%
+  theme_vanilla() %>%
+  autofit() %>%
+  align(j = 3:6, align = "center", part = "all")
+psych_table
+
