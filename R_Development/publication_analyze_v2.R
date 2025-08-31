@@ -21,9 +21,6 @@ all_names <- facet_names[all_facets]
 
 sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 
-print("Using facets:")
-print(all_facets)
-
 source("macros_v2.R")
 
 sink()
