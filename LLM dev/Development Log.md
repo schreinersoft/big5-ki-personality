@@ -14,7 +14,7 @@ Es gibt mehrere Möglichkeiten der Verbesserung des Modells, von denen nur einze
 # Version 1
 * Prompt: Prompt 1
 * Modell: gpt-5-mini-2025-08-07
-* Essays: 1 bis 50
+* Essays: 1 bis 250
 * Wiederholungen pro Essay: 10
 * 9-Punkt-Skala
 * Kosten: $1.60 
