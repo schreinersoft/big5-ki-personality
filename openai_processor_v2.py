@@ -1,6 +1,7 @@
 from database import *
 import openai_classifier
 
+# XXX publication: switch v2 and v3 everywhere!!!!
 
 def make_prompt():
     features = ['Fantasy', 'Aesthetics', 'Feelings', 'Actions', 'Ideas', 'Values',

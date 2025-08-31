@@ -1,12 +1,12 @@
 # Model version for printing
-modelVersion <- "v2.0"
+modelVersion <- "v3.0"
 
 source("connect_database.R")
 source("functions.R")
 source("NEO-PI-R-Names-EN.R")
 
 # combine datasets               DANGER !!! v2 in publication is v3 XXX
-data <- tbl(con, "openai_analyzation_v3") %>% select(-updated_at) %>%
+data <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>%
   collect() %>% 
   drop_na("of1")
 

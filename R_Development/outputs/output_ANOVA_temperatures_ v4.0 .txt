@@ -1,0 +1,16 @@
+[1] "ANOVA of aggregated data, factor = temperature"
+             Df Sum Sq Mean Sq F value Pr(>F)
+temp.factor   5   1.14  0.2274   0.265  0.932
+Residuals   294 252.73  0.8596               
+             Df Sum Sq Mean Sq F value Pr(>F)
+temp.factor   5    1.5  0.3077   0.165  0.975
+Residuals   294  548.0  1.8639               
+             Df Sum Sq Mean Sq F value Pr(>F)
+temp.factor   5    0.8  0.1616   0.092  0.994
+Residuals   294  518.6  1.7640               
+             Df Sum Sq Mean Sq F value Pr(>F)
+temp.factor   5   0.96  0.1929   0.222  0.953
+Residuals   294 255.01  0.8674               
+             Df Sum Sq Mean Sq F value Pr(>F)
+temp.factor   5    0.9  0.1872   0.144  0.982
+Residuals   294  381.2  1.2965               

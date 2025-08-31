@@ -107,6 +107,19 @@ verteilung_dreifach <- function(data, facets) {
   return((p[[1]] | p[[2]] | p[[3]]))
 }
 
+verteilung_sechsfach <- function(data, facets) {
+  # Liste für Plots initialisieren
+  p <- list()
+  
+  # Plots erstellen
+  for (i in 1:length(facets)) {
+    p[[i]] <- verteilung(data, facets[i])
+  }
+  
+  # 3x2 Matrix erstellen
+  return((p[[1]] | p[[2]] | p[[3]]) / (p[[4]] | p[[5]] | p[[6]]))
+}
+
 
 
 violinJitter <- function(data, variable, group=NULL) {

@@ -22,6 +22,7 @@ all_names <- facet_names[all_facets]
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
 
+
 sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 
 source("macros_v1.R")
