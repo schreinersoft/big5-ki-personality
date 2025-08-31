@@ -9,7 +9,7 @@ source("connect_database.R")
 source("functions.R")
 source("NEO-PI-R-Names.R")
 
-# combine datasets
+# combine datasets      DANGER !!! v2 is v3 in dataset!!
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
 openai_v2 <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>% collect
 # join only rows with values
