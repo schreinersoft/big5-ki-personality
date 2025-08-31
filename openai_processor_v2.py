@@ -3,7 +3,7 @@ import openai_classifier
 
 # XXX publication: switch v2 and v3 everywhere!!!!
 
-def make_prompt():
+def make_function_schema():
     features = ['Fantasy', 'Aesthetics', 'Feelings', 'Actions', 'Ideas', 'Values',
                 'Competence', 'Order', 'Dutifulness', 'Achievement striving', 'Self-Discipline', 'Deliberation',
                 'Warmth','Gregariousness','Assertiveness','Activity','Excitement seeking','Positive emotions',
@@ -33,7 +33,7 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
             essays = db.query(Essay)\
                     .outerjoin(OpenAIAnalyzationV2)\
                     .filter(OpenAIAnalyzationV2.essay_id.is_(None))\
-                    .filter(Essay.id <=100)\
+                    .filter(Essay.id <=250)\
                     .limit(batch_size)\
                     .all()
 
@@ -103,5 +103,5 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
 
                 
 if __name__ == "__main__":
-    process_openai_v3(5, 50, repeats=5) #, service_tier="default")
+    process_openai_v3(5, 1000, repeats=5) #, service_tier="default")
 

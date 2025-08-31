@@ -1,5 +1,3 @@
-source("aggregate_v4_NEO_temperature.R")
-
 # create results per temperature setting
 temperatures = data_facets$temperature %>% unique()
 
@@ -130,7 +128,7 @@ for (temp in temperatures)
     align(align = "center", part = "header") %>%
     align(j = 2:6, align = "center", part = "body") %>%
     bold(part = "header", i = 1)
-  save_as_docx(ft, path = paste("tables/loadings_", modelVersion, ".docx"))
+  save_as_docx(ft, path = paste("tables/loadings_", modelVersion, "_temp", temp, ".docx"))
   
   
   # Generiere Scree Plot 

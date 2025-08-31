@@ -1,5 +1,5 @@
 # Model version for printing
-modelVersion <- "v4.0"
+modelVersion <- "v4.1"
 
 source("connect_database.R")
 source("functions.R")
