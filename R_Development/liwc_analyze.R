@@ -94,6 +94,8 @@ liwc_data$n_sametendency <- ifelse(liwc_data$n_liwc_z * liwc_data$n_bin_z > 0, 1
 liwc_data <- liwc_data %>% 
   mutate(sametendency = rowSums(across(ends_with("_sametendency"))))
 
+
+# find out 
 threshold <- 0.5
 
 liwc_fit <- liwc_data %>% 
@@ -141,6 +143,31 @@ liwc_data %>%
   theme_minimal() 
 
 # Number of essays by threshold
-threshold <- 
+threshold <- seq(0, 15, 0.2)
 
+count_essays <- function(threshold){
+  liwc_data %>% 
+    filter(dist <= threshold) %>% 
+    count()
+}
+
+numEssays <- tibble(threshold = threshold) %>% 
+  rowwise() %>% 
+  mutate(essays = sum(count_essays(threshold)))
+
+describe(numEssays)
+
+numEssays %>% 
+  ggplot(aes(x = threshold, y = essays)) +
+  geom_col(color= "black", fill="lightyellow") + 
+  labs(title = "Essays nach Abstandsmass",
+       x = "Schwellwert",
+       y= "Anzahl") +
+  theme_minimal()
+
+numEssays %>% 
+  filter(same) %>% 
+  tibble(threshold = threshold) %>% 
+  rowwise() %>% 
+  mutate(essays = sum(count_essays(threshold)))
 
