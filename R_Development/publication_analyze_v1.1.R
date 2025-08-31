@@ -111,14 +111,54 @@ ft <- flextable(fit_data) %>%
   add_header_lines("Zusammenfassung Analyse V1") %>%
   bold(part = "header")
 
-# Print table (will render nicely in RMarkdown/Word)
 ft
 save_as_docx(ft, path = paste("tables/measures_", modelVersion, ".docx"))
 
 
+# Generiere Faktorladungen Tabelle für Word
+loadings_matrix <- faModel$loadings[]
+
+# Convert to data frame and add item names
+loadings_df <- as.data.frame(loadings_matrix)
+loadings_df$h2 = faModel$communality
+loadings_df <- round(loadings_df, 2)  # Round to 3 decimal places
+
+# Add item names as first column (adjust item names as needed)
+loadings_df$Item <- rownames(loadings_matrix)
+loadings_df <- loadings_df[, c("Item", paste0("PA", 1:5), "h2")]  # Reorder columns
+# Row mit Eigenwerten einfügen
+eigenwerte <- round(faModel$values, 2)
+loadings_df <- loadings_df %>% 
+  add_row(Item="Eigenwert",
+          PA1 = eigenwerte[1],
+          PA2 = eigenwerte[2],
+          PA3 = eigenwerte[3],
+          PA4 = eigenwerte[4],
+          PA5 = eigenwerte[5],
+          h2 = NULL,
+          .before=1)
+
+ft <- flextable(loadings_df)
+ft <- ft %>%
+  set_header_labels(
+    Item = "",
+    PA1 = "Faktor 1",
+    PA2 = "Faktor 2", 
+    PA3 = "Faktor 3",
+    PA4 = "Faktor 4",
+    PA5 = "Faktor 5",
+    h2 = "h²"
+  ) %>%
+  theme_vanilla() %>%
+  autofit() %>%
+  align(align = "center", part = "header") %>%
+  align(j = 2:6, align = "center", part = "body") %>%
+  bold(part = "header", i = 1)
+ft
+save_as_docx(ft, path = paste("tables/loadings_", modelVersion, ".docx"))
 
 
-# Scree Plot 
+# Generiere Scree Plot 
 scree_data <- data.frame(
   Component = 1:length(faModel$values),
   Eigenvalue = faModel$values
@@ -128,114 +168,10 @@ screePlot <- scree_data %>%
   geom_point(size = 3) +
   geom_line() +
   labs(
-    title = "Scree Plot",
     x = "Primärkomponente",
     y = "Eigenwert"
   ) +
   theme_minimal() +
-  scale_x_continuous(breaks = 1:length(pcModel$values))
+  scale_x_continuous(breaks = 1:length(faModel$values))
 screePlot
 ggsave(paste("graphics/screeplot_" , modelVersion, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)
-
-
-##################################################
-
-alphas <- list()
-
-# Cronbachs alpha der Facetten
-for (facets in facet_list) {
-  alpha <- openai_joined %>% 
-    select(all_of(facets)) %>% 
-    as_tibble() %>% 
-    psych::alpha()
-  print(alpha)
-}
-
-
-
-
-pcModel$RMSEA
-summary(pcModel)
-
-
-pcModelOblique <- principal(facet_table, nfactors = 5, rotate = "oblimin")
-pcModelOblique
-
-pcModelOblique <- principal(facet_table, nfactors = 5, rotate = "target")
-pcModelOblique
-
-
-
-
-
-
-
-
-
-# Eigenvalues und Varianzaufklärung
-eigenvalues <- pcModel$values[1:5]
-var_explained <- eigenvalues / sum(eigenvalues) * 100
-cumvar_explained <- cumsum(var_explained)
-
-# Übersichtstabelle
-summary_pca <- data.frame(
-  Faktor = paste("Faktor", 1:5),
-  Eigenvalue = round(eigenvalues, 2),
-  Communality = round(communality, 2),
-  Kumulative_Varianz = round(cumvar_explained, 2)
-)
-
-summary_table <- summary_pca %>%
-  flextable() %>%
-  set_header_labels(
-    Faktor = "Faktor",
-    Eigenvalue = "Eigenwert",
-    Varianz_Prozent = "Varianz (%)",
-    Kumulative_Varianz = "Kumulativ (%)"
-  ) %>%
-  theme_booktabs() %>%
-  bold(part = "header") %>%
-  # Faktoren mit Eigenwert > 1 hervorheben
-  bg(i = ~ Eigenvalue > 1.0, bg = "#f0f9ff") %>%
-  autofit() %>%
-  align(j = 2:4, align = "center", part = "all")
-print(summary_table)
-save_as_docx(summary_table, path = "pca_summary.docx")
-
-
-# PCA
-pcModel <- principal(facet_table, nfactors = 5, rotate = "varimax", scores = TRUE, residuals = TRUE)
-pcModel
-
-
-
-
-
-
-# CFA
-model <- '
-  Ofactor =~ of1 + of2 + of3
-  Cfactor =~ cf1 + cf2 + cf3
-  Efactor =~ ef1 + ef2 + ef3
-  Afactor =~ af1 + af2 + af3
-  Nfactor =~ nf1 + nf2 + nf3
-'
-
-
-
-#fit <- cfa(model, data = facets, 
-#           estimator = "GLS")
-fit <- cfa(model, data = facet_table, 
-           estimator = "ML")
-           #,
-           #se="bootstrap",
-           #bootstrap = 2000) # see CFA.md
-
-summary(fit, fit.measures = TRUE, standardized = TRUE)
-parameterEstimates(fit)
-standardizedSolution(fit)  # -1... +1
-reliability(fit) 
-inspect(fit, "cor.lv")
-modificationIndices(fit, sort = TRUE)
-residuals(fit, type = "standardized")
-

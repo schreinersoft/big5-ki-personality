@@ -6,10 +6,16 @@ library(semTools)
 library(corrplot)
 library(patchwork)
 library(purrr)
+library(flextable)
 
 source("connect_database.R")
 source("functions.R")
 source("BFI-2-Names-EN.R")
+
+
+# Model version for printing
+modelVersion <- "v1.0"
+
 
 # combine datasets
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
@@ -39,9 +45,6 @@ all_names <- facet_names[all_facets]
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
 
-# Model version for printing
-modelVersion <- "v1.0"
-
 
 cor_matrix <- cor(openai_joined[, all_facets], use = "complete.obs")
 # Round to 2 decimal places
@@ -60,6 +63,7 @@ faModel
 round(faModel$residual, 2)
 round(faModel$values, 2)
 
+# Generiere Summary für Word
 fit_summary <- data.frame(
   RMSEA = faModel$RMSEA[1],           # RMSEA point estimate
   RMSEA_lower = faModel$RMSEA[2],     # RMSEA lower bound (90% CI)
@@ -94,7 +98,6 @@ fit_data <- data.frame(
   )
 )
 
-# Create flextable
 ft <- flextable(fit_data) %>%
   set_header_labels(
     Measure = "Kenngröße",
@@ -115,9 +118,50 @@ ft
 save_as_docx(ft, path = paste("tables/measures_", modelVersion, ".docx"))
 
 
+# Generiere Faktorladungen Tabelle für Word
+loadings_matrix <- faModel$loadings[]
+
+# Convert to data frame and add item names
+loadings_df <- as.data.frame(loadings_matrix)
+loadings_df$h2 = faModel$communality
+loadings_df <- round(loadings_df, 2)  # Round to 3 decimal places
+
+# Add item names as first column (adjust item names as needed)
+loadings_df$Item <- rownames(loadings_matrix)
+loadings_df <- loadings_df[, c("Item", paste0("PA", 1:5), "h2")]  # Reorder columns
+# Row mit Eigenwerten einfügen
+eigenwerte <- round(faModel$values, 2)
+loadings_df <- loadings_df %>% 
+  add_row(Item="Eigenwert",
+           PA1 = eigenwerte[1],
+           PA2 = eigenwerte[2],
+           PA3 = eigenwerte[3],
+           PA4 = eigenwerte[4],
+           PA5 = eigenwerte[5],
+           h2 = NULL,
+           .before=1)
+                     
+ft <- flextable(loadings_df)
+ft <- ft %>%
+  set_header_labels(
+    Item = "",
+    PA1 = "Faktor 1",
+    PA2 = "Faktor 2", 
+    PA3 = "Faktor 3",
+    PA4 = "Faktor 4",
+    PA5 = "Faktor 5",
+    h2 = "h²"
+  ) %>%
+  theme_vanilla() %>%
+  autofit() %>%
+  align(align = "center", part = "header") %>%
+  align(j = 2:6, align = "center", part = "body") %>%
+  bold(part = "header", i = 1)
+ft
+save_as_docx(ft, path = paste("tables/loadings_", modelVersion, ".docx"))
 
 
-# Scree Plot 
+# Generiere Scree Plot 
 scree_data <- data.frame(
   Component = 1:length(faModel$values),
   Eigenvalue = faModel$values
@@ -127,12 +171,11 @@ screePlot <- scree_data %>%
   geom_point(size = 3) +
   geom_line() +
   labs(
-    title = "Scree Plot",
     x = "Primärkomponente",
     y = "Eigenwert"
   ) +
   theme_minimal() +
-  scale_x_continuous(breaks = 1:length(pcModel$values))
+  scale_x_continuous(breaks = 1:length(faModel$values))
 screePlot
 ggsave(paste("graphics/screeplot_" , modelVersion, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)
 
