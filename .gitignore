@@ -220,3 +220,6 @@ packrat/src/
 *.temp
 
 ~$*
+
+R_Development/graphics
+R_Development/tables

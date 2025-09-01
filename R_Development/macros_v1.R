@@ -77,7 +77,7 @@ ft <- flextable(fit_data) %>%
   align(j = 2, align = "center") %>%
   width(j = 1, width = 1.5) %>%
   width(j = 2, width = 1) %>%
-  width(j = 3, width = 1.8) %>%
+  width(j = 3, width = 1.8)
 save_as_docx(ft, path = paste("tables/measures_", modelVersion, ".docx"))
 
 

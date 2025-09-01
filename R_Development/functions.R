@@ -6,6 +6,7 @@ library(semTools)
 library(corrplot)
 library(patchwork)
 library(purrr)
+library(flextable)
 
 
 z_verteilung_title <- function(data, variable, title, span) {

@@ -25,8 +25,6 @@ def make_function_schema():
 
 def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tier: str = "flex", temperature: int = 0.0):
     
-    with open("prompts\Prompt2_NEO_PI_R.txt", "rt") as file:
-        system_prompt = file.read()
     i = 0
     with get_session() as db:
         while i < (max_num * repeats):
