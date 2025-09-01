@@ -12,7 +12,7 @@ n_facets <- c("nf1", "nf4", "nf6")
 
 all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
-all_names <- list("Creative Imagination", "Fantasy", "Aesthetics", "Ideas",
+facet_names <- list("Creative Imagination", "Fantasy", "Aesthetics", "Ideas",
                   "Productiveness", "Responsibility", "Dutifulness", "Self-Discipline",
                   "Gregariousness", "Energy Level", "Activity", "Excitement-seeking", 
                   "Compassion", "Trust", "Altruism", "Tender-mindedness", 
