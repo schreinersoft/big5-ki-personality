@@ -20,11 +20,84 @@ liwc_data$e_liwc_z <- as.numeric(scale(liwc_data$e_liwc))
 liwc_data$a_liwc_z <- as.numeric(scale(liwc_data$a_liwc))
 liwc_data$n_liwc_z <- as.numeric(scale(liwc_data$n_liwc))
 
+liwc_data$o_bin <- ifelse(liwc_data$o_binary == "1", 1, 0)
+liwc_data$c_bin <- ifelse(liwc_data$c_binary == "1", 1, 0)
+liwc_data$e_bin <- ifelse(liwc_data$e_binary == "1", 1, 0)
+liwc_data$a_bin <- ifelse(liwc_data$a_binary == "1", 1, 0)
+liwc_data$n_bin <- ifelse(liwc_data$n_binary == "1", 1, 0)
 liwc_data$o_bin_z <- ifelse(liwc_data$o_binary == "1", 1, -1)
 liwc_data$c_bin_z <- ifelse(liwc_data$c_binary == "1", 1, -1)
 liwc_data$e_bin_z <- ifelse(liwc_data$e_binary == "1", 1, -1)
 liwc_data$a_bin_z <- ifelse(liwc_data$a_binary == "1", 1, -1)
 liwc_data$n_bin_z <- ifelse(liwc_data$n_binary == "1", 1, -1)
+
+# OCEAN type
+liwc_data <- liwc_data %>% 
+  mutate(
+    ocean_type = sum(
+      o_bin * 1,
+      c_bin * 2,
+      e_bin * 4,
+      a_bin * 8,
+      n_bin * 16
+    )
+  )
+
+### create a similarity score
+liwc_data <- liwc_data %>% 
+  rowwise() %>% 
+  mutate(
+    o_liwc_z_prod = o_liwc_z * o_bin_z,
+    c_liwc_z_prod = c_liwc_z * c_bin_z,
+    e_liwc_z_prod = e_liwc_z * e_bin_z,
+    a_liwc_z_prod = a_liwc_z * a_bin_z,
+    n_liwc_z_prod = n_liwc_z * n_bin_z,
+    liwc_sim_score = sum(across(ends_with("z_prod")))
+  )
+
+# DIES wäre der Kennwert
+mean(liwc_data$liwc_sim_score)
+
+
+
+liwc_data %>% 
+  group_by(sametendency) %>% 
+  summarize(
+    n=n(),
+    mean=mean(liwc_sim_score)
+  )
+liwc_data %>% 
+  ggplot(aes(x=liwc_sim_score, group=sametendency, fill=sametendency))+
+  geom_density()
+
+numEssays <- function(threshold){
+  liwc_data %>% 
+    filter(liwc_sim_score >= threshold) %>% 
+    nrow()
+}
+
+tibble(
+  threshold = seq(-5, 10, 0.1)
+) %>% 
+  rowwise() %>% 
+  mutate(essays = numEssays(threshold)) %>% 
+  ggplot(aes(x=threshold, y=essays)) + 
+  geom_col()
+
+
+# verteilung der OCEAN Typen
+
+liwc_data %>% 
+  group_by(ocean_type) %>% 
+  summarise(
+    n = n(),
+    mean = mean(liwc_sim_score)
+  ) %>% 
+  ggplot(aes(x=ocean_type, y=n)) +
+  geom_col() +
+  theme_minimal()
+
+
 
 # Tests auf Normalverteilung
 # --> alle normalverteilt!
@@ -58,13 +131,13 @@ ks.test(vec, "pnorm", mean(vec), sd(vec))
 liwc_data %>% 
   z_verteilung_title("o_liwc_z", "O", 3)  
 liwc_data %>% 
-  z_verteilung_title("c_liwc_z", "O", 3)  
+  z_verteilung_title("c_liwc_z", "C", 3)  
 liwc_data %>% 
-  z_verteilung_title("e_liwc_z", "O", 3)  
+  z_verteilung_title("e_liwc_z", "E", 3)  
 liwc_data %>% 
-  z_verteilung_title("a_liwc_z", "O", 3)  
+  z_verteilung_title("a_liwc_z", "A", 3)  
 liwc_data %>% 
-  z_verteilung_title("n_liwc_z", "O", 3)  
+  z_verteilung_title("n_liwc_z", "N", 3)  
 
 # analyze OCEAN factors of all liwc data
 plots <- list()
@@ -84,6 +157,10 @@ combined_plot
 ggsave("graphics/density_liwc_factors.png", plot = combined_plot, dpi=300, width = 8, height = 6)
 
 
+
+
+
+
 # find out which liwc and binary codings tend to same direction
 liwc_data$o_sametendency <- ifelse(liwc_data$o_liwc_z * liwc_data$o_bin_z > 0, 1, 0)
 liwc_data$c_sametendency <- ifelse(liwc_data$c_liwc_z * liwc_data$c_bin_z > 0, 1, 0)
@@ -93,6 +170,16 @@ liwc_data$n_sametendency <- ifelse(liwc_data$n_liwc_z * liwc_data$n_bin_z > 0, 1
 
 liwc_data <- liwc_data %>% 
   mutate(sametendency = rowSums(across(ends_with("_sametendency"))))
+
+
+liwc_data %>%
+  filter(id ==86) %>% 
+  select(all_of(ends_with("_z")))
+
+
+
+
+
 
 
 # find out 
@@ -106,6 +193,7 @@ liwc_fit <- liwc_data %>%
     (abs(a_liwc_z) > threshold) &
     (abs(n_liwc_z) > threshold)) %>% 
   filter(sametendency ==5) # %>% 
+liwc_fit
 #  group_by(sametendency) %>% 
 #  summarize(n = n()) %>% 
 #  select(n) %>% 

@@ -97,7 +97,7 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
 
                 
 if __name__ == "__main__":
-    process_openai_v3(1, 40, repeats=4) #, service_tier="flex")
+    process_openai_v3(1, 460, repeats=4) #, service_tier="flex")
 
 
 

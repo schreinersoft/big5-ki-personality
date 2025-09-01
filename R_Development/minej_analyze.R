@@ -1,8 +1,9 @@
 library(tidyverse)
 library(rstatix)
 
-source("connect_minej_truncatedbase.R")
+source("connect_database.R")
 source("functions.R")
+source("Factor-Names-EN.R")
 
 essays <- tbl(con, "essays")  %>% select(-text, -author) %>% collect()
 minej <- tbl(con, "minej_analyzation")  %>% select(-updated_at,) %>% collect
@@ -10,6 +11,45 @@ minej_joined <- left_join(essays, minej, by = c("id" = "essay_id")) %>%
   drop_na(o_minej)
 minej_truncated <- minej_joined %>% filter(classification_type == "truncated")
 minej_sliding <- minej_joined %>% filter(classification_type == "slidingWindow")
+
+# suboptimal!
+verteilung_factornames_minej <- function(data, variable, group=NULL) {
+  mean_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    mean(na.rm = TRUE)
+  sd_val <- data %>% 
+    pull(!!sym(variable)) %>% 
+    sd(na.rm = TRUE)
+  
+  data %>% 
+    ggplot(aes(x = !!sym(variable))) +
+    geom_density(color = "black",
+                 fill = "lightblue") +   # XXX factor colors?
+    labs(title = factor_names[variable],
+         #x = "Value",
+         y = "") +
+    stat_function(
+      fun = dnorm,  # Normal distribution function
+      args = list(mean = mean_val, sd = sd_val), 
+      color = "blue", linewidth = 0.5, linetype = "dashed"
+    ) +
+    theme_minimal() 
+}
+
+
+
+# set up facets
+o_facets <- paste0("of", 1:6)
+c_facets <- paste0("cf", 1:6)
+e_facets <- paste0("ef", 1:6)
+a_facets <- paste0("af", 1:6)
+n_facets <- paste0("nf", 1:6)
+all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
+all_names <- facet_names[all_facets]
+facets_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
+#all_factors <- c("O", "C", "E", "A", "N")
+all_factors <- c("o_minej_z", "c_minej_z", "e_minej_z", "a_minej_z", "n_minej_z")
+all_factor_names <- factor_names[all_factors]
 
 
 # z-Normalisierung
@@ -19,32 +59,150 @@ minej_truncated$e_minej_z = as_vector(scale(minej_truncated$e_minej))
 minej_truncated$a_minej_z = as_vector(scale(minej_truncated$a_minej))
 minej_truncated$n_minej_z = as_vector(scale(minej_truncated$n_minej))
 
-# Tests auf Normalverteilung
-# --> nur A und E normalverteilt
-vec <- minej_truncated %>%
-  select(o_minej) %>% 
-  pull(o_minej)
-ks.test(vec, "pnorm", mean(vec), sd(vec))
+data_temp <- minej_truncated
 
-vec <- minej_truncated %>%
-  select(c_minej) %>% 
-  pull(c_minej)
-ks.test(vec, "pnorm", mean(vec), sd(vec))
 
-vec <- minej_truncated %>%
-  select(e_minej) %>% 
-  pull(e_minej)
-ks.test(vec, "pnorm", mean(vec), sd(vec))
+# analyze OCEAN factors of all essays
+plots <- list()
+i <- 1
+for (factor in all_factors){
+  plots[[i]] <- data_temp %>%
+    verteilung_factornames_minej(factor)
+  i <- i + 1
+}
+combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
+combined_plot
+ggsave(paste("graphics/density_", modelVersion, "_temp", temp, "_factors.png"), plot = combined_plot, dpi=300, width = 8, height = 6)
 
-vec <- minej_truncated %>%
-  select(a_minej) %>% 
-  pull(a_minej)
-ks.test(vec, "pnorm", mean(vec), sd(vec))
 
-vec <- minej_truncated %>%
-  select(n_minej) %>% 
-  pull(n_minej)
-ks.test(vec, "pnorm", mean(vec), sd(vec))
+# descriptive statistics of all facets
+desc.stats <- data_temp %>% 
+  select(all_of(all_factors)) %>% 
+  describe()
+desc_df <- desc.stats %>%
+  as.data.frame() %>%
+  rownames_to_column("Variable") %>%
+  select(Variable, n, mean, sd, median, min, max) %>%
+  mutate(
+    across(c(mean, sd, median, min, max), ~round(.x, 2))
+  )
+psych_table <- desc_df %>%
+  flextable() %>%
+  set_header_labels(
+    Variable = "Variable",
+    n = "N",
+    mean = "M",
+    sd = "SD", 
+    median = "Median",
+    min = "Min",
+    max = "Max"
+  ) %>%
+  theme_vanilla() %>%
+  autofit() %>%
+  align(j = 2:7, align = "center", part = "all")
+save_as_docx(psych_table, path = paste("tables/desc_minej_factors.docx")) 
+
+sink("outputs/analyze_desc_minej_factors.txt")
+ks.tests <- list()
+i <- 1
+# Kolmogorov-Smirnov-Tests
+for (factor in all_factors){
+  vec <- data_temp %>%
+    select(!!sym(factor)) %>% 
+    pull(!!sym(factor))
+  ks.tests[[i]] <- ks.test(vec, "pnorm", mean(vec), sd(vec))
+  i <- i+1
+}
+print(ks.tests)
+sink()
+
+
+plot0 <- data_temp %>%
+  filter(o_binary == 0) %>% 
+  z_verteilung_title("o_minej_z", "Openness 0", 3.0)
+plot1<- data_temp %>%
+  filter(o_binary == 1) %>% 
+  z_verteilung_title("o_minej_z", "Openness 1", 3.0)
+
+plot0 + plot1
+
+
+plot0 <- data_temp %>%
+  filter(c_binary == 0) %>% 
+  z_verteilung_title("c_minej_z", "Conscentiousness 0", 3.0)
+plot1<- data_temp %>%
+  filter(c_binary == 1) %>% 
+  z_verteilung_title("c_minej_z", "Conscentiousness 1", 3.0)
+
+plot0 + plot1
+
+
+plot0 <- data_temp %>%
+  filter(e_binary == 0) %>% 
+  z_verteilung_title("e_minej_z", "Extraversion 0", 3.0)
+plot1<- data_temp %>%
+  filter(e_binary == 1) %>% 
+  z_verteilung_title("e_minej_z", "Extraversion 1", 3.0)
+
+plot0 + plot1
+
+
+plot0 <- data_temp %>%
+  filter(a_binary == 0) %>% 
+  z_verteilung_title("a_minej_z", "Agreeableness 0", 3.0)
+plot1<- data_temp %>%
+  filter(a_binary == 1) %>% 
+  z_verteilung_title("a_minej_z", "Agreeableness 1", 3.0)
+
+plot0 + plot1
+
+
+plot0 <- data_temp %>%
+  filter(n_binary == 0) %>% 
+  z_verteilung_title("n_minej_z", "Neuroticism 0", 3.0)
+plot1<- data_temp %>%
+  filter(n_binary == 1) %>% 
+  z_verteilung_title("n_minej_z", "Neuroticism 1", 3.0)
+
+plot0 + plot1
+
+
+# Boxplots
+minej_truncated %>% 
+  boxplot("o_minej_z", "o_binary")
+minej_truncated %>% 
+  boxplot("c_minej_z", "c_binary")
+minej_truncated %>% 
+  boxplot("e_minej_z", "e_binary")
+minej_truncated %>% 
+  boxplot("a_minej_z", "a_binary")
+minej_truncated %>% 
+  boxplot("n_minej_z", "n_binary")
+
+
+# ANOVA der Binärgruppen
+# --> truncated alle tests signifikant!
+model_oneway <- aov(o_minej_z ~ o_binary, data = minej_truncated)
+summary(model_oneway)
+model_oneway <- aov(c_minej_z ~ c_binary, data = minej_truncated)
+summary(model_oneway)
+model_oneway <- aov(e_minej_z ~ e_binary, data = minej_truncated)
+summary(model_oneway)
+model_oneway <- aov(a_minej_z ~ a_binary, data = minej_truncated)
+summary(model_oneway)
+model_oneway <- aov(n_minej_z ~ n_binary, data = minej_truncated)
+summary(model_oneway)
+
+
+
+
+
+
+
+
+
+############################### OLD
+
 
 # ANOVA der Binärgruppen
 # --> truncated alle tests signifikant!

@@ -8,5 +8,10 @@ factor_names = c(
   'c_llm' = 'Conscentiousness',
   'e_llm' = "Extraversion",
   'a_llm' = "Agreeableness",
-  'n_llm' = "Neuroticism"
+  'n_llm' = "Neuroticism",
+  'o_minej_z' = 'Openness',
+  'c_minej_z' = 'Conscentiousness',
+  'e_minej_z' = "Extraversion",
+  'a_minej_z' = "Agreeableness",
+  'n_minej_z' = "Neuroticism"
 )

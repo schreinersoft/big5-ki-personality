@@ -1,11 +1,8 @@
-modelVersion <- "v5.0"
+modelVersion <- "v5.1"
 
 source("connect_database.R")
 source("functions.R")
 source("BFI-2-Names-EN.R")
-
-
-# XXX funzt nicht! kann raus (keine Histogramme möglich)
 
 
 ###############################
