@@ -36,6 +36,7 @@ verteilung_factornames_minej <- function(data, variable, group=NULL) {
     theme_minimal() 
 }
 
+data <- minej_truncated
 
 
 # set up facets
@@ -53,13 +54,37 @@ all_factor_names <- factor_names[all_factors]
 
 
 # z-Normalisierung
-minej_truncated$o_minej_z = as_vector(scale(minej_truncated$o_minej))
-minej_truncated$c_minej_z = as_vector(scale(minej_truncated$c_minej))
-minej_truncated$e_minej_z = as_vector(scale(minej_truncated$e_minej))
-minej_truncated$a_minej_z = as_vector(scale(minej_truncated$a_minej))
-minej_truncated$n_minej_z = as_vector(scale(minej_truncated$n_minej))
+data$o_minej_z = as.numeric(scale(data$o_minej))
+data$c_minej_z = as.numeric(scale(data$c_minej))
+data$e_minej_z = as.numeric(scale(data$e_minej))
+data$a_minej_z = as.numeric(scale(data$a_minej))
+data$n_minej_z = as.numeric(scale(data$n_minej))
+data$o_bin <- ifelse(data$o_binary == "1", 1, 0)
+data$c_bin <- ifelse(data$c_binary == "1", 1, 0)
+data$e_bin <- ifelse(data$e_binary == "1", 1, 0)
+data$a_bin <- ifelse(data$a_binary == "1", 1, 0)
+data$n_bin <- ifelse(data$n_binary == "1", 1, 0)
+data$o_bin_z <- ifelse(data$o_binary == "1", 1, -1)
+data$c_bin_z <- ifelse(data$c_binary == "1", 1, -1)
+data$e_bin_z <- ifelse(data$e_binary == "1", 1, -1)
+data$a_bin_z <- ifelse(data$a_binary == "1", 1, -1)
+data$n_bin_z <- ifelse(data$n_binary == "1", 1, -1)
 
-data_temp <- minej_truncated
+### create a data_temp score
+data <- data %>% 
+  rowwise() %>% 
+  mutate(
+    o_minej_z_prod = o_minej_z * o_bin_z,
+    c_minej_z_prod = c_minej_z * c_bin_z,
+    e_minej_z_prod = e_minej_z * e_bin_z,
+    a_minej_z_prod = a_minej_z * a_bin_z,
+    n_minej_z_prod = n_minej_z * n_bin_z,
+    minej_sim_score = sum(across(ends_with("z_prod")))
+  )
+
+# DIES wäre der Kennwert
+mean(data$minej_sim_score)
+
 
 
 # analyze OCEAN factors of all essays
@@ -168,29 +193,29 @@ plot0 + plot1
 
 
 # Boxplots
-minej_truncated %>% 
+data %>% 
   boxplot("o_minej_z", "o_binary")
-minej_truncated %>% 
+data %>% 
   boxplot("c_minej_z", "c_binary")
-minej_truncated %>% 
+data %>% 
   boxplot("e_minej_z", "e_binary")
-minej_truncated %>% 
+data %>% 
   boxplot("a_minej_z", "a_binary")
-minej_truncated %>% 
+data %>% 
   boxplot("n_minej_z", "n_binary")
 
 
 # ANOVA der Binärgruppen
 # --> truncated alle tests signifikant!
-model_oneway <- aov(o_minej_z ~ o_binary, data = minej_truncated)
+model_oneway <- aov(o_minej_z ~ o_binary, data = data)
 summary(model_oneway)
-model_oneway <- aov(c_minej_z ~ c_binary, data = minej_truncated)
+model_oneway <- aov(c_minej_z ~ c_binary, data = data)
 summary(model_oneway)
-model_oneway <- aov(e_minej_z ~ e_binary, data = minej_truncated)
+model_oneway <- aov(e_minej_z ~ e_binary, data = data)
 summary(model_oneway)
-model_oneway <- aov(a_minej_z ~ a_binary, data = minej_truncated)
+model_oneway <- aov(a_minej_z ~ a_binary, data = data)
 summary(model_oneway)
-model_oneway <- aov(n_minej_z ~ n_binary, data = minej_truncated)
+model_oneway <- aov(n_minej_z ~ n_binary, data = data)
 summary(model_oneway)
 
 
@@ -206,55 +231,55 @@ summary(model_oneway)
 
 # ANOVA der Binärgruppen
 # --> truncated alle tests signifikant!
-model_oneway <- aov(o_minej ~ o_binary, data = minej_truncated)
+model_oneway <- aov(o_minej ~ o_binary, data = data)
 summary(model_oneway)
 model_oneway <- aov(o_minej ~ o_binary, data = minej_sliding)
 summary(model_oneway)
-model_oneway <- aov(c_minej ~ c_binary, data = minej_truncated)
+model_oneway <- aov(c_minej ~ c_binary, data = data)
 summary(model_oneway)
 model_oneway <- aov(c_minej ~ c_binary, data = minej_sliding)
 summary(model_oneway)
-model_oneway <- aov(e_minej ~ e_binary, data = minej_truncated)
+model_oneway <- aov(e_minej ~ e_binary, data = data)
 summary(model_oneway)
 model_oneway <- aov(e_minej ~ e_binary, data = minej_sliding)
 summary(model_oneway)
-model_oneway <- aov(a_minej ~ a_binary, data = minej_truncated)
+model_oneway <- aov(a_minej ~ a_binary, data = data)
 summary(model_oneway)
 model_oneway <- aov(a_minej ~ a_binary, data = minej_sliding)
 summary(model_oneway)
-model_oneway <- aov(n_minej ~ n_binary, data = minej_truncated)
+model_oneway <- aov(n_minej ~ n_binary, data = data)
 summary(model_oneway)
 model_oneway <- aov(n_minej ~ n_binary, data = minej_sliding)
 summary(model_oneway)
 
 # U-Tests
 # 1. Deskriptive Statistiken
-desc_stats <- minej_truncated %>%
+desc_stats <- data %>%
   group_by(o_binary) %>%
   collect() %>% 
   summarise(
     n = n(),
     median = median(o_minej),
     iqr = IQR(o_minej),
-    mean_rank = mean(rank(minej_truncated$o_minej)[minej_truncated$o_binary == cur_group()[[1]]])
+    mean_rank = mean(rank(data$o_minej)[data$o_binary == cur_group()[[1]]])
   )
 print(desc_stats)
 
 # 2. Wilcoxon-Test
 # --> ebenfalls alle signifikant!
-wilcox_result <- wilcox.test(o_minej ~ o_binary, data = minej_truncated)
+wilcox_result <- wilcox.test(o_minej ~ o_binary, data = data)
 print(wilcox_result)
-wilcox_result <- wilcox.test(c_minej ~ c_binary, data = minej_truncated)
+wilcox_result <- wilcox.test(c_minej ~ c_binary, data = data)
 print(wilcox_result)
-wilcox_result <- wilcox.test(e_minej ~ e_binary, data = minej_truncated)
+wilcox_result <- wilcox.test(e_minej ~ e_binary, data = data)
 print(wilcox_result)
-wilcox_result <- wilcox.test(a_minej ~ a_binary, data = minej_truncated)
+wilcox_result <- wilcox.test(a_minej ~ a_binary, data = data)
 print(wilcox_result)
-wilcox_result <- wilcox.test(n_minej ~ n_binary, data = minej_truncated)
+wilcox_result <- wilcox.test(n_minej ~ n_binary, data = data)
 print(wilcox_result)
 
 # 3. Effektgröße (r)
-n <- nrow(minej_truncated)
+n <- nrow(data)
 z_score <- qnorm(wilcox_result$p.value / 2)  # Z-Wert aus p-Wert
 r <- abs(z_score) / sqrt(n)  # Effektgröße r
 
@@ -286,19 +311,19 @@ if(wilcox_result$p.value < 0.05) {
 # Vergleiche nach Binärvariable
 # Verteilungen
 # --> C schief
-minej_truncated %>% 
+data %>% 
   verteilung("o_minej", "o_binary")  
-minej_truncated %>% 
+data %>% 
   verteilung("c_minej", "c_binary")  
-minej_truncated %>% 
+data %>% 
   verteilung("e_minej", "e_binary")  
-minej_truncated %>% 
+data %>% 
   verteilung("a_minej", "a_binary")  
-minej_truncated %>% 
+data %>% 
   verteilung("n_minej", "n_binary")  
 
 # Einfacher Q-Q Plot
-minej_truncated %>% 
+data %>% 
   ggplot(aes(sample = e_minej)) +
   stat_qq() +
   stat_qq_line(color = "red") +
@@ -377,7 +402,7 @@ minej_joined %>%
     n=n()
   )
 
-minej_truncated %>%
+data %>%
   group_by(n_binary) %>%
   summarise(
     mean = mean(n_minej),
