@@ -42,3 +42,4 @@ data_aggregated <- data %>%
 data_facets <- data_aggregated %>% 
   select(all_of(all_facets)) %>% 
   as_tibble()
+

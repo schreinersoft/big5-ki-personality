@@ -66,6 +66,10 @@ data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id"
 data_facets <- data_aggregated %>% 
   select(all_of(all_facets))
 
+sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+source("omega.R")
+sink()
+
 sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 
 source("macros_v5.R")

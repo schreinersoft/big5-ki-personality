@@ -34,6 +34,12 @@ facet_table <- openai_joined %>%
   select(all_of(all_facets)) %>% 
   as_tibble()
 
+source("aggregate_v1_BFI.R")
+
+sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+source("omega.R")
+sink()
+
 
 sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 

@@ -4,8 +4,6 @@ print("Using facets:")
 print(all_facets)
 print("")
 
-source("aggregate_v1_BFI.R")
-
 # Korrelationsmatrix
 cor_matrix <- cor(data_facets, use = "complete.obs")
 # Round to 2 decimal places

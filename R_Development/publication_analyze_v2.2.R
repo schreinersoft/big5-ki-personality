@@ -43,3 +43,8 @@ sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 source("macros_v2.R")
 
 sink()
+
+
+
+
+
