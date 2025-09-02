@@ -26,10 +26,19 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
     i = 0
     with get_session() as db:
         while i < (max_num * repeats):
+            # essays = db.query(Essay)\
+            #         .outerjoin(OpenAIAnalyzationV5)\
+            #         .filter(OpenAIAnalyzationV5.essay_id.is_(None))\
+            #         .filter(Essay.id <=250)\
+            #         .limit(batch_size)\
+            #         .all()
+            excluded_essays = db.query(OpenAIAnalyzationV5.essay_id)\
+                   .filter(OpenAIAnalyzationV5.model.startswith("gpt-5-mini"))\
+                   .subquery()
             essays = db.query(Essay)\
                     .outerjoin(OpenAIAnalyzationV5)\
-                    .filter(OpenAIAnalyzationV5.essay_id.is_(None))\
-                    .filter(Essay.id <=250)\
+                    .filter(Essay.id <=500)\
+                    .filter(~Essay.id.in_(excluded_essays))\
                     .limit(batch_size)\
                     .all()
             if not essays:
@@ -84,6 +93,7 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                     finally:
                         i+=1
                 db.commit()
+                print("committed!")
 
                 
 if __name__ == "__main__":

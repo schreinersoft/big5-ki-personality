@@ -80,10 +80,10 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                         
                         db.add(new_openai)
                     except KeyError:
-                        db.commit()
+                        #db.commit()
                         raise
                     except Exception as e:
-                        db.commit()
+                        #db.commit()
                         raise(e)
                         # Store error message
                         new_openai = OpenAIAnalyzationV5(
