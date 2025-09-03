@@ -22,6 +22,17 @@ facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 
 source("aggregate_v4_NEO_temperature.R")
+
+data_facets <- data_facets %>% 
+  filter(temperature==0.0) %>% 
+  select(all_of(all_facets))
+
+sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+source("omega.R")
+sink()
+
+
+
 source("macros_v4.R")
 
 # Speziell Analyse Temperatur Faktoren

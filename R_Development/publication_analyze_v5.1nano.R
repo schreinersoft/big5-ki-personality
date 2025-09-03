@@ -19,6 +19,8 @@ facet_names <- list("Creative Imagination", "Fantasy", "Aesthetics", "Ideas",
                   "Compassion", "Trust", "Altruism", "Tender-mindedness", 
                   "Anxiety", "Self-consciousness", "Vulnerability")
 
+
+
 # NANO MODEL!
 # combine V1 and V2 aggregated
 data <- tbl(con, "openai_analyzation_v5") %>% 
@@ -63,10 +65,19 @@ data_aggregated <- data %>%
     n_llm_z = as.numeric(scale(n_llm))
   )
 
+all_factors <- c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm")
+all_factor_names <- factor_names[all_factors]
 
 data_facets <- data_aggregated %>% 
-  select(all_of(all_facets)) %>% 
-  as_tibble()
+  select(all_of(all_facets))
+
+source("ocean_plot.R")
+
+
+sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+source("omega.R")
+sink()
+
 
 sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 

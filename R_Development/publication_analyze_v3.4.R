@@ -39,6 +39,14 @@ all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 
+source("aggregate_v2_NEO.R")
+
+sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+source("omega.R")
+sink()
+
+
+
 
 sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 

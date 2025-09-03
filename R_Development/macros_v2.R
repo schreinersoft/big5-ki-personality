@@ -4,7 +4,6 @@ print("Using facets:")
 print(all_facets)
 print("")
 
-source("aggregate_v2_NEO.R")
 
 # Korrelationsmatrix
 cor_matrix <- cor(data_facets, use = "complete.obs")

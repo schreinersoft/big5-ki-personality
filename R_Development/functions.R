@@ -59,7 +59,7 @@ verteilung <- function(data, variable, group=NULL) {
 }
 
 # suboptimal!
-verteilung_factornames <- function(data, variable, group=NULL) {
+verteilung_factornames <- function(data, variable, name=NULL) {
   mean_val <- data %>% 
     pull(!!sym(variable)) %>% 
     mean(na.rm = TRUE)

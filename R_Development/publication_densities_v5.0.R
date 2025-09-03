@@ -26,7 +26,7 @@ for (facets in facet_list){
 }
 combined_plot <- (plots[[1]] / plots[[2]] / plots[[3]] / plots[[4]] / plots[[5]])
 combined_plot
-ggsave("graphics/density_openai_v1_facets.png", plot = combined_plot, dpi=300, width = 8, height = 8)
+ggsave(paste("graphics/density_", modelVersion, "_facets.png"), plot = combined_plot, dpi=300, width = 8, height = 8)
 
 
 # descriptive statistics of all facets
@@ -56,18 +56,6 @@ psych_table <- desc_df %>%
   align(j = 2:7, align = "center", part = "all")
 psych_table
 save_as_docx(psych_table, path = "tables/desc_openai_v1_facets.docx")
-
-# analyze OCEAN factors of all essays
-plots <- list()
-i <- 1
-for (factor in all_factors){
-  plots[[i]] <- llm_aggregated %>%
-    verteilung_factornames(factor)
-  i <- i + 1
-}
-combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
-combined_plot
-ggsave(paste("graphics/density_", modelVersion, "_factors.png"), plot = combined_plot, dpi=300, width = 8, height = 6)
 
 # descriptive statistics of all factors
 desc.stats <- llm_aggregated %>% 

@@ -37,7 +37,7 @@ data_bfi <- tbl(con, "openai_analyzation") %>%
          af1b = af1,
          essay_idb = essay_id)
 
-
+# simulation of V5 !
 # combine datasets               DANGER !!! v2 in publication is v3 XXX
 data_neo <- tbl(con, "openai_analyzation_v3") %>%
   select(essay_id, of1, of2, of5, cf3, cf5, ef2, ef4, ef5, af1, af3, af6, nf1, nf4, nf6) %>% 

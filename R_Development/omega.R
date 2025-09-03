@@ -29,7 +29,7 @@ alpha_n <- alpha(data_o)
 
 omega_results <- tibble(
   factor = c("O", "C", "E", "A", "N"),
-  alpah = c(
+  alpha = c(
     round(alpha_o$total$raw_alpha, 2),
     round(alpha_c$total$raw_alpha, 2),
     round(alpha_e$total$raw_alpha, 2),

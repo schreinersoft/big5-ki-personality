@@ -1,12 +1,12 @@
 # Model version for printing
-modelVersion <- "v3.0"
+modelVersion <- "v2.0"
 
 source("connect_database.R")
 source("functions.R")
 source("NEO-PI-R-Names-EN.R")
 
 # combine datasets               DANGER !!! v2 in publication is v3 XXX
-data <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>%
+data <- tbl(con, "openai_analyzation_v3") %>% select(-updated_at) %>%
   collect() %>% 
   drop_na("of1")
 
@@ -18,6 +18,13 @@ n_facets <- paste0("nf", 1:6)
 all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
+
+
+source("aggregate_v2_NEO.R")
+
+sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+source("omega.R")
+sink()
 
 sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
 
