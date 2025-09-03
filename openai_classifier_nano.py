@@ -19,7 +19,7 @@ def classify(input_text: str, system_prompt: str, service_tier: str = "flex", te
     while attempt <= 10:
         try:
             response = client.chat.completions.create(
-                model="gpt-5-nano", # !!!XXX
+                model="gpt-5-nano-2025-08-07", # !!!XXX
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"TEXT TO EVALUATE: <<<{input_text}>>>"},
@@ -42,7 +42,7 @@ def classify_by_function(input_text: str, function: str = "", service_tier: str 
     while attempt <= 5:
         try:
             response = client.chat.completions.create(
-                model="gpt-5-nano", # !!!XXX
+                model="gpt-5-nano-2025-08-07", # !!!XXX
                 messages=[
                     {"role": "system", "content": "You are an expert text evaluator."},
                     {"role": "user", "content": f"TEXT TO EVALUATE: {input_text}"},

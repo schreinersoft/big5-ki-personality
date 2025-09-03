@@ -43,6 +43,12 @@ liwc_data <- liwc_data %>%
     )
   )
 
+
+
+
+
+
+######################################### DEPRECATED
 ### create a similarity score
 liwc_data <- liwc_data %>% 
   rowwise() %>% 
