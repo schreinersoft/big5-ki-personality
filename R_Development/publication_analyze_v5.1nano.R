@@ -25,6 +25,7 @@ facet_names <- list("Creative Imagination", "Fantasy", "Aesthetics", "Ideas",
 # get data
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(essay_id, all_of(all_facets), model) %>% 
+  filter(essay_id <=250) %>% 
   filter(model=="gpt-5-nano-2025-08-07") %>% 
   collect()
 
@@ -70,6 +71,9 @@ all_factor_names <- factor_names[all_factors]
 
 data_facets <- data_aggregated %>% 
   select(all_of(all_facets))
+data_factors <- data_aggregated %>% 
+  select(all_of(all_facets))
+
 
 source("ocean_plot.R")
 

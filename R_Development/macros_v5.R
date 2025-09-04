@@ -4,7 +4,7 @@ print("Using facets:")
 print(all_facets)
 print("")
 
-# Korrelationsmatrix
+# Korrelationsmatrix Facets
 cor_matrix <- cor(data_facets, use = "complete.obs")
 # Round to 2 decimal places
 cor_matrix_rounded <- round(cor_matrix, 2)
@@ -12,10 +12,39 @@ print("Correlation Matrix:")
 print(cor_matrix_rounded)
 
 # Plot correlation Matrix
-png(paste("graphics/corrplot_", modelVersion, ".png"), width = 2400, height = 2400, res = 150)
+png(paste("graphics/corrplot_", modelVersion, "_facets.png"), width = 2400, height = 2400, res = 150)
 corrplot(cor_matrix_rounded, method = "color", type = "upper", 
          addCoef.col = "black", tl.cex = 0.8)
 dev.off()
+
+
+# Korrelationsmatrix Facets spearman
+cor_matrix <- cor(data_facets, use = "complete.obs", method="spearman")
+# Round to 2 decimal places
+cor_matrix_rounded <- round(cor_matrix, 2)
+print("Correlation Matrix:")
+print(cor_matrix_rounded)
+
+# Plot correlation Matrix
+png(paste("graphics/corrplot_spearman_", modelVersion, "_facets.png"), width = 2400, height = 2400, res = 150)
+corrplot(cor_matrix_rounded, method = "color", type = "upper", 
+         addCoef.col = "black", tl.cex = 0.8)
+dev.off()
+
+# Korrelationsmatrix Factors
+corr_result <- corr.test(data_factors, use = "complete.obs")
+cor_matrix <- cor(data_factors, use = "complete.obs")
+# Round to 2 decimal places
+cor_matrix_rounded <- round(cor_matrix, 2)
+print("Correlation Matrix:")
+print(cor_matrix_rounded)
+
+# Plot correlation Matrix
+png(paste("graphics/corrplot_", modelVersion, "_factors.png"), width = 2400, height = 2400, res = 150)
+corrplot(cor_matrix_rounded, method = "color", type = "upper", 
+         addCoef.col = "black", tl.cex = 0.8)
+dev.off()
+
 
 
 # Faktorenanalyse

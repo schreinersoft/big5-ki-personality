@@ -3,7 +3,7 @@
 	Asymptotic one-sample Kolmogorov-Smirnov test
 
 data:  vec
-D = 0.062216, p-value = 0.04168
+D = 0.063277, p-value = 0.2695
 alternative hypothesis: two-sided
 
 
@@ -12,7 +12,7 @@ alternative hypothesis: two-sided
 	Asymptotic one-sample Kolmogorov-Smirnov test
 
 data:  vec
-D = 0.065695, p-value = 0.02671
+D = 0.064077, p-value = 0.2562
 alternative hypothesis: two-sided
 
 
@@ -21,7 +21,7 @@ alternative hypothesis: two-sided
 	Asymptotic one-sample Kolmogorov-Smirnov test
 
 data:  vec
-D = 0.046593, p-value = 0.2278
+D = 0.05587, p-value = 0.4161
 alternative hypothesis: two-sided
 
 
@@ -30,7 +30,7 @@ alternative hypothesis: two-sided
 	Asymptotic one-sample Kolmogorov-Smirnov test
 
 data:  vec
-D = 0.037474, p-value = 0.4838
+D = 0.03533, p-value = 0.9139
 alternative hypothesis: two-sided
 
 
@@ -39,7 +39,7 @@ alternative hypothesis: two-sided
 	Asymptotic one-sample Kolmogorov-Smirnov test
 
 data:  vec
-D = 0.075871, p-value = 0.006325
+D = 0.070421, p-value = 0.1675
 alternative hypothesis: two-sided
 
 

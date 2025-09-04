@@ -3,6 +3,7 @@ modelVersion <- "v5.0"
 
 source("connect_database.R")
 source("functions.R")
+source("Factor-Names-EN.R")
 
 o_facets <- c("of3b", "of1", "of2", "of5")
 c_facets <- c("cf2b", "cf3b", "cf3", "cf5")
@@ -17,6 +18,9 @@ facet_names <- list("Creative Imagination", "Fantasy", "Aesthetics", "Ideas",
                   "Gregariousness", "Energy Level", "Activity", "Excitement-seeking", 
                   "Compassion", "Trust", "Altruism", "Tender-mindedness", 
                   "Anxiety", "Self-consciousness", "Vulnerability")
+
+all_factors <- c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm")
+all_factor_names <- factor_names[all_factors]
 
 # combine V1 and V2 aggregated
 data_bfi <- tbl(con, "openai_analyzation") %>% 
@@ -75,6 +79,8 @@ data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id"
 
 data_facets <- data_aggregated %>% 
   select(all_of(all_facets))
+data_factors <- data_aggregated %>% 
+  select(all_of(all_factors))
 
 sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
 source("omega.R")

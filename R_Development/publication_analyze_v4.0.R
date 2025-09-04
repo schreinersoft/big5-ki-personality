@@ -21,11 +21,19 @@ all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 
+all_factors <- c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm")
+all_factor_names <- factor_names[all_factors]
+
 source("aggregate_v4_NEO_temperature.R")
 
-data_facets <- data_facets %>% 
+data_facets <- data_aggregated %>% 
   filter(temperature==0.0) %>% 
   select(all_of(all_facets))
+data_factors <- data_aggregated %>% 
+  filter(temperature==0.0) %>% 
+  select(all_of(all_factors))
+
+
 
 sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
 source("omega.R")

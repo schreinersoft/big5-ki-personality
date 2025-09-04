@@ -4,7 +4,7 @@ To do this, run the function again with the 'check.keys=TRUE' optionSome items (
 probably should be reversed.  
 To do this, run the function again with the 'check.keys=TRUE' optionSome items ( of3 of4 ) were negatively correlated with the first principal component and 
 probably should be reversed.  
-To do this, run the function again with the 'check.keys=TRUE' option# A tibble: 5 × 3
+To do this, run the function again with the 'check.keys=TRUE' option# A tibble: 6 × 3
   factor alpha omega
   <chr>  <dbl> <dbl>
 1 O       0.5   0.74
@@ -12,6 +12,7 @@ To do this, run the function again with the 'check.keys=TRUE' option# A tibble: 
 3 E       0.75  0.89
 4 A       0.56  0.68
 5 N       0.5   0.84
+6 Mean    0.63  0.82
 
 Reliability analysis   
 Call: alpha(x = data_o)
