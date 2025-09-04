@@ -102,11 +102,11 @@ analyze <- liwc_data %>%
   rowwise() %>% 
   mutate(
     rowmax = max(abs(c(o_liwc_z, c_liwc_z, e_liwc_z, a_liwc_z, n_liwc_z))),
-    po = (o_liwc_z/rowmax),
-    pc = (c_liwc_z/rowmax),
-    pe = (e_liwc_z/rowmax),
-    pa = (a_liwc_z/rowmax),
-    pn = (n_liwc_z/rowmax),
+    No = (o_liwc_z/rowmax),
+    Nc = (c_liwc_z/rowmax),
+    Ne = (e_liwc_z/rowmax),
+    Na = (a_liwc_z/rowmax),
+    Nn = (n_liwc_z/rowmax),
     So = 1 - sqrt((o_bin_z - po)^2),
     Sc = 1 - sqrt((c_bin_z - pc)^2),
     Se = 1 - sqrt((e_bin_z - pe)^2),

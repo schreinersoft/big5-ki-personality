@@ -7,10 +7,13 @@ source("connect_database.R")
 source("functions.R")
 source("Factor-Names-EN.R")
 
-essays <- tbl(con, "essays")  %>% select(-text, -author) %>% collect()
+essays <- tbl(con, "essays")  %>% select(-author) %>% collect()
 liwc <- tbl(con, "liwc_analyzation")  %>% select(-updated_at, -liwc_all) %>% collect
 liwc_data <- left_join(essays, liwc, by = c("id" = "essay_id")) %>% 
   drop_na(o_liwc)
+
+liwc_ocean <- c("o_liwc_z", "c_liwc_z", "e_liwc_z", "a_liwc_z", "n_liwc_z")
+
 
 # z-Normalisierung
 liwc_data$o_liwc_z <- as.numeric(scale(liwc_data$o_liwc))
@@ -49,18 +52,115 @@ cor.test(liwc_data$o_bin, liwc_data$o_liwc, method = "spearman")
 
 
 
+# Bilde Scores
+analyze <- liwc_data %>% 
+  select(id, o_bin_z, c_bin_z, e_bin_z, a_bin_z, n_bin_z, o_liwc_z, c_liwc_z, e_liwc_z, a_liwc_z, n_liwc_z) %>% 
+  rename(essay_id = id) %>% 
+  rowwise() %>% 
+  mutate(
+    rowmax = max(abs(c(o_liwc_z, c_liwc_z, e_liwc_z, a_liwc_z, n_liwc_z))),
+    No = (o_liwc_z/rowmax),
+    Nc = (c_liwc_z/rowmax),
+    Ne = (e_liwc_z/rowmax),
+    Na = (a_liwc_z/rowmax),
+    Nn = (n_liwc_z/rowmax),
+    So = 1 - sqrt((o_bin_z - No)^2),
+    Sc = 1 - sqrt((c_bin_z - Nc)^2),
+    Se = 1 - sqrt((e_bin_z - Ne)^2),
+    Sa = 1 - sqrt((a_bin_z - Na)^2),
+    Sn = 1 - sqrt((n_bin_z - Nn)^2),
+    SCORE = (So + Sc + Se + Sa + Sn)/5
+  )
+
+analyze %>% 
+  select(No,Nc,Ne,Na,Nn,So,Sc,Se,Sa,Sn, SCORE) %>% 
+  describe()
+
+
+analyze %>% 
+  ggplot +
+  geom_density(aes(x=No)) +
+  geom_density(aes(x=Nc)) +
+  geom_density(aes(x=Ne)) +
+  geom_density(aes(x=Na)) +
+  geom_density(aes(x=Nn)) + 
+  geom_density(aes(x=SCORE, color="red"))
+
+# Alle Sfs
+analyze %>% 
+  select(So, Sc, Se, Sa, Sn) %>% 
+  pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
+  ggplot(aes(x = value, color = "darkgrey", group = variable, fill=variable)) +
+  geom_density(alpha=0.7)+
+  scale_fill_brewer(type = "qual", palette = "Oranges")
+
+# Alle Nfs
+analyze %>% 
+  select(No, Nc, Ne, Na, Nn) %>% 
+  pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
+  ggplot(aes(x = value, color = "darkgrey", fill = variable)) +
+  geom_density(alpha=0.7)+
+  scale_fill_brewer(type = "qual", palette = "Oranges")
+
+analyze %>% 
+  ggplot +
+  geom_density(aes(x=SCORE), fill="yellow")
+
+
+# Number of essays by threshold
+count_essays <- function(thr)
+{
+  analyze %>% 
+    filter(SCORE >= thr) %>% 
+    count() %>% sum()
+}
+
+threshold <- seq(-1, 1, 0.01)
+essays_filtered <- tibble(threshold = threshold) %>% 
+  rowwise() %>% 
+  mutate(
+    essays = sum(count_essays(threshold)))
+describe(essays_filtered)
+essays_filtered %>% 
+  ggplot(aes(x = threshold, y = essays)) +
+  geom_col(color= "black", fill="orange") + 
+  labs(title = "Essays nach Abstandsmass",
+       x = "Schwellwert",
+       y= "Anzahl") +
+  theme_minimal()
 
 
 
 
 
 
+# empirisch: Schwelle bei ca. 0.6
+thr <- 0.5
+
+# insgesamt?
+analyze %>% 
+  select(essay_id, SCORE, all_of(liwc_ocean)) %>% 
+  filter(SCORE >= thr) %>% 
+  arrange(desc(SCORE))
 
 
+# as.array()# oder alle gemeinsam?
+analyze %>% 
+  filter(
+    (So >= thr) &
+      (Sc >= thr) &
+      (Se >= thr) &
+      (Sa >= thr) &
+      (Sn >= thr))
 
+enhanced_essays <- analyze %>% 
+  select(essay_id, SCORE) %>% 
+  filter(SCORE >= thr)
 
+mean(enhanced_essays$SCORE)
 
-
+analyze %>% 
+  arrange(SCORE)
 
 
 
