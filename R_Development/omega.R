@@ -28,21 +28,31 @@ alpha_n <- alpha(data_o)
 
 
 omega_results <- tibble(
-  factor = c("O", "C", "E", "A", "N"),
+  factor = c("O", "C", "E", "A", "N", "Mean"),
   alpha = c(
     round(alpha_o$total$raw_alpha, 2),
     round(alpha_c$total$raw_alpha, 2),
     round(alpha_e$total$raw_alpha, 2),
     round(alpha_a$total$raw_alpha, 2),
-    round(alpha_n$total$raw_alpha, 2)),    
+    round(alpha_n$total$raw_alpha, 2),
+    round(mean(c(alpha_o$total$raw_alpha, 
+                 alpha_c$total$raw_alpha, 
+                 alpha_e$total$raw_alpha,
+                 alpha_a$total$raw_alpha,
+                 alpha_n$total$raw_alpha)), 2)),
   omega = c(
     round(omega_o$omega.tot, 2),
     round(omega_c$omega.tot, 2),
     round(omega_e$omega.tot, 2),
     round(omega_a$omega.tot, 2),
-    round(omega_n$omega.tot, 2)
-  )
+    round(omega_n$omega.tot, 2),
+    round(mean(c(omega_o$omega.tot, 
+            omega_c$omega.tot,
+            omega_e$omega.tot,
+            omega_a$omega.tot,
+            omega_n$omega.tot)),2))
 )
+
 print(omega_results)
 print(alpha_o)
 print(omega_o)

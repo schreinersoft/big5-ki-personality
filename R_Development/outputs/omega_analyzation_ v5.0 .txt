@@ -1,4 +1,4 @@
-# A tibble: 5 × 3
+# A tibble: 6 × 3
   factor alpha omega
   <chr>  <dbl> <dbl>
 1 O       0.88  0.89
@@ -6,6 +6,7 @@
 3 E       0.86  0.91
 4 A       0.89  0.93
 5 N       0.88  0.9 
+6 Mean    0.89  0.92
 
 Reliability analysis   
 Call: alpha(x = data_o)

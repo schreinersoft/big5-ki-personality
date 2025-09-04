@@ -13,5 +13,5 @@ facet_names = c(
   'af3' = 'Trust',
   'nf1' = 'Anxiety',
   'nf2' = 'Depression',
-  'nf3' = 'Emotional Volatility'
+  'nf3' = 'Emotional Volatility',
 )

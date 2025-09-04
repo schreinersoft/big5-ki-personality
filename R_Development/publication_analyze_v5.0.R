@@ -61,7 +61,17 @@ data_neo <- tbl(con, "openai_analyzation_v3") %>%
     .groups = "drop")
 
 
-data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id"))
+data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id")) %>%
+  rowwise() %>% 
+  mutate(
+    o_llm = mean(c_across(all_of(o_facets)), na.rm = TRUE),
+    c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
+    e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
+    a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
+    n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE)
+  )
+  
+  
 
 data_facets <- data_aggregated %>% 
   select(all_of(all_facets))

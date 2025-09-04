@@ -1,146 +1,147 @@
-# A tibble: 5 × 3
+# A tibble: 6 × 3
   factor alpha omega
   <chr>  <dbl> <dbl>
-1 O       0.87  0.9 
-2 C       0.93  0.97
+1 O       0.86  0.9 
+2 C       0.94  0.97
 3 E       0.86  0.93
-4 A       0.88  0.91
-5 N       0.87  0.88
+4 A       0.88  0.9 
+5 N       0.86  0.88
+6 Mean    0.88  0.92
 
 Reliability analysis   
 Call: alpha(x = data_o)
 
   raw_alpha std.alpha G6(smc) average_r S/N    ase mean sd median_r
-      0.87      0.87    0.86      0.62 6.5 0.0099  4.4  1     0.63
+      0.86      0.86    0.86      0.61 6.2 0.0097  4.4  1     0.63
 
     95% confidence boundaries 
          lower alpha upper
-Feldt     0.85  0.87  0.89
-Duhachek  0.85  0.87  0.89
+Feldt     0.84  0.86  0.88
+Duhachek  0.84  0.86  0.88
 
  Reliability if an item is dropped:
-     raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
-of3b      0.75      0.75    0.67      0.50 3.0    0.020 0.003  0.52
-of1       0.85      0.85    0.82      0.66 5.7    0.012 0.013  0.72
-of2       0.84      0.84    0.84      0.64 5.3    0.013 0.029  0.72
-of5       0.86      0.86    0.83      0.67 6.2    0.011 0.012  0.72
+     raw_alpha std.alpha G6(smc) average_r S/N alpha se  var.r med.r
+of3b      0.74      0.74    0.66      0.49 2.9    0.020 0.0037  0.50
+of1       0.84      0.84    0.81      0.64 5.4    0.012 0.0165  0.71
+of2       0.84      0.84    0.83      0.63 5.1    0.012 0.0318  0.71
+of5       0.86      0.86    0.83      0.67 6.2    0.011 0.0125  0.72
 
  Item statistics 
        n raw.r std.r r.cor r.drop mean  sd
-of3b 449  0.95  0.95  0.95   0.90  5.0 1.4
-of1  449  0.83  0.81  0.74   0.67  3.3 1.3
-of2  449  0.82  0.83  0.74   0.69  3.8 1.2
-of5  449  0.78  0.80  0.71   0.64  5.5 1.1
+of3b 500  0.95  0.95  0.96   0.90  5.0 1.4
+of1  500  0.82  0.81  0.74   0.67  3.2 1.3
+of2  500  0.82  0.82  0.73   0.68  3.8 1.2
+of5  500  0.77  0.78  0.69   0.62  5.5 1.1
 Omega 
 Call: omegah(m = m, nfactors = nfactors, fm = fm, key = key, flip = flip, 
     digits = digits, title = title, sl = sl, labels = labels, 
     plot = plot, n.obs = n.obs, rotate = rotate, Phi = Phi, option = option, 
     covar = covar)
-Alpha:                 0.87 
+Alpha:                 0.86 
 G.6:                   0.86 
-Omega Hierarchical:    0.82 
+Omega Hierarchical:    0.83 
 Omega H asymptotic:    0.92 
 Omega Total            0.9 
 
 Schmid Leiman Factor loadings greater than  0.2 
         g   F1*   F2*   F3*   h2   h2   u2   p2  com
-of3b 0.94  0.26  0.25       1.00 1.00 0.00 0.88 1.31
-of1  0.71  0.41             0.67 0.67 0.33 0.74 1.60
-of2  0.75                   0.53 0.53 0.47 1.06 1.00
-of5  0.68        0.40       0.63 0.63 0.37 0.73 1.63
+of3b 0.96        0.20       1.00 1.00 0.00 0.93 1.15
+of1  0.70  0.43             0.68 0.68 0.32 0.73 1.66
+of2  0.75                   0.55 0.55 0.45 1.04 1.00
+of5  0.64        0.48       0.65 0.65 0.35 0.64 1.86
 
 With Sums of squares  of:
    g  F1*  F2*  F3*   h2 
-2.39 0.23 0.23 0.00 2.11 
+2.40 0.22 0.27 0.00 2.17 
 
-general/max  1.13   max/min =   Inf
-mean percent general =  0.85    with sd =  0.15 and cv of  0.18 
-Explained Common Variance of the general factor =  0.84 
+general/max  1.11   max/min =   Inf
+mean percent general =  0.84    with sd =  0.18 and cv of  0.22 
+Explained Common Variance of the general factor =  0.83 
 
 The degrees of freedom are -3  and the fit is  0 
-The number of observations was  449  with Chi Square =  0  with prob <  NA
+The number of observations was  500  with Chi Square =  0  with prob <  NA
 The root mean square of the residuals is  0 
 The df corrected root mean square of the residuals is  NA
 
 Compare this with the adequacy of just a general factor and no group factors
-The degrees of freedom for just the general factor are 2  and the fit is  0.18 
-The number of observations was  449  with Chi Square =  81.48  with prob <  2e-18
-The root mean square of the residuals is  0.06 
-The df corrected root mean square of the residuals is  0.1 
+The degrees of freedom for just the general factor are 2  and the fit is  0.16 
+The number of observations was  500  with Chi Square =  79.13  with prob <  6.6e-18
+The root mean square of the residuals is  0.05 
+The df corrected root mean square of the residuals is  0.09 
 
-RMSEA index =  0.297  and the 90 % confidence intervals are  0.245 0.355
-BIC =  69.26 
+RMSEA index =  0.278  and the 90 % confidence intervals are  0.228 0.332
+BIC =  66.7 
 
 Measures of factor score adequacy             
                                                  g   F1*   F2* F3*
-Correlation of scores with factors            0.94  0.54  0.55   0
-Multiple R square of scores with factors      0.89  0.30  0.30   0
-Minimum correlation of factor score estimates 0.77 -0.41 -0.39  -1
+Correlation of scores with factors            0.97  0.53  0.58   0
+Multiple R square of scores with factors      0.94  0.28  0.33   0
+Minimum correlation of factor score estimates 0.88 -0.43 -0.34  -1
 
  Total, General and Subset omega for each subset
                                                  g  F1*  F2* F3*
-Omega total for total scores and subscales    0.90 0.90 0.72  NA
-Omega general for total scores and subscales  0.82 0.77 0.67  NA
-Omega group for total scores and subscales    0.05 0.13 0.05  NA
+Omega total for total scores and subscales    0.90 0.68 0.88  NA
+Omega general for total scores and subscales  0.83 0.50 0.81  NA
+Omega group for total scores and subscales    0.06 0.19 0.07  NA
 Factor Analysis using method =  minres
 Call: fa(r = data_o)
 Standardized loadings (pattern matrix) based upon correlation matrix
       MR1   h2     u2 com
-of3b 1.01 1.02 -0.017   1
-of1  0.72 0.52  0.484   1
-of2  0.74 0.54  0.455   1
-of5  0.69 0.47  0.526   1
+of3b 1.01 1.02 -0.023   1
+of1  0.72 0.51  0.488   1
+of2  0.73 0.54  0.462   1
+of5  0.67 0.45  0.553   1
 
                 MR1
-SS loadings    2.55
-Proportion Var 0.64
+SS loadings    2.52
+Proportion Var 0.63
 
 Mean item complexity =  1
 Test of the hypothesis that 1 factor is sufficient.
 
-df null model =  6  with the objective function =  2.36 with Chi Square =  1050.04
+df null model =  6  with the objective function =  2.33 with Chi Square =  1159.94
 df of  the model are 2  and the objective function was  0.06 
 
 The root mean square of the residuals (RMSR) is  0.03 
 The df corrected root mean square of the residuals is  0.05 
 
-The harmonic n.obs is  449 with the empirical chi square  4.68  with prob <  0.096 
-The total n.obs was  449  with Likelihood Chi Square =  25.25  with prob <  3.3e-06 
+The harmonic n.obs is  500 with the empirical chi square  5.65  with prob <  0.059 
+The total n.obs was  500  with Likelihood Chi Square =  31.09  with prob <  1.8e-07 
 
-Tucker Lewis Index of factoring reliability =  0.933
-RMSEA index =  0.161  and the 90 % confidence intervals are  0.109 0.22
-BIC =  13.03
+Tucker Lewis Index of factoring reliability =  0.924
+RMSEA index =  0.171  and the 90 % confidence intervals are  0.121 0.226
+BIC =  18.66
 Fit based upon off diagonal values = 1
 Reliability analysis   
 Call: alpha(x = data_c)
 
-  raw_alpha std.alpha G6(smc) average_r S/N    ase mean  sd median_r
-      0.93      0.93    0.95      0.78  14 0.0054  4.9 1.1     0.77
+  raw_alpha std.alpha G6(smc) average_r S/N   ase mean  sd median_r
+      0.94      0.94    0.95      0.79  15 0.005    5 1.1     0.78
 
     95% confidence boundaries 
          lower alpha upper
-Feldt     0.92  0.93  0.94
-Duhachek  0.92  0.93  0.94
+Feldt     0.93  0.94  0.94
+Duhachek  0.93  0.94  0.95
 
  Reliability if an item is dropped:
      raw_alpha std.alpha G6(smc) average_r  S/N alpha se  var.r med.r
-cf2b      0.94      0.94    0.93      0.84 15.2   0.0055 0.0124  0.78
-cf3b      0.90      0.90    0.87      0.75  9.2   0.0081 0.0043  0.78
-cf3       0.90      0.90    0.87      0.75  9.1   0.0081 0.0037  0.76
-cf5       0.91      0.91    0.91      0.78 10.4   0.0079 0.0262  0.69
+cf2b      0.94      0.94    0.94      0.84 16.1   0.0050 0.0108  0.79
+cf3b      0.91      0.91    0.87      0.76  9.6   0.0074 0.0040  0.79
+cf3       0.91      0.90    0.87      0.76  9.5   0.0074 0.0037  0.78
+cf5       0.91      0.91    0.91      0.78 10.7   0.0073 0.0247  0.69
 
  Item statistics 
        n raw.r std.r r.cor r.drop mean  sd
-cf2b 449  0.87  0.87  0.80   0.77  4.9 1.2
-cf3b 449  0.93  0.93  0.94   0.88  5.2 1.1
-cf3  449  0.94  0.94  0.94   0.88  5.0 1.2
-cf5  449  0.92  0.92  0.87   0.85  4.5 1.2
+cf2b 500  0.87  0.87  0.80   0.77  4.9 1.2
+cf3b 500  0.94  0.94  0.94   0.89  5.3 1.2
+cf3  500  0.94  0.94  0.94   0.88  5.1 1.2
+cf5  500  0.92  0.92  0.88   0.86  4.5 1.2
 Omega 
 Call: omegah(m = m, nfactors = nfactors, fm = fm, key = key, flip = flip, 
     digits = digits, title = title, sl = sl, labels = labels, 
     plot = plot, n.obs = n.obs, rotate = rotate, Phi = Phi, option = option, 
     covar = covar)
-Alpha:                 0.93 
+Alpha:                 0.94 
 G.6:                   0.95 
 Omega Hierarchical:    0.88 
 Omega H asymptotic:    0.91 
@@ -148,84 +149,84 @@ Omega Total            0.97
 
 Schmid Leiman Factor loadings greater than  0.2 
         g   F1*   F2*   F3*   h2   h2   u2   p2  com
-cf2b 0.68        0.54       0.77 0.77 0.23 0.61 1.92
-cf3b 0.99                   0.97 0.97 0.03 1.01 1.01
-cf3  0.99                   0.98 0.98 0.02 1.00 1.01
-cf5  0.77        0.53       0.87 0.87 0.13 0.68 1.79
+cf2b 0.68        0.55       0.76 0.76 0.24 0.60 1.93
+cf3b 1.00                   0.96 0.96 0.04 1.03 1.00
+cf3  0.99                   0.97 0.97 0.03 1.02 1.01
+cf5  0.77        0.53       0.87 0.87 0.13 0.67 1.79
 
 With Sums of squares  of:
    g  F1*  F2*  F3*   h2 
-3.01 0.00 0.57 0.02 3.24 
+3.02 0.00 0.59 0.01 3.21 
 
-general/max  0.93   max/min =   Inf
-mean percent general =  0.82    with sd =  0.21 and cv of  0.25 
+general/max  0.94   max/min =   Inf
+mean percent general =  0.83    with sd =  0.23 and cv of  0.27 
 Explained Common Variance of the general factor =  0.84 
 
 The degrees of freedom are -3  and the fit is  0 
-The number of observations was  449  with Chi Square =  0  with prob <  NA
+The number of observations was  500  with Chi Square =  0  with prob <  NA
 The root mean square of the residuals is  0 
 The df corrected root mean square of the residuals is  NA
 
 Compare this with the adequacy of just a general factor and no group factors
-The degrees of freedom for just the general factor are 2  and the fit is  0.54 
-The number of observations was  449  with Chi Square =  241.99  with prob <  2.8e-53
-The root mean square of the residuals is  0.11 
-The df corrected root mean square of the residuals is  0.2 
+The degrees of freedom for just the general factor are 2  and the fit is  2.05 
+The number of observations was  500  with Chi Square =  1015.35  with prob <  3.3e-221
+The root mean square of the residuals is  0.12 
+The df corrected root mean square of the residuals is  0.21 
 
-RMSEA index =  0.517  and the 90 % confidence intervals are  0.464 0.574
-BIC =  229.78 
+RMSEA index =  1.007  and the 90 % confidence intervals are  0.956 1.06
+BIC =  1002.92 
 
 Measures of factor score adequacy             
                                                  g F1*  F2*   F3*
-Correlation of scores with factors            1.00   0 0.89  0.54
-Multiple R square of scores with factors      0.99   0 0.79  0.29
-Minimum correlation of factor score estimates 0.99  -1 0.59 -0.42
+Correlation of scores with factors            1.01   0 0.93  0.35
+Multiple R square of scores with factors      1.01   0 0.86  0.12
+Minimum correlation of factor score estimates 1.02  -1 0.71 -0.75
 
  Total, General and Subset omega for each subset
                                                  g F1*  F2*  F3*
-Omega total for total scores and subscales    0.97  NA 0.90 0.99
-Omega general for total scores and subscales  0.88  NA 0.58 0.99
+Omega total for total scores and subscales    0.97  NA 0.90 1.01
+Omega general for total scores and subscales  0.88  NA 0.57 1.01
 Omega group for total scores and subscales    0.09  NA 0.32 0.00
 Factor Analysis using method =  minres
 Call: fa(r = data_c)
 Standardized loadings (pattern matrix) based upon correlation matrix
       MR1   h2   u2 com
-cf2b 0.79 0.62 0.38   1
-cf3b 0.93 0.87 0.13   1
+cf2b 0.79 0.63 0.37   1
+cf3b 0.94 0.88 0.12   1
 cf3  0.94 0.88 0.12   1
-cf5  0.88 0.77 0.23   1
+cf5  0.88 0.78 0.22   1
 
                 MR1
-SS loadings    3.14
-Proportion Var 0.78
+SS loadings    3.16
+Proportion Var 0.79
 
 Mean item complexity =  1
 Test of the hypothesis that 1 factor is sufficient.
 
-df null model =  6  with the objective function =  4.66 with Chi Square =  2078.38
-df of  the model are 2  and the objective function was  0.93 
+df null model =  6  with the objective function =  4.68 with Chi Square =  2327.34
+df of  the model are 2  and the objective function was  0.86 
 
 The root mean square of the residuals (RMSR) is  0.07 
-The df corrected root mean square of the residuals is  0.13 
+The df corrected root mean square of the residuals is  0.12 
 
-The harmonic n.obs is  449 with the empirical chi square  28.4  with prob <  6.8e-07 
-The total n.obs was  449  with Likelihood Chi Square =  412.06  with prob <  3.3e-90 
+The harmonic n.obs is  500 with the empirical chi square  28.26  with prob <  7.3e-07 
+The total n.obs was  500  with Likelihood Chi Square =  428.4  with prob <  9.4e-94 
 
-Tucker Lewis Index of factoring reliability =  0.406
-RMSEA index =  0.676  and the 90 % confidence intervals are  0.622 0.732
-BIC =  399.84
+Tucker Lewis Index of factoring reliability =  0.448
+RMSEA index =  0.653  and the 90 % confidence intervals are  0.602 0.707
+BIC =  415.97
 Fit based upon off diagonal values = 0.99
 Measures of factor score adequacy             
                                                    MR1
 Correlation of (regression) scores with factors   0.97
 Multiple R square of scores with factors          0.95
-Minimum correlation of possible factor scores     0.89
+Minimum correlation of possible factor scores     0.90
 
 Reliability analysis   
 Call: alpha(x = data_e)
 
-  raw_alpha std.alpha G6(smc) average_r S/N   ase mean  sd median_r
-      0.86      0.87    0.88      0.63 6.7 0.011  4.4 1.1     0.59
+  raw_alpha std.alpha G6(smc) average_r S/N  ase mean  sd median_r
+      0.86      0.88    0.88      0.64   7 0.01  4.4 1.2      0.6
 
     95% confidence boundaries 
          lower alpha upper
@@ -234,23 +235,23 @@ Duhachek  0.84  0.86  0.88
 
  Reliability if an item is dropped:
      raw_alpha std.alpha G6(smc) average_r S/N alpha se   var.r med.r
-ef2       0.87      0.89    0.87      0.72 7.7    0.011 0.02451  0.65
-ef3b      0.79      0.80    0.73      0.58 4.1    0.016 0.00089  0.58
-ef4       0.79      0.80    0.74      0.57 3.9    0.017 0.00797  0.58
-ef5       0.82      0.84    0.84      0.64 5.4    0.016 0.05131  0.55
+ef2       0.87      0.89    0.87      0.72 7.8    0.011 0.02540  0.65
+ef3b      0.80      0.81    0.74      0.59 4.3    0.015 0.00059  0.60
+ef4       0.80      0.81    0.74      0.58 4.2    0.015 0.00647  0.60
+ef5       0.83      0.85    0.85      0.65 5.7    0.014 0.04845  0.56
 
  Item statistics 
        n raw.r std.r r.cor r.drop mean  sd
-ef2  449  0.79  0.77  0.63   0.60  4.3 1.5
-ef3b 449  0.87  0.89  0.90   0.77  4.5 1.3
-ef4  449  0.88  0.90  0.91   0.80  4.7 1.1
-ef5  449  0.85  0.84  0.74   0.71  3.9 1.5
+ef2  500  0.80  0.78  0.65   0.62  4.3 1.5
+ef3b 500  0.87  0.89  0.90   0.78  4.5 1.3
+ef4  500  0.88  0.90  0.91   0.80  4.8 1.1
+ef5  500  0.86  0.84  0.74   0.71  3.9 1.5
 Omega 
 Call: omegah(m = m, nfactors = nfactors, fm = fm, key = key, flip = flip, 
     digits = digits, title = title, sl = sl, labels = labels, 
     plot = plot, n.obs = n.obs, rotate = rotate, Phi = Phi, option = option, 
     covar = covar)
-Alpha:                 0.87 
+Alpha:                 0.88 
 G.6:                   0.88 
 Omega Hierarchical:    0.83 
 Omega H asymptotic:    0.89 
@@ -258,175 +259,175 @@ Omega Total            0.93
 
 Schmid Leiman Factor loadings greater than  0.2 
         g  F1*  F2*  F3*   h2   h2   u2   p2  com
-ef2  0.52      0.53      0.59 0.59 0.41 0.46 2.18
+ef2  0.54      0.53      0.61 0.61 0.39 0.48 2.16
 ef3b 0.97                0.99 0.99 0.01 0.96 1.06
-ef4  0.96                0.93 0.93 0.07 0.98 1.07
-ef5  0.63      0.52      0.68 0.68 0.32 0.59 2.08
+ef4  0.96                0.94 0.94 0.06 0.98 1.07
+ef5  0.64      0.52      0.69 0.69 0.31 0.58 2.08
 
 With Sums of squares  of:
    g  F1*  F2*  F3*   h2 
-2.54 0.00 0.54 0.11 2.66 
+2.56 0.00 0.56 0.11 2.71 
 
-general/max  0.95   max/min =   Inf
-mean percent general =  0.75    with sd =  0.26 and cv of  0.35 
+general/max  0.95   max/min =   3058.38
+mean percent general =  0.75    with sd =  0.26 and cv of  0.34 
 Explained Common Variance of the general factor =  0.79 
 
 The degrees of freedom are -3  and the fit is  0 
-The number of observations was  449  with Chi Square =  0  with prob <  NA
+The number of observations was  500  with Chi Square =  0  with prob <  NA
 The root mean square of the residuals is  0 
 The df corrected root mean square of the residuals is  NA
 
 Compare this with the adequacy of just a general factor and no group factors
-The degrees of freedom for just the general factor are 2  and the fit is  0.3 
-The number of observations was  449  with Chi Square =  133.77  with prob <  8.9e-30
-The root mean square of the residuals is  0.1 
+The degrees of freedom for just the general factor are 2  and the fit is  0.31 
+The number of observations was  500  with Chi Square =  151.99  with prob <  9.9e-34
+The root mean square of the residuals is  0.11 
 The df corrected root mean square of the residuals is  0.18 
 
-RMSEA index =  0.383  and the 90 % confidence intervals are  0.33 0.44
-BIC =  121.56 
+RMSEA index =  0.387  and the 90 % confidence intervals are  0.337 0.441
+BIC =  139.56 
 
 Measures of factor score adequacy             
-                                                 g F1*  F2*  F3*
-Correlation of scores with factors            0.99   0 0.77 0.78
-Multiple R square of scores with factors      0.98   0 0.59 0.62
-Minimum correlation of factor score estimates 0.96  -1 0.19 0.23
+                                                 g   F1*  F2*  F3*
+Correlation of scores with factors            0.99  0.03 0.78 0.79
+Multiple R square of scores with factors      0.98  0.00 0.61 0.62
+Minimum correlation of factor score estimates 0.96 -1.00 0.22 0.24
 
  Total, General and Subset omega for each subset
                                                  g F1*  F2*  F3*
-Omega total for total scores and subscales    0.93  NA 0.77 0.98
+Omega total for total scores and subscales    0.93  NA 0.78 0.98
 Omega general for total scores and subscales  0.83  NA 0.43 0.98
-Omega group for total scores and subscales    0.09  NA 0.34 0.00
+Omega group for total scores and subscales    0.10  NA 0.35 0.00
 Factor Analysis using method =  minres
 Call: fa(r = data_e)
 Standardized loadings (pattern matrix) based upon correlation matrix
       MR1   h2   u2 com
-ef2  0.62 0.38 0.62   1
+ef2  0.63 0.40 0.60   1
 ef3b 0.91 0.82 0.18   1
 ef4  0.92 0.84 0.16   1
-ef5  0.74 0.54 0.46   1
+ef5  0.74 0.55 0.45   1
 
                 MR1
-SS loadings    2.59
+SS loadings    2.62
 Proportion Var 0.65
 
 Mean item complexity =  1
 Test of the hypothesis that 1 factor is sufficient.
 
-df null model =  6  with the objective function =  2.75 with Chi Square =  1223.82
-df of  the model are 2  and the objective function was  0.32 
+df null model =  6  with the objective function =  2.84 with Chi Square =  1410.17
+df of  the model are 2  and the objective function was  0.35 
 
 The root mean square of the residuals (RMSR) is  0.07 
 The df corrected root mean square of the residuals is  0.13 
 
-The harmonic n.obs is  449 with the empirical chi square  28.34  with prob <  7e-07 
-The total n.obs was  449  with Likelihood Chi Square =  141.7  with prob <  1.7e-31 
+The harmonic n.obs is  500 with the empirical chi square  33.29  with prob <  5.9e-08 
+The total n.obs was  500  with Likelihood Chi Square =  174.36  with prob <  1.4e-38 
 
-Tucker Lewis Index of factoring reliability =  0.655
-RMSEA index =  0.394  and the 90 % confidence intervals are  0.341 0.451
-BIC =  129.48
+Tucker Lewis Index of factoring reliability =  0.631
+RMSEA index =  0.415  and the 90 % confidence intervals are  0.365 0.469
+BIC =  161.93
 Fit based upon off diagonal values = 0.99
 Measures of factor score adequacy             
                                                    MR1
 Correlation of (regression) scores with factors   0.96
-Multiple R square of scores with factors          0.91
+Multiple R square of scores with factors          0.92
 Minimum correlation of possible factor scores     0.83
 
 Reliability analysis   
 Call: alpha(x = data_n)
 
-  raw_alpha std.alpha G6(smc) average_r S/N  ase mean  sd median_r
-      0.88      0.88    0.83      0.71 7.3 0.01  6.2 1.1     0.72
+  raw_alpha std.alpha G6(smc) average_r S/N    ase mean  sd median_r
+      0.88      0.88    0.83      0.71 7.2 0.0096  6.2 1.1     0.71
 
     95% confidence boundaries 
          lower alpha upper
-Feldt     0.86  0.88   0.9
-Duhachek  0.86  0.88   0.9
+Feldt     0.86  0.88  0.89
+Duhachek  0.86  0.88  0.89
 
  Reliability if an item is dropped:
     raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
-nf1      0.84      0.84    0.72      0.72 5.1    0.015    NA  0.72
-nf4      0.84      0.85    0.74      0.74 5.6    0.014    NA  0.74
-nf6      0.80      0.80    0.67      0.67 4.0    0.019    NA  0.67
+nf1      0.83      0.83    0.71      0.71 4.9    0.015    NA  0.71
+nf4      0.84      0.85    0.74      0.74 5.7    0.014    NA  0.74
+nf6      0.80      0.80    0.67      0.67 4.0    0.018    NA  0.67
 
  Item statistics 
       n raw.r std.r r.cor r.drop mean  sd
-nf1 449  0.90  0.89  0.81   0.76  6.1 1.3
-nf4 449  0.88  0.89  0.79   0.74  6.1 1.2
-nf6 449  0.91  0.91  0.85   0.80  6.4 1.1
+nf1 500  0.90  0.89  0.81   0.76  6.0 1.3
+nf4 500  0.88  0.88  0.79   0.74  6.0 1.2
+nf6 500  0.91  0.91  0.85   0.79  6.4 1.1
 Omega 
 Call: omegah(m = m, nfactors = nfactors, fm = fm, key = key, flip = flip, 
     digits = digits, title = title, sl = sl, labels = labels, 
     plot = plot, n.obs = n.obs, rotate = rotate, Phi = Phi, option = option, 
     covar = covar)
 Alpha:                 0.87 
-G.6:                   0.88 
-Omega Hierarchical:    0.75 
-Omega H asymptotic:    0.83 
-Omega Total            0.91 
+G.6:                   0.87 
+Omega Hierarchical:    0.77 
+Omega H asymptotic:    0.86 
+Omega Total            0.9 
 
 Schmid Leiman Factor loadings greater than  0.2 
-        g  F1* F2*   F3*   h2   h2   u2   p2  com
-af1b 0.85 0.54           1.00 1.00 0.00 0.72 1.78
-af1  0.60           0.23 0.37 0.37 0.63 0.95 1.33
-af3  0.65 0.62           0.87 0.87 0.13 0.49 2.04
-af6  0.84                0.69 0.69 0.31 1.02 1.01
+        g  F1*  F2*  F3*   h2   h2   u2   p2  com
+af1b 0.85      0.51      1.00 1.00 0.00 0.73 1.70
+af1  0.63                0.37 0.37 0.63 1.08 1.13
+af3  0.94                0.86 0.86 0.14 1.04 1.02
+af6  0.54      0.61      0.69 0.69 0.31 0.43 2.01
 
 With Sums of squares  of:
    g  F1*  F2*  F3*   h2 
-2.20 0.69 0.00 0.09 2.36 
+2.31 0.00 0.63 0.06 2.33 
 
-general/max  0.93   max/min =   Inf
-mean percent general =  0.79    with sd =  0.24 and cv of  0.3 
-Explained Common Variance of the general factor =  0.74 
+general/max  0.99   max/min =   Inf
+mean percent general =  0.82    with sd =  0.3 and cv of  0.37 
+Explained Common Variance of the general factor =  0.77 
 
 The degrees of freedom are -3  and the fit is  0 
-The number of observations was  449  with Chi Square =  0  with prob <  NA
+The number of observations was  500  with Chi Square =  0  with prob <  NA
 The root mean square of the residuals is  0 
 The df corrected root mean square of the residuals is  NA
 
 Compare this with the adequacy of just a general factor and no group factors
-The degrees of freedom for just the general factor are 2  and the fit is  0.76 
-The number of observations was  449  with Chi Square =  339.43  with prob <  2e-74
-The root mean square of the residuals is  0.15 
-The df corrected root mean square of the residuals is  0.25 
+The degrees of freedom for just the general factor are 2  and the fit is  0.55 
+The number of observations was  500  with Chi Square =  272.34  with prob <  7.3e-60
+The root mean square of the residuals is  0.13 
+The df corrected root mean square of the residuals is  0.23 
 
-RMSEA index =  0.613  and the 90 % confidence intervals are  0.56 0.67
-BIC =  327.21 
+RMSEA index =  0.52  and the 90 % confidence intervals are  0.469 0.574
+BIC =  259.91 
 
 Measures of factor score adequacy             
-                                                 g  F1* F2*   F3*
-Correlation of scores with factors            0.91 0.88   0  0.62
-Multiple R square of scores with factors      0.83 0.77   0  0.39
-Minimum correlation of factor score estimates 0.66 0.54  -1 -0.22
+                                                 g F1*  F2*   F3*
+Correlation of scores with factors            0.96   0 0.99  0.46
+Multiple R square of scores with factors      0.92   0 0.98  0.21
+Minimum correlation of factor score estimates 0.83  -1 0.95 -0.58
 
  Total, General and Subset omega for each subset
-                                                 g  F1* F2*  F3*
-Omega total for total scores and subscales    0.91 0.97  NA 0.72
-Omega general for total scores and subscales  0.75 0.60  NA 0.71
-Omega group for total scores and subscales    0.12 0.37  NA 0.01
+                                                 g F1*  F2*  F3*
+Omega total for total scores and subscales    0.90  NA 0.91 0.81
+Omega general for total scores and subscales  0.77  NA 0.55 0.81
+Omega group for total scores and subscales    0.11  NA 0.36 0.00
 Factor Analysis using method =  minres
 Call: fa(r = data_n)
 Standardized loadings (pattern matrix) based upon correlation matrix
      MR1   h2   u2 com
-nf1 0.83 0.68 0.32   1
-nf4 0.81 0.65 0.35   1
+nf1 0.83 0.69 0.31   1
+nf4 0.80 0.64 0.36   1
 nf6 0.89 0.79 0.21   1
 
                 MR1
-SS loadings    2.13
+SS loadings    2.12
 Proportion Var 0.71
 
 Mean item complexity =  1
 Test of the hypothesis that 1 factor is sufficient.
 
-df null model =  3  with the objective function =  1.61 with Chi Square =  716.22
+df null model =  3  with the objective function =  1.59 with Chi Square =  790.02
 df of  the model are 0  and the objective function was  0 
 
 The root mean square of the residuals (RMSR) is  0 
 The df corrected root mean square of the residuals is  NA 
 
-The harmonic n.obs is  449 with the empirical chi square  0  with prob <  NA 
-The total n.obs was  449  with Likelihood Chi Square =  0  with prob <  NA 
+The harmonic n.obs is  500 with the empirical chi square  0  with prob <  NA 
+The total n.obs was  500  with Likelihood Chi Square =  0  with prob <  NA 
 
 Tucker Lewis Index of factoring reliability =  -Inf
 Fit based upon off diagonal values = 1
@@ -434,32 +435,32 @@ Measures of factor score adequacy
                                                    MR1
 Correlation of (regression) scores with factors   0.94
 Multiple R square of scores with factors          0.89
-Minimum correlation of possible factor scores     0.78
+Minimum correlation of possible factor scores     0.77
 
 Reliability analysis   
 Call: alpha(x = data_o)
 
   raw_alpha std.alpha G6(smc) average_r S/N    ase mean sd median_r
-      0.87      0.87    0.86      0.62 6.5 0.0099  4.4  1     0.63
+      0.86      0.86    0.86      0.61 6.2 0.0097  4.4  1     0.63
 
     95% confidence boundaries 
          lower alpha upper
-Feldt     0.85  0.87  0.89
-Duhachek  0.85  0.87  0.89
+Feldt     0.84  0.86  0.88
+Duhachek  0.84  0.86  0.88
 
  Reliability if an item is dropped:
-     raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
-of3b      0.75      0.75    0.67      0.50 3.0    0.020 0.003  0.52
-of1       0.85      0.85    0.82      0.66 5.7    0.012 0.013  0.72
-of2       0.84      0.84    0.84      0.64 5.3    0.013 0.029  0.72
-of5       0.86      0.86    0.83      0.67 6.2    0.011 0.012  0.72
+     raw_alpha std.alpha G6(smc) average_r S/N alpha se  var.r med.r
+of3b      0.74      0.74    0.66      0.49 2.9    0.020 0.0037  0.50
+of1       0.84      0.84    0.81      0.64 5.4    0.012 0.0165  0.71
+of2       0.84      0.84    0.83      0.63 5.1    0.012 0.0318  0.71
+of5       0.86      0.86    0.83      0.67 6.2    0.011 0.0125  0.72
 
  Item statistics 
        n raw.r std.r r.cor r.drop mean  sd
-of3b 449  0.95  0.95  0.95   0.90  5.0 1.4
-of1  449  0.83  0.81  0.74   0.67  3.3 1.3
-of2  449  0.82  0.83  0.74   0.69  3.8 1.2
-of5  449  0.78  0.80  0.71   0.64  5.5 1.1
+of3b 500  0.95  0.95  0.96   0.90  5.0 1.4
+of1  500  0.82  0.81  0.74   0.67  3.2 1.3
+of2  500  0.82  0.82  0.73   0.68  3.8 1.2
+of5  500  0.77  0.78  0.69   0.62  5.5 1.1
 Omega 
 Call: omegah(m = m, nfactors = nfactors, fm = fm, key = key, flip = flip, 
     digits = digits, title = title, sl = sl, labels = labels, 
@@ -467,72 +468,72 @@ Call: omegah(m = m, nfactors = nfactors, fm = fm, key = key, flip = flip,
     covar = covar)
 Alpha:                 0.88 
 G.6:                   0.83 
-Omega Hierarchical:    0.01 
-Omega H asymptotic:    0.01 
+Omega Hierarchical:    0.02 
+Omega H asymptotic:    0.02 
 Omega Total            0.88 
 
 Schmid Leiman Factor loadings greater than  0.2 
         g  F1*   F2*   F3*   h2   h2   u2   p2  com
-nf1       0.83             0.69 0.69 0.31 0.01 1.03
-nf4       0.80             0.66 0.66 0.34 0.01 1.05
-nf6       0.88             0.79 0.79 0.21 0.01 1.03
+nf1       0.83             0.70 0.70 0.30 0.02 1.05
+nf4       0.80             0.65 0.65 0.35 0.02 1.07
+nf6       0.87             0.78 0.78 0.22 0.02 1.04
 
 With Sums of squares  of:
    g  F1*  F2*  F3*   h2 
-0.03 2.11 0.01 0.00 1.54 
+0.04 2.08 0.01 0.00 1.53 
 
-general/max  0.01   max/min =   Inf
-mean percent general =  0.01    with sd =  0 and cv of  0 
-Explained Common Variance of the general factor =  0.01 
+general/max  0.02   max/min =   Inf
+mean percent general =  0.02    with sd =  0 and cv of  0 
+Explained Common Variance of the general factor =  0.02 
 
 The degrees of freedom are -3  and the fit is  0 
-The number of observations was  449  with Chi Square =  0  with prob <  NA
+The number of observations was  500  with Chi Square =  0  with prob <  NA
 The root mean square of the residuals is  0 
 The df corrected root mean square of the residuals is  NA
 
 Compare this with the adequacy of just a general factor and no group factors
-The degrees of freedom for just the general factor are 0  and the fit is  1.57 
-The number of observations was  449  with Chi Square =  698.42  with prob <  NA
-The root mean square of the residuals is  0.7 
+The degrees of freedom for just the general factor are 0  and the fit is  1.53 
+The number of observations was  500  with Chi Square =  758.68  with prob <  NA
+The root mean square of the residuals is  0.69 
 The df corrected root mean square of the residuals is  NA 
 
 Measures of factor score adequacy             
                                                   g  F1*   F2* F3*
-Correlation of scores with factors             0.11 0.94  0.17   0
-Multiple R square of scores with factors       0.01 0.88  0.03   0
-Minimum correlation of factor score estimates -0.98 0.75 -0.94  -1
+Correlation of scores with factors             0.14 0.93  0.16   0
+Multiple R square of scores with factors       0.02 0.87  0.03   0
+Minimum correlation of factor score estimates -0.96 0.74 -0.95  -1
 
  Total, General and Subset omega for each subset
                                                  g  F1* F2* F3*
 Omega total for total scores and subscales    0.88 0.88  NA  NA
-Omega general for total scores and subscales  0.01 0.01  NA  NA
-Omega group for total scores and subscales    0.87 0.87  NA  NA
+Omega general for total scores and subscales  0.02 0.02  NA  NA
+Omega group for total scores and subscales    0.86 0.86  NA  NA
 Factor Analysis using method =  minres
 Call: fa(r = data_o)
 Standardized loadings (pattern matrix) based upon correlation matrix
       MR1   h2     u2 com
-of3b 1.01 1.02 -0.017   1
-of1  0.72 0.52  0.484   1
-of2  0.74 0.54  0.455   1
-of5  0.69 0.47  0.526   1
+of3b 1.01 1.02 -0.023   1
+of1  0.72 0.51  0.488   1
+of2  0.73 0.54  0.462   1
+of5  0.67 0.45  0.553   1
 
                 MR1
-SS loadings    2.55
-Proportion Var 0.64
+SS loadings    2.52
+Proportion Var 0.63
 
 Mean item complexity =  1
 Test of the hypothesis that 1 factor is sufficient.
 
-df null model =  6  with the objective function =  2.36 with Chi Square =  1050.04
+df null model =  6  with the objective function =  2.33 with Chi Square =  1159.94
 df of  the model are 2  and the objective function was  0.06 
 
 The root mean square of the residuals (RMSR) is  0.03 
 The df corrected root mean square of the residuals is  0.05 
 
-The harmonic n.obs is  449 with the empirical chi square  4.68  with prob <  0.096 
-The total n.obs was  449  with Likelihood Chi Square =  25.25  with prob <  3.3e-06 
+The harmonic n.obs is  500 with the empirical chi square  5.65  with prob <  0.059 
+The total n.obs was  500  with Likelihood Chi Square =  31.09  with prob <  1.8e-07 
 
-Tucker Lewis Index of factoring reliability =  0.933
-RMSEA index =  0.161  and the 90 % confidence intervals are  0.109 0.22
-BIC =  13.03
+Tucker Lewis Index of factoring reliability =  0.924
+RMSEA index =  0.171  and the 90 % confidence intervals are  0.121 0.226
+BIC =  18.66
 Fit based upon off diagonal values = 1

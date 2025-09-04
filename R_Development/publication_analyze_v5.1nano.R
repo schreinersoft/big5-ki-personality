@@ -22,7 +22,7 @@ facet_names <- list("Creative Imagination", "Fantasy", "Aesthetics", "Ideas",
 
 
 # NANO MODEL!
-# combine V1 and V2 aggregated
+# get data
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(essay_id, all_of(all_facets), model) %>% 
   filter(model=="gpt-5-nano-2025-08-07") %>% 
