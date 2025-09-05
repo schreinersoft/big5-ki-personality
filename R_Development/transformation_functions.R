@@ -1,8 +1,7 @@
 library("tidyverse")
 
-
 # calculate all means of facets and factors
-model_aggregate <- function(d)
+aggregate_model <- function(d)
 {
   o_facets <- d %>% select(starts_with(("of")))
   c_facets <- d %>% select(starts_with(("cf")))

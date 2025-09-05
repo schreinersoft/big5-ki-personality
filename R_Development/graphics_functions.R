@@ -6,8 +6,10 @@ source("combined_names_EN.R")
 # environmental variables:
 ## graphics_output_folder
 ## tables_output_folder
+## raw_output_folder
 
 # create all histogram plots of raw data for one essay
+# needs raw_data, not aggregated!
 create_essay_histograms <- function(data, model_version, essay_number)
 {
   o_facets <- data %>% select(starts_with(("of")))
@@ -74,10 +76,9 @@ create_facet_densities <- function(data)
 
   for (i in 1:length(factor_names)) {
     factor_name <- factor_names[i]
-    facets_df <- factor_facets_list[[i]]  # This is a data frame
-    plots <- list()  # Reset plots list for each factor
+    facets_df <- factor_facets_list[[i]]
+    plots <- list()
     
-    # Create plots for all facets of current factor
     plot_index <- 1
     
     for (facet in names(facets_df)) { 
@@ -90,8 +91,8 @@ create_facet_densities <- function(data)
              y = "") +
         stat_function(
           fun = dnorm,
-          args = list(mean = mean(d[[facet]], na.rm = TRUE), 
-                      sd = sd(d[[facet]], na.rm = TRUE)), 
+          args = list(mean = mean(data[[facet]], na.rm = TRUE), 
+                      sd = sd(data[[facet]], na.rm = TRUE)), 
           color = "blue", linewidth = 0.5, linetype = "dashed"
         ) +
         theme_minimal()
@@ -109,5 +110,105 @@ create_facet_densities <- function(data)
     ggsave(paste(graphics_output_folder,"/density_", factor_name, "_", modelVersion, "_facets.png", sep = ""), 
            plot = combined_plot, dpi = 300, width = 8, height = 6)
   }
+}
+
+# plot OCEAN factors of all essays
+create_factor_densities <- function(data, model_version)
+{
+  all_factors <- data %>% select(
+    starts_with("o_"),
+    starts_with("c_"),
+    starts_with("e_"),
+    starts_with("a_"),
+    starts_with("n_")) %>% names()
+  
+  plots <- list()
+  i <- 1
+  for (factor in all_factors){
+    plots[[i]] <- data %>%
+      ggplot(aes(x = .data[[factor]])) +
+      xlim(1, 9) +
+      geom_density(color = "black",
+                   fill = "lightblue") +   # XXX factor colors?
+      labs(title = variable_names[[factor]] %||% factor,
+           #x = "Value",
+           y = "") +
+      stat_function(
+        fun = dnorm,  # Normal distribution function
+        args = list(mean = mean(data[[factor]], na.rm = TRUE), 
+                    sd = sd(data[[factor]], na.rm = TRUE)), 
+        color = "blue", linewidth = 0.5, linetype = "dashed"
+      ) +
+      theme_minimal() 
+    i <- i + 1
+  }
+  combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
+  combined_plot
+  ggsave(paste(graphics_output_folder, "/density_", model_version, "_factors.png", sep=""),
+         plot = combined_plot, dpi=300, width = 8, height = 6)
+}
+
+# Correlation matrices
+create_correlation_matrices <- function(data, model_version)
+{
+  data_facets <- data %>%
+    select(starts_with(("of")),
+           starts_with(("cf")),
+           starts_with(("ef")),
+           starts_with(("af")),
+           starts_with(("nf")))
+  
+  data_factors <- data %>%
+    select(starts_with(("o_")),
+           starts_with(("c_")),
+           starts_with(("e_")),
+           starts_with(("a_")),
+           starts_with(("n_")))
+
+  sink(paste(raw_output_folder, "/output_analyzation_", model_version, ".txt", sep=""))
+
+  cor_matrix <- corr.test(data_facets, use = "complete.obs", method="pearson")
+  cor_matrix_rounded <- round(cor_matrix$r, 2)
+  print("Correlation Matrix (Pearson's r):")
+  print(cor_matrix_rounded)
+  print("p-Values:")
+  print(round(cor_matrix$p, 3))
+
+  
+  png(paste(graphics_output_folder, "/corrplot_", model_version, "_facets.png", sep=""), width = 2400, height = 2400, res = 150)
+  corrplot(cor_matrix_rounded, method = "color", type = "upper", 
+           addCoef.col = "black", tl.cex = 0.8)
+  dev.off()
+  
+  # Facets Spearman
+  cor_matrix <- corr.test(data_facets, use = "complete.obs", method="spearman")
+  # Round to 2 decimal places
+  cor_matrix_rounded <- round(cor_matrix$r, 2)
+  print("Correlation Matrix (Spearmans's rho):")
+  print(cor_matrix_rounded)
+  print("p-Values:")
+  print(round(cor_matrix$p, 3))
+  
+  # Plot correlation Matrix
+  png(paste(graphics_output_folder, "/corrplot_spearman_", model_version, "_facets.png", sep=""), width = 2400, height = 2400, res = 150)
+  corrplot(cor_matrix_rounded, method = "color", type = "upper", 
+           addCoef.col = "black", tl.cex = 0.8)
+  dev.off()
+  
+  # Factors
+  cor_matrix <- corr.test(data_factors, use = "complete.obs", method="pearson")
+  # Round to 2 decimal places
+  cor_matrix_rounded <- round(cor_matrix$r, 2)
+  print("Correlation Matrix (Pearson's r):")
+  print(cor_matrix_rounded)
+  print("p-Values:")
+  print(round(cor_matrix$p, 3))
+  
+  # Plot correlation Matrix
+  png(paste(graphics_output_folder, "/corrplot_factors_", model_version, ".png", sep=""), width = 2400, height = 2400, res = 150)
+  corrplot(cor_matrix_rounded, method = "color", type = "upper", 
+           addCoef.col = "black", tl.cex = 0.8)
+  dev.off()
+  sink()
 }
 
