@@ -1,4 +1,4 @@
-facet_names = c(
+variable_names = c(
   'of1b' = 'Intellectual Curiosity',
   'of2b' = 'Aesthetic Sensitivity',
   'of3b' = 'Creative Imagination',
