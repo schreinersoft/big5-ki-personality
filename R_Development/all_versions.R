@@ -19,6 +19,7 @@ analyze_all <- function(data, model_version)
 {
   analyze_alpha_omega(data, model_version)
   analyze_factor_loadings(data, model_version)
+  analyze_item_statistics(data, model_version)
 }
 
 create_all <- function(data, model_version)
@@ -95,10 +96,11 @@ data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id"
     a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
     n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE)
   )
-create_correlation_matrices(data, model_version)
-create_facet_densities(data, model_version)
-create_factor_densities(data, model_version)
-
+create_correlation_matrices(data_aggregated, model_version)
+create_facet_densities(data_aggregated, model_version)
+create_factor_densities(data_aggregated, model_version)
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
 
 
 ################################################# V5.1

@@ -96,7 +96,7 @@ return(omega_results)
 
 ########################
 # descriptive statistics of all facets
-item_statistics <- function(data, model_version)
+analyze_item_statistics <- function(data, model_version)
 {
   all_factors <- data %>% select(
     starts_with("o_"),

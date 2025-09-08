@@ -148,6 +148,12 @@ create_factor_densities <- function(data, model_version)
       theme_minimal() 
     i <- i + 1
   }
+  
+  # Calculate layout dimensions after all plots are created
+  n_plots <- length(plots)
+  n_cols <- min(n_plots, 3)
+  n_rows <- ceiling(n_plots / n_cols)
+  
   combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
   combined_plot
   ggsave(paste(graphics_output_folder, "/density_", model_version, "_factors.png", sep=""),
