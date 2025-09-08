@@ -1,5 +1,5 @@
 # Pro Modell messen:
-# Facetten deskriptiv + KS
+# Facetten deskriptiv + KS + Itemschwierigkeit + Trennschärfe
 # Korrelationsmatrix Facetten Text + Grafik
 # Faktoren deskriptiv + Alpha + Omega + KS + Eigenwerte
 # Korrelationsmatrix Faktoren Text + Grafik

@@ -58,6 +58,8 @@ data <- tbl(con, "openai_analyzation") %>%
     nf3b = nf3
   )
 data_aggregated <- aggregate_model(data)
+db_write_model(data_aggregated, model_version)
+
 create_essay_histograms(data, model_version, 27)
 create_essay_histograms(data, model_version, 42)
 create_essay_histograms(data, model_version, 112)
@@ -71,6 +73,8 @@ data_aggregated <- data %>%
   select(-ef2b) %>% 
   aggregate_model()
 
+db_write_model(data_aggregated, model_version)
+
 analyze_alpha_omega(data_aggregated, model_version)
 analyze_factor_loadings(data_aggregated, model_version)
 analyze_item_statistics(data_aggregated, model_version)
@@ -82,6 +86,8 @@ model_version <- "v1.2"
 data_aggregated <- data %>% 
   select(-ef2b, -af2b) %>% 
   aggregate_model()
+
+db_write_model(data_aggregated, model_version)
 
 analyze_alpha_omega(data_aggregated, model_version)
 analyze_factor_loadings(data_aggregated, model_version)

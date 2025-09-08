@@ -14,6 +14,9 @@ liwc_data <- left_join(essays, liwc, by = c("id" = "essay_id")) %>%
 
 liwc_ocean <- c("o_liwc_z", "c_liwc_z", "e_liwc_z", "a_liwc_z", "n_liwc_z")
 
+liwc_data <- liwc_data %>% 
+  filter(id <= 250)
+
 
 # z-Normalisierung
 liwc_data$o_liwc_z <- as.numeric(scale(liwc_data$o_liwc))
@@ -46,14 +49,20 @@ liwc_data <- liwc_data %>%
     )
   )
 
-# Korrelationen der 5 Faktoren mit LIWC
+####################### Analysiere Fähigkeit zur Differenzierung
+anova_o <- model_oneway <- aov(o_liwc ~ o_binary, data = liwc_data)
+summary(anova_o)
+
+anova_o$terms
+  
+  
+####################### Korrelationen der 5 Faktoren mit LIWC
 cor.test(liwc_data$o_bin, liwc_data$o_liwc)
 cor.test(liwc_data$o_bin, liwc_data$o_liwc, method = "spearman")
 
 
-
-# Bilde Scores
-analyze <- liwc_data %>% 
+####################### Bilde Scores
+score_analyze <- liwc_data %>% 
   select(id, o_bin_z, c_bin_z, e_bin_z, a_bin_z, n_bin_z, o_liwc_z, c_liwc_z, e_liwc_z, a_liwc_z, n_liwc_z) %>% 
   rename(essay_id = id) %>% 
   rowwise() %>% 
@@ -72,12 +81,12 @@ analyze <- liwc_data %>%
     SCORE = (So + Sc + Se + Sa + Sn)/5
   )
 
-analyze %>% 
+score_analyze %>% 
   select(No,Nc,Ne,Na,Nn,So,Sc,Se,Sa,Sn, SCORE) %>% 
   describe()
 
 
-analyze %>% 
+score_analyze %>% 
   ggplot +
   geom_density(aes(x=No)) +
   geom_density(aes(x=Nc)) +
@@ -87,7 +96,7 @@ analyze %>%
   geom_density(aes(x=SCORE, color="red"))
 
 # Alle Sfs
-analyze %>% 
+score_analyze %>% 
   select(So, Sc, Se, Sa, Sn) %>% 
   pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
   ggplot(aes(x = value, color = "darkgrey", group = variable, fill=variable)) +
@@ -95,14 +104,14 @@ analyze %>%
   scale_fill_brewer(type = "qual", palette = "Oranges")
 
 # Alle Nfs
-analyze %>% 
+score_analyze %>% 
   select(No, Nc, Ne, Na, Nn) %>% 
   pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
   ggplot(aes(x = value, color = "darkgrey", fill = variable)) +
   geom_density(alpha=0.7)+
   scale_fill_brewer(type = "qual", palette = "Oranges")
 
-analyze %>% 
+score_analyze %>% 
   ggplot +
   geom_density(aes(x=SCORE), fill="yellow")
 
@@ -110,7 +119,7 @@ analyze %>%
 # Number of essays by threshold
 count_essays <- function(thr)
 {
-  analyze %>% 
+  score_analyze %>% 
     filter(SCORE >= thr) %>% 
     count() %>% sum()
 }
@@ -138,14 +147,14 @@ essays_filtered %>%
 thr <- 0.5
 
 # insgesamt?
-analyze %>% 
+score_analyze %>% 
   select(essay_id, SCORE, all_of(liwc_ocean)) %>% 
   filter(SCORE >= thr) %>% 
   arrange(desc(SCORE))
 
 
 # as.array()# oder alle gemeinsam?
-analyze %>% 
+score_analyze %>% 
   filter(
     (So >= thr) &
       (Sc >= thr) &
@@ -153,13 +162,13 @@ analyze %>%
       (Sa >= thr) &
       (Sn >= thr))
 
-enhanced_essays <- analyze %>% 
+enhanced_essays <- score_analyze %>% 
   select(essay_id, SCORE) %>% 
   filter(SCORE >= thr)
 
 mean(enhanced_essays$SCORE)
 
-analyze %>% 
+score_analyze %>% 
   arrange(SCORE)
 
 
