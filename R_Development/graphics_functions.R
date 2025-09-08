@@ -113,7 +113,7 @@ create_facet_densities <- function(data, model_version)
     
     # Create and save combined plot for this factor
     combined_plot <- wrap_plots(plots, ncol = n_cols)
-    ggsave(paste(graphics_output_folder,"/density_", factor_name, "_", model_version, "_facets.png", sep = ""), 
+    ggsave(paste(graphics_output_folder,"/density_", model_version, "_", factor_name, "_facets.png", sep = ""), 
            plot = combined_plot, dpi = 300, width = n_cols * 3, height = n_rows * 3)
   }
 }
@@ -135,7 +135,7 @@ create_factor_densities <- function(data, model_version)
       ggplot(aes(x = .data[[factor]])) +
       xlim(1, 9) +
       geom_density(color = "black",
-                   fill = "lightblue") +   # XXX factor colors?
+                   fill = "orange") +   # XXX factor colors?
       labs(title = variable_names[[factor]] %||% factor,
            #x = "Value",
            y = "") +

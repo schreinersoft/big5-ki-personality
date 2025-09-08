@@ -22,14 +22,11 @@ analyze_all <- function(data, model_version)
   analyze_item_statistics(data, model_version)
 }
 
-create_all <- function(data, model_version)
+create_all_graphics <- function(data, model_version)
 {
   create_correlation_matrices(data, model_version)
   create_facet_densities(data, model_version)
   create_factor_densities(data, model_version)
-  create_essay_histograms(data, model_version, 27)
-  create_essay_histograms(data, model_version, 42)
-  create_essay_histograms(data, model_version, 112)
 }
 
 tables_output_folder <- "C:/temp/tables"
@@ -38,7 +35,40 @@ stats_output_folder <- "C:/temp/outputs"
 
 
 
+################################################# V1.0
+model_version <- "v1.0"
+data <- tbl(con, "openai_analyzation") %>% 
+  select(-temperature) %>% 
+  collect() %>% 
+  rename(
+    of1b = of1,
+    of2b = of2,
+    of3b = of3,
+    cf1b = cf1,
+    cf2b = cf2,
+    cf3b = cf3,
+    ef1b = ef1,
+    ef2b = ef2,
+    ef3b = ef3,
+    af1b = af1,
+    af2b = af2,
+    af3b = af3,
+    nf1b = nf1,
+    nf2b = nf2,
+    nf3b = nf3
+  )
+data_aggregated <- aggregate_model(data)
+create_essay_histograms(data, model_version, 27)
+create_essay_histograms(data, model_version, 42)
+create_essay_histograms(data, model_version, 112)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
 
+
+################################################# V2.0
+model_version <- "v2.0"
 
 
 

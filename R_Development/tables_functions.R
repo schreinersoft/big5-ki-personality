@@ -148,7 +148,7 @@ analyze_item_statistics <- function(data, model_version)
                         mean(data[[Variable]], na.rm = TRUE), 
                         sd(data[[Variable]], na.rm = TRUE))$p.value),
            sw = shapiro.test(data[[Variable]])$p.value) %>% 
-    select(Variable, Name, n, mean, sd, median, min, max, difficulty, ks, sw) %>%
+    select(Variable, Name, n, mean, sd, median, min, max, ks, sw, difficulty) %>%
     mutate(
       across(c(mean, sd, median, min, max), ~round(.x, 2)),
       across(c(ks, sw), ~round(.x, 2))
@@ -177,11 +177,11 @@ analyze_item_statistics <- function(data, model_version)
       median = "Median",
       min = "Min",
       max = "Max",
-      r.cor = "Trennschärfe",
-      r.drop = "Trennschärfe ohne",
-      difficulty = "Itemschwierigkeit",
-      ks = "KS-Test",
-      sw = "Shapiro-Wilk"
+      r.cor = "TS",
+      r.drop = "TS/oh",
+      difficulty = "IS",
+      ks = "KS",
+      sw = "SW"
     ) %>%
     theme_vanilla() %>%
     autofit() %>%
