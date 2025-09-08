@@ -145,7 +145,7 @@ analyze_item_statistics <- function(data, model_version)
     rownames_to_column("Variable") %>%
     rowwise() %>%
     mutate(Name = variable_names[Variable],
-           difficulty = round(((mean / 9)*100)), # assuming scale with 9 steps 
+           difficulty = round((((mean-1) / 8)*100)), # assuming scale with 9 steps 
            ks = suppressWarnings(ks.test(data[[Variable]], "pnorm", 
                         mean(data[[Variable]], na.rm = TRUE), 
                         sd(data[[Variable]], na.rm = TRUE))$p.value),
@@ -230,12 +230,18 @@ analyze_factor_loadings <- function(data, model_version)
   
   # Add item names as first column (adjust item names as needed)
   loadings_df$Item <- rownames(loadings_matrix)
-  loadings_df <- loadings_df[, c("Item", paste0("PA", 1:5), "h2")]  # Reorder columns
+  loadings_df <- loadings_df %>%
+    rowwise() %>% 
+    mutate(
+      Name = variable_names[[Item]]
+    )
+  loadings_df <- loadings_df[, c("Item", "Name", paste0("PA", 1:5), "h2")]  # Reorder columns
   
   # Row mit Eigenwerten einfügen
   eigenwerte <- round(faModel$values, 2)
   loadings_df <- loadings_df %>% 
-    add_row(Item="Eigenwert",
+    add_row(Item="",
+            Name="Eigenwert",
             PA1 = eigenwerte[1],
             PA2 = eigenwerte[2],
             PA3 = eigenwerte[3],
@@ -264,7 +270,10 @@ analyze_factor_loadings <- function(data, model_version)
     bold(i = ~ (PA2 > 0.3 & PA2 <= 1.0) | PA2 < -0.3, j = "PA2") %>%
     bold(i = ~ (PA3 > 0.3 & PA3 <= 1.0) | PA3 < -0.3, j = "PA3") %>%
     bold(i = ~ (PA4 > 0.3 & PA4 <= 1.0) | PA4 < -0.3, j = "PA4") %>%
-    bold(i = ~ (PA5 > 0.3 & PA5 <= 1.0) | PA5 < -0.3, j = "PA5")
+    bold(i = ~ (PA5 > 0.3 & PA5 <= 1.0) | PA5 < -0.3, j = "PA5") %>% 
+    align(j = 2, align="left") %>% 
+    align(j = 7, align="center") %>% 
+    italic(i = 1)
   save_as_docx(ft, path = paste(tables_output_folder, "/loadings_", model_version, ".docx", sep=""))
 
   # Generiere Scree Plot 

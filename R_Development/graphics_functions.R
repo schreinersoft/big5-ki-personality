@@ -64,7 +64,7 @@ create_essay_histograms <- function(data, model_version, essay_number)
     
   ggsave(
     paste(graphics_output_folder,"/histograms_", model_version, "_", factor_names[[i]], "_essay_", essay_number, ".png", sep = ""),
-    plot = combined_plot, dpi=300, width = n_cols * 3, height = n_rows * 3)
+    plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
   }
 }
 
@@ -80,6 +80,10 @@ create_facet_densities <- function(data, model_version)
   factor_names <- c("O", "C", "E", "A", "N")
   factor_facets_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
+  combined_plots <- list()
+  combined_plot_index <- 1
+  combined_plot_rows <- 0
+  
   for (i in 1:length(factor_names)) {
     factor_name <- factor_names[i]
     facets_df <- factor_facets_list[[i]]
@@ -112,10 +116,16 @@ create_facet_densities <- function(data, model_version)
     n_rows <- ceiling(n_plots / n_cols)
     
     # Create and save combined plot for this factor
-    combined_plot <- wrap_plots(plots, ncol = n_cols)
+    combined_plots[[combined_plot_index]] <- wrap_plots(plots, ncol = n_cols)
     ggsave(paste(graphics_output_folder,"/density_", model_version, "_", factor_name, "_facets.png", sep = ""), 
-           plot = combined_plot, dpi = 300, width = n_cols * 3, height = n_rows * 3)
+           plot = combined_plots[[combined_plot_index]], dpi = 300, width = 8, height = n_rows * 3)
+    
+    combined_plot_index <- combined_plot_index + 1
+    combined_plot_rows <- combined_plot_rows + n_rows
   }
+  combined_all <- wrap_plots(combined_plots, ncol = 1)
+  ggsave(paste(graphics_output_folder,"/density_", model_version, "_combined_facets.png", sep = ""), 
+         plot = combined_all, dpi = 300, width = 8, height = combined_plot_rows * 2)
 }
 
 # plot OCEAN factors of all essays
@@ -157,8 +167,46 @@ create_factor_densities <- function(data, model_version)
   combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
   combined_plot
   ggsave(paste(graphics_output_folder, "/density_", model_version, "_factors.png", sep=""),
-         plot = combined_plot, dpi=300, width = n_cols * 3, height = n_rows * 3)
+         plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
 }
+
+# plot Q-Q-Plot of OCEAN factors
+create_q_q_plot <- function(data, model_version)
+{
+  all_factors <- data %>% select(
+    starts_with("o_"),
+    starts_with("c_"),
+    starts_with("e_"),
+    starts_with("a_"),
+    starts_with("n_")) %>% names()
+  
+  plots <- list()
+  i <- 1
+  for (factor in all_factors){
+    plots[[i]] <- data %>%
+      ggplot(aes(sample = .data[[factor]])) +
+      stat_qq() +
+      stat_qq_line(color = "red") +
+      labs(title = variable_names[[factor]] %||% factor, 
+           x = "", 
+           y = "") +
+      theme_minimal()
+    i <- i + 1
+  }
+  
+  # Calculate layout dimensions after all plots are created
+  n_plots <- length(plots)
+  n_cols <- min(n_plots, 3)
+  n_rows <- ceiling(n_plots / n_cols)
+  
+  combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
+  combined_plot
+  ggsave(paste(graphics_output_folder, "/q-q-plot_", model_version, "_factors.png", sep=""),
+         plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
+}
+
+
+
 
 # Correlation matrices
 create_correlation_matrices <- function(data, model_version)
@@ -186,8 +234,9 @@ create_correlation_matrices <- function(data, model_version)
   print("p-Values:")
   print(round(cor_matrix$p, 3))
 
+  size <- dim(data_facets)[[2]] * 90
   
-  png(paste(graphics_output_folder, "/corrplot_", model_version, "_facets.png", sep=""), width = 2400, height = 2400, res = 150)
+  png(paste(graphics_output_folder, "/corrplot_", model_version, "_facets.png", sep=""), width = size, height = size, res = 150)
   corrplot(cor_matrix_rounded, method = "color", type = "upper", 
            addCoef.col = "black", tl.cex = 0.8)
   dev.off()
@@ -202,7 +251,7 @@ create_correlation_matrices <- function(data, model_version)
   print(round(cor_matrix$p, 3))
   
   # Plot correlation Matrix
-  png(paste(graphics_output_folder, "/corrplot_spearman_", model_version, "_facets.png", sep=""), width = 2400, height = 2400, res = 150)
+  png(paste(graphics_output_folder, "/corrplot_spearman_", model_version, "_facets.png", sep=""), width = size, height = size, res = 150)
   corrplot(cor_matrix_rounded, method = "color", type = "upper", 
            addCoef.col = "black", tl.cex = 0.8)
   dev.off()
@@ -216,8 +265,10 @@ create_correlation_matrices <- function(data, model_version)
   print("p-Values:")
   print(round(cor_matrix$p, 3))
   
+  size <- dim(data_factors)[[2]] * 150
+  
   # Plot correlation Matrix
-  png(paste(graphics_output_folder, "/corrplot_factors_", model_version, ".png", sep=""), width = 2400, height = 2400, res = 150)
+  png(paste(graphics_output_folder, "/corrplot_factors_", model_version, ".png", sep=""), width = size, height = size, res = 150)
   corrplot(cor_matrix_rounded, method = "color", type = "upper", 
            addCoef.col = "black", tl.cex = 0.8)
   dev.off()

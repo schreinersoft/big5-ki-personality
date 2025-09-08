@@ -6,6 +6,11 @@ source("tables_functions.R")
 source("transformation_functions.R")
 source("connect_database.R")
 
+root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
+tables_output_folder <- paste(root_folder, "/tables", sep="")
+graphics_output_folder <- paste(root_folder, "/graphics", sep="")
+stats_output_folder <- paste(root_folder, "/outputs", sep="")
+
 fetch_raw_data <- function(table_name)
 {
   data_raw <- tbl(con, table_name) %>% 
@@ -29,9 +34,7 @@ create_all_graphics <- function(data, model_version)
   create_factor_densities(data, model_version)
 }
 
-tables_output_folder <- "C:/temp/tables"
-graphics_output_folder <- "C:/temp/graphics"
-stats_output_folder <- "C:/temp/outputs"
+
 
 
 
@@ -58,7 +61,7 @@ data <- tbl(con, "openai_analyzation") %>%
     nf3b = nf3
   )
 data_aggregated <- aggregate_model(data)
-db_write_model(data_aggregated, model_version)
+#db_write_model(data_aggregated, model_version)
 
 create_essay_histograms(data, model_version, 27)
 create_essay_histograms(data, model_version, 42)
