@@ -1,4 +1,4 @@
-modelVersion <- "v5.1"
+model_version <- "v5.1"
 
 source("connect_database.R")
 source("functions.R")
@@ -17,13 +17,13 @@ for (facets in facet_list){
   plots[[i]] <- data_aggregated %>%
     filter(essay_idb == essay_number) %>% 
     histogramm(facet) + plot_annotation(title=paste(facet_names[[i]]))
-  ggsave(paste("graphics/histograms_", i, "_", modelVersion, "essay_", essay_number, ".png"), plot = plots[[i]], dpi=300, width = 8, height = 6)
+  ggsave(paste("graphics/histograms_", i, "_", model_version, "essay_", essay_number, ".png"), plot = plots[[i]], dpi=300, width = 8, height = 6)
   i <- i + 1
   }
 }
 combined_plot <- (plots[[1]] / plots[[2]] / plots[[3]] / plots[[4]] / plots[[5]])
 combined_plot
-ggsave(paste("graphics/histograms_", modelVersion, "essay_", essay_number, ".png"), plot = combined_plot, dpi=300, width = 8, height = 8)
+ggsave(paste("graphics/histograms_", model_version, "essay_", essay_number, ".png"), plot = combined_plot, dpi=300, width = 8, height = 8)
 
 # descriptive statistics on one Essay
 desc.stats <- data %>% 

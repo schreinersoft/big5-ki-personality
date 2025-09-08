@@ -6,74 +6,112 @@ source("tables_functions.R")
 source("transformation_functions.R")
 source("connect_database.R")
 
-
-modelVersion <- "v5.1"
-
-data <- tbl(con, "openai_analyzation_v5") %>% 
-  select(essay_id, all_of(all_facets), model) %>% 
-  filter(essay_id <=250) %>% 
-  filter(model=="gpt-5-mini-2025-08-07") %>% 
-  collect()
-
-data_aggregated <- model_aggregate(data)
-
-source("ocean_plot.R")
-
-sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
-source("omega.R")
-sink()
-
-sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
-
-source("macros_v5.R")
-
-sink()
-
-
-essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
-data_joined <- left_join(essays, data_aggregated, by = c("id" = "essay_id")) %>% 
-  collect() %>% 
-  drop_na(of1)
-
-
-
-
-
-# ANOVA der Binärgruppen
-model_oneway <- aov(o_llm ~ o_binary, data = data_joined)
-summary(model_oneway)
-model_oneway <- aov(c_llm ~ c_binary, data = data_joined)
-summary(model_oneway)
-model_oneway <- aov(e_llm ~ e_binary, data = data_joined)
-summary(model_oneway)
-model_oneway <- aov(a_llm ~ a_binary, data = data_joined)
-summary(model_oneway)
-model_oneway <- aov(n_llm ~ n_binary, data = data_joined)
-summary(model_oneway)
-
-
-binary <- "0"
-# plot all facet groups
-plots <- list()
-i <- 1
-for (facet in all_facets){
-  plots[[i]] <- data_aggregated %>%
-    filter(o_binary=binary) %>% 
-    verteilung(facet)
-  i <- i + 1
+fetch_raw_data <- function(table_name)
+{
+  data_raw <- tbl(con, table_name) %>% 
+    select(-id, -updated_at, -input_tokens, -output_tokens) %>% 
+    collect() %>% 
+    select(where(~ !any(is.na(.))))
+  return (data_raw)
 }
-combined_plot <- (plots[[1]] | plots[[2]] | plots[[3]] | plots[[4]])
-ggsave(paste("graphics/density_", modelVersion, "_facets_", binary,"_O.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
-combined_plot <-  (plots[[5]] | plots[[6]] | plots[[7]] | plots[[8]])
-ggsave(paste("graphics/density_", modelVersion, "_facets", binary,"_C.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+analyze_all <- function(data, model_version)
+{
+  analyze_alpha_omega(data, model_version)
+  analyze_factor_loadings(data, model_version)
+}
 
-combined_plot <-  (plots[[9]] | plots[[10]] | plots[[11]] | plots[[12]])
-ggsave(paste("graphics/density_", modelVersion, "_facets", binary,"_E.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+create_all <- function(data, model_version)
+{
+  create_correlation_matrices(data, model_version)
+  create_facet_densities(data, model_version)
+  create_factor_densities(data, model_version)
+  create_essay_histograms(data, model_version, 27)
+  create_essay_histograms(data, model_version, 42)
+  create_essay_histograms(data, model_version, 112)
+}
 
-combined_plot <- (plots[[13]] | plots[[14]] | plots[[15]] | plots[[16]])
-ggsave(paste("graphics/density_", modelVersion, "_facets", binary,"_A.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+tables_output_folder <- "C:/temp/tables"
+graphics_output_folder <- "C:/temp/graphics"
+stats_output_folder <- "C:/temp/outputs"
 
-combined_plot <- (plots[[17]] | plots[[18]] | plots[[19]])
-ggsave(paste("graphics/density_", modelVersion, "_facets", binary,"_N.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+
+
+
+
+
+
+################################################# V5.0
+model_version <- "v5.0"
+o_facets <- c("of3b", "of1", "of2", "of5")
+c_facets <- c("cf2b", "cf3b", "cf3", "cf5")
+e_facets <- c("ef2", "ef3b", "ef4", "ef5")
+a_facets <- c("af1b", "af1", "af3", "af6")
+n_facets <- c("nf1", "nf4", "nf6")
+data_bfi <- tbl(con, "openai_analyzation") %>% 
+  select(essay_id, of3, cf2, cf3, ef3, af1) %>% 
+  collect() %>% 
+  group_by(essay_id) %>%
+  summarise(
+    of3 = mean(of3, na.rm = TRUE),
+    cf2 = mean(cf2, na.rm = TRUE),
+    cf3 = mean(cf3, na.rm = TRUE),
+    ef3 = mean(ef3, na.rm = TRUE),
+    af1 = mean(af1, na.rm = TRUE),
+    .groups = "drop") %>% 
+  rename(of3b = of3,
+         cf2b = cf2,
+         cf3b = cf3,
+         ef3b = ef3,
+         af1b = af1,
+         essay_idb = essay_id)
+
+data_neo <- tbl(con, "openai_analyzation_v3") %>%
+  select(essay_id, of1, of2, of5, cf3, cf5, ef2, ef4, ef5, af1, af3, af6, nf1, nf4, nf6) %>% 
+  collect() %>% 
+  group_by(essay_id) %>%
+  summarise(
+    of1 = mean(of1, na.rm = TRUE),
+    of2 = mean(of2, na.rm = TRUE),
+    of5 = mean(of5, na.rm = TRUE),
+    cf3 = mean(cf3, na.rm = TRUE),
+    cf5 = mean(cf5, na.rm = TRUE),
+    ef2 = mean(ef2, na.rm = TRUE),
+    ef4 = mean(ef4, na.rm = TRUE),
+    ef5 = mean(ef5, na.rm = TRUE),
+    af1 = mean(af1, na.rm = TRUE),
+    af3 = mean(af3, na.rm = TRUE),
+    af6 = mean(af6, na.rm = TRUE),
+    nf1 = mean(nf1, na.rm = TRUE),
+    nf4 = mean(nf4, na.rm = TRUE),
+    nf6 = mean(nf6, na.rm = TRUE),
+    .groups = "drop")
+data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id")) %>%
+  rowwise() %>% 
+  mutate(
+    o_llm = mean(c_across(all_of(o_facets)), na.rm = TRUE),
+    c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
+    e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
+    a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
+    n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE)
+  )
+create_correlation_matrices(data, model_version)
+create_facet_densities(data, model_version)
+create_factor_densities(data, model_version)
+
+
+
+################################################# V5.1
+model_version <- "v5.1"
+data_raw_v5 <- fetch_raw_data("openai_analyzation_v5")
+
+data <- data_raw_v5 %>% 
+  filter(model=="gpt-5-mini-2025-08-07") %>% 
+  filter(essay_id <=250)
+data_aggregated <- aggregate_model(data)
+
+create_essay_histograms(data, model_version, 27)
+create_essay_histograms(data, model_version, 42)
+create_essay_histograms(data, model_version, 112)
+create_all(data_aggregated, model_version)
 

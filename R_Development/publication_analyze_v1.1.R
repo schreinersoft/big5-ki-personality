@@ -1,5 +1,5 @@
 # Model version for printing
-modelVersion <- "v1.1"
+model_version <- "v1.1"
 
 source("connect_database.R")
 source("functions.R")
@@ -36,12 +36,12 @@ facet_table <- openai_joined %>%
 
 source("aggregate_v1_BFI.R")
 
-sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
 source("omega.R")
 sink()
 
 
-sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
+sink(paste("outputs/output_analyzation_", model_version, ".txt"))
 
 source("macros_v1.R")
 

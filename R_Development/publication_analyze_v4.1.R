@@ -1,5 +1,5 @@
 # Model version for printing
-modelVersion <- "v4.1"
+model_version <- "v4.1"
 
 source("connect_database.R")
 source("functions.R")
@@ -53,7 +53,7 @@ data_facets <- data_facets %>%
   filter(temperature==0.0) %>% 
   select(all_of(all_facets))
 
-sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
 source("omega.R")
 sink()
 
@@ -135,7 +135,7 @@ plots[[6]] <- get_legend(temp_plot)
 combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plots[[6]] + plot_layout(ncol = 3)
 combined_plot
 
-ggsave(paste("graphics/factors_with_tempeature_" , modelVersion, ".png"), plot = combined_plot, dpi=300, width = 16, height = 10)
+ggsave(paste("graphics/factors_with_tempeature_" , model_version, ".png"), plot = combined_plot, dpi=300, width = 16, height = 10)
 
 
 # Speziell Essay 14

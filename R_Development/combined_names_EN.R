@@ -52,6 +52,6 @@ variable_names = c(
   'o_llm' = 'Openness',
   'c_llm' = 'Conscentiousness',
   'e_llm' = "Extraversion",
-  'a_llm' = "Agreeableness",
-  'n_llm' = "Neuroticism",
+  'a_llm' = 'Agreeableness',
+  'n_llm' = 'Neuroticism'
 )

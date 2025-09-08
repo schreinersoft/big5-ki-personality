@@ -1,4 +1,4 @@
-print(paste("Analyzation ",modelVersion))
+print(paste("Analyzation ",model_version))
 print("")
 print("Using facets:")
 print(all_facets)
@@ -12,7 +12,7 @@ print("Correlation Matrix:")
 print(cor_matrix_rounded)
 
 # Plot correlation Matrix
-png(paste("graphics/corrplot_", modelVersion, "_facets.png"), width = 2400, height = 2400, res = 150)
+png(paste("graphics/corrplot_", model_version, "_facets.png"), width = 2400, height = 2400, res = 150)
 corrplot(cor_matrix_rounded, method = "color", type = "upper", 
          addCoef.col = "black", tl.cex = 0.8)
 dev.off()
@@ -26,7 +26,7 @@ print("Correlation Matrix:")
 print(cor_matrix_rounded)
 
 # Plot correlation Matrix
-png(paste("graphics/corrplot_spearman_", modelVersion, "_facets.png"), width = 2400, height = 2400, res = 150)
+png(paste("graphics/corrplot_spearman_", model_version, "_facets.png"), width = 2400, height = 2400, res = 150)
 corrplot(cor_matrix_rounded, method = "color", type = "upper", 
          addCoef.col = "black", tl.cex = 0.8)
 dev.off()
@@ -40,7 +40,7 @@ print("Correlation Matrix:")
 print(cor_matrix_rounded)
 
 # Plot correlation Matrix
-png(paste("graphics/corrplot_", modelVersion, "_factors.png"), width = 2400, height = 2400, res = 150)
+png(paste("graphics/corrplot_", model_version, "_factors.png"), width = 2400, height = 2400, res = 150)
 corrplot(cor_matrix_rounded, method = "color", type = "upper", 
          addCoef.col = "black", tl.cex = 0.8)
 dev.off()
@@ -104,7 +104,7 @@ ft <- flextable(fit_data) %>%
   width(j = 1, width = 1.5) %>%
   width(j = 2, width = 1) %>%
   width(j = 3, width = 1.8)
-save_as_docx(ft, path = paste("tables/measures_", modelVersion, ".docx"))
+save_as_docx(ft, path = paste("tables/measures_", model_version, ".docx"))
 
 
 # Generiere Faktorladungen Tabelle für Word
@@ -146,7 +146,7 @@ ft <- ft %>%
   align(align = "center", part = "header") %>%
   align(j = 2:6, align = "center", part = "body") %>%
   bold(part = "header", i = 1)
-save_as_docx(ft, path = paste("tables/loadings_", modelVersion, ".docx"))
+save_as_docx(ft, path = paste("tables/loadings_", model_version, ".docx"))
 
 
 # Generiere Scree Plot 
@@ -164,5 +164,5 @@ screePlot <- scree_data %>%
   ) +
   theme_minimal() +
   scale_x_continuous(breaks = 1:length(faModel$values))
-ggsave(paste("graphics/screeplot_" , modelVersion, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)
+ggsave(paste("graphics/screeplot_" , model_version, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)
 

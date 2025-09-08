@@ -26,7 +26,7 @@ for (facets in facet_list){
 }
 combined_plot <- (plots[[1]] / plots[[2]] / plots[[3]] / plots[[4]] / plots[[5]])
 combined_plot
-ggsave(paste("graphics/density_", modelVersion, "_facets.png"), plot = combined_plot, dpi=300, width = 8, height = 8)
+ggsave(paste("graphics/density_", model_version, "_facets.png"), plot = combined_plot, dpi=300, width = 8, height = 8)
 
 
 # descriptive statistics of all facets
@@ -83,9 +83,9 @@ psych_table <- desc_df %>%
   autofit() %>%
   align(j = 2:7, align = "center", part = "all")
 psych_table
-save_as_docx(psych_table, path = paste("tables/desc_", modelVersion, "_factors.docx"))
+save_as_docx(psych_table, path = paste("tables/desc_", model_version, "_factors.docx"))
 
-sink( paste("outputs/desc_", modelVersion, ".txt"))
+sink( paste("outputs/desc_", model_version, ".txt"))
 library(purrr)
 ks.tests <- list()
 i <- 1

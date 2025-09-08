@@ -1,5 +1,5 @@
 # Model version for printing
-modelVersion <- "v5.2"
+model_version <- "v5.2"
 
 source("connect_database.R")
 source("functions.R")
@@ -71,11 +71,11 @@ data_facets <- data_aggregated %>%
 
 source("ocean_plot.R")
 
-sink(paste("outputs/omega_analyzation_", modelVersion, ".txt"))
+sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
 source("omega.R")
 sink()
 
-sink(paste("outputs/output_analyzation_", modelVersion, ".txt"))
+sink(paste("outputs/output_analyzation_", model_version, ".txt"))
 
 source("macros_v5.R")
 

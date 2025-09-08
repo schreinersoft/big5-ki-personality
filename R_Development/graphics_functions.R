@@ -1,5 +1,12 @@
-library("tidyverse")
-library("patchwork")
+library(tidyverse)
+library(psych)
+library(lavaan)
+library(knitr)
+library(semTools)
+library(corrplot)
+library(patchwork)
+library(purrr)
+library(flextable)
 
 source("combined_names_EN.R")
 
@@ -56,15 +63,14 @@ create_essay_histograms <- function(data, model_version, essay_number)
     combined_plot <- wrap_plots(plots, ncol = n_cols) + plot_annotation()
     
   ggsave(
-    paste(graphics_output_folder,"/histograms_", variable_names[[factor_names[[j]]]], "_", model_version, "essay_", essay_number, ".png", sep = ""),
-    plot = combined_plot, dpi=300, width = plot_width, height = plot_height)
-  j <- j + 1
+    paste(graphics_output_folder,"/histograms_", variable_names[[factor_names[[i]]]], "_", model_version, "essay_", essay_number, ".png", sep = ""),
+    plot = combined_plot, dpi=300, width = n_cols * 3, height = n_rows * 3)
   }
 }
 
 
 # create facet density plots of all essays
-create_facet_densities <- function(data)
+create_facet_densities <- function(data, model_version)
 {
   o_facets <- data %>% select(starts_with(("of")))
   c_facets <- data %>% select(starts_with(("cf")))
@@ -107,8 +113,8 @@ create_facet_densities <- function(data)
     
     # Create and save combined plot for this factor
     combined_plot <- wrap_plots(plots, ncol = n_cols)
-    ggsave(paste(graphics_output_folder,"/density_", factor_name, "_", modelVersion, "_facets.png", sep = ""), 
-           plot = combined_plot, dpi = 300, width = 8, height = 6)
+    ggsave(paste(graphics_output_folder,"/density_", factor_name, "_", model_version, "_facets.png", sep = ""), 
+           plot = combined_plot, dpi = 300, width = n_cols * 3, height = n_rows * 3)
   }
 }
 
@@ -145,7 +151,7 @@ create_factor_densities <- function(data, model_version)
   combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
   combined_plot
   ggsave(paste(graphics_output_folder, "/density_", model_version, "_factors.png", sep=""),
-         plot = combined_plot, dpi=300, width = 8, height = 6)
+         plot = combined_plot, dpi=300, width = n_cols * 3, height = n_rows * 3)
 }
 
 # Correlation matrices
@@ -165,7 +171,7 @@ create_correlation_matrices <- function(data, model_version)
            starts_with(("a_")),
            starts_with(("n_")))
 
-  sink(paste(raw_output_folder, "/output_analyzation_", model_version, ".txt", sep=""))
+  sink(paste(stats_output_folder, "/output_analyzation_", model_version, ".txt", sep=""))
 
   cor_matrix <- corr.test(data_facets, use = "complete.obs", method="pearson")
   cor_matrix_rounded <- round(cor_matrix$r, 2)
