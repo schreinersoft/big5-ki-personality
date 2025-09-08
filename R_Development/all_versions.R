@@ -32,6 +32,7 @@ create_all_graphics <- function(data, model_version)
   create_correlation_matrices(data, model_version)
   create_facet_densities(data, model_version)
   create_factor_densities(data, model_version)
+  create_q_q_plot(data, model_version)
 }
 
 
@@ -73,7 +74,7 @@ create_all_graphics(data_aggregated, model_version)
 ################################################# V1.1
 model_version <- "v1.1"
 data_aggregated <- data %>% 
-  select(-ef2b) %>% 
+  select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
   aggregate_model()
 
 db_write_model(data_aggregated, model_version)
@@ -83,11 +84,81 @@ analyze_factor_loadings(data_aggregated, model_version)
 analyze_item_statistics(data_aggregated, model_version)
 
 create_all_graphics(data_aggregated, model_version)
+
+
 
 ################################################# V1.2
 model_version <- "v1.2"
 data_aggregated <- data %>% 
-  select(-ef2b, -af2b) %>% 
+  select(-cf1b, -ef2b, -nf2b) %>% 
+  aggregate_model()
+
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V2.0
+model_version <- "v2.0"
+
+# v2 in publication is v3 in data XXX
+data <- tbl(con, "openai_analyzation_v3") %>% 
+  select(-updated_at) %>%
+  filter(essay_id <= 250) %>% 
+  collect() %>% 
+  drop_na("of1")
+
+data_aggregated <- aggregate_model(data)
+
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V2.1
+model_version <- "v2.1"
+
+data_aggregated <- data %>% 
+  select(-of3, -of4, -cf1, -ef1, -ef3, -af2, -nf2, -nf5) %>% 
+  aggregate_model()
+
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V2.2
+model_version <- "v2.2"
+
+data_aggregated <- data %>% 
+  select(-of3, -of4, -cf1, -ef1, -ef3, -ef6, -af2, -nf2, -nf5) %>% 
+  aggregate_model()
+
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+################################################# V2.3
+model_version <- "v2.3"
+
+data_aggregated <- data %>% 
+  select(-of3, -of4, -of6, -cf1, -cf4, -ef1, -ef3, -ef6, -af2, -af5, -nf2, -nf5) %>% 
   aggregate_model()
 
 db_write_model(data_aggregated, model_version)
@@ -100,8 +171,109 @@ create_all_graphics(data_aggregated, model_version)
 
 
 
-################################################# V2.0
-model_version <- "v2.0"
+################################################# V3.0
+model_version <- "v3.0"
+
+# DANGER !!! v2 in publication is v3 XXX
+data <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>%
+  collect() %>% 
+  drop_na("of1")
+
+data_aggregated <- data %>% 
+  aggregate_model()
+
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V4.0
+model_version <- "v4.000"
+data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
+  filter(essay_id <= 50) %>% 
+  collect() %>% 
+  drop_na("of1")
+
+data_aggregated <- data %>% 
+  filter(temperature == 0) %>% 
+  aggregate_model()
+
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+model_version <- "v4.002"
+data_aggregated <- data %>% 
+  filter(temperature == 0.2) %>% 
+  aggregate_model()
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+model_version <- "v4.004"
+data_aggregated <- data %>% 
+  filter(temperature == 0.4) %>% 
+  aggregate_model()
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+model_version <- "v4.006"
+data_aggregated <- data %>% 
+  filter(temperature == 0.6) %>% 
+  aggregate_model()
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+model_version <- "v4.008"
+data_aggregated <- data %>% 
+  filter(temperature == 0.8) %>% 
+  aggregate_model()
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+model_version <- "v4.010"
+data_aggregated <- data %>% 
+  filter(temperature == 1.0) %>% 
+  aggregate_model()
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
 
 
 

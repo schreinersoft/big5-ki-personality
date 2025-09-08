@@ -63,7 +63,9 @@ analyze_alpha_omega <- function(data, model_version)
   )
 
   #print detailed outputs
-  sink(paste("outputs/alpha_omega_analyzation_", model_version, ".txt"))
+  sink(paste(stats_output_folder, "/alpha_omega_analyzation_", model_version, ".txt", sep=""))
+  print(omega_results)
+  
   print("##### O Factor Analysis")
   print(alpha_o)
   print(omega_o)
