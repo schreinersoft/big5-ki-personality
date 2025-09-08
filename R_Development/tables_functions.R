@@ -20,11 +20,11 @@ analyze_alpha_omega <- function(data, model_version)
   data_n <- data %>% 
     select(starts_with(("nf")))
   
-  omega_o <- omega(data_o, flip=FALSE, plot=FALSE)
-  omega_c <- omega(data_c, flip=FALSE, plot=FALSE)
-  omega_e <- omega(data_e, flip=FALSE, plot=FALSE)
-  omega_a <- omega(data_a, flip=FALSE, plot=FALSE)
-  omega_n <- omega(data_n, flip=FALSE, plot=FALSE)
+  omega_o <- omega(data_o, nfactors = 1, flip=FALSE, plot=FALSE)
+  omega_c <- omega(data_c, nfactors = 1, flip=FALSE, plot=FALSE)
+  omega_e <- omega(data_e, nfactors = 1, flip=FALSE, plot=FALSE)
+  omega_a <- omega(data_a, nfactors = 1, flip=FALSE, plot=FALSE)
+  omega_n <- omega(data_n, nfactors = 1, flip=FALSE, plot=FALSE)
   fa_o <- fa(data_o)
   fa_c <- fa(data_c)
   fa_e <- fa(data_e)
@@ -112,10 +112,12 @@ analyze_item_statistics <- function(data, model_version)
   factor_facets_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
   all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
   
+  sink(paste(stats_output_folder, "/item_statistics_", model_version, ".txt", sep=""))
   desc.stats <- data %>% 
     select(all_of(all_facets), all_of(all_factors)) %>% 
     psych::describe()
-  
+  print(desc.stats)
+    
   # analysiere jede faktorgruppe einzeln
   item_analysis_results <- list()
   
@@ -125,7 +127,8 @@ analyze_item_statistics <- function(data, model_version)
       names()
     
     alpha_result <- psych::alpha(data[factor_items])
-
+    print(alpha_result)
+    
     item_stats <- alpha_result$item.stats
     item_stats$Variable <- rownames(item_stats)
     item_analysis_results[[factor]] <- item_stats
@@ -134,7 +137,6 @@ analyze_item_statistics <- function(data, model_version)
   # Alle Item-Analyse-Ergebnisse zusammenfassen
   all_item_stats <- do.call(rbind, item_analysis_results)
   
-  sink(paste(stats_output_folder, "/item_statistics_", model_version, ".txt", sep=""))
   print(all_item_stats)
   sink()
   

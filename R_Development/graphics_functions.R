@@ -63,7 +63,7 @@ create_essay_histograms <- function(data, model_version, essay_number)
     combined_plot <- wrap_plots(plots, ncol = n_cols) + plot_annotation()
     
   ggsave(
-    paste(graphics_output_folder,"/histograms_", variable_names[[factor_names[[i]]]], "_", model_version, "essay_", essay_number, ".png", sep = ""),
+    paste(graphics_output_folder,"/histograms_", model_version, "_", factor_names[[i]], "_essay_", essay_number, ".png", sep = ""),
     plot = combined_plot, dpi=300, width = n_cols * 3, height = n_rows * 3)
   }
 }
