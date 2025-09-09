@@ -6,6 +6,8 @@ library(dotenv)
 load_dot_env(file="../.env")
 
 # Connect to PostgreSQL TEST
+if (!exists("con")) 
+{
 con <- dbConnect(
   RPostgreSQL::PostgreSQL(),
   host = "db.schreinersoft.de",
@@ -14,6 +16,8 @@ con <- dbConnect(
   user = Sys.getenv("DB_USER"),
   password = Sys.getenv("DB_PASSWORD")
 )
+
+}
 
 # Connect to PostgreSQL
 #con <- dbConnect(

@@ -4,7 +4,6 @@ source("connect_database.R")
 source("graphics_functions.R")
 source("tables_functions.R")
 source("transformation_functions.R")
-source("connect_database.R")
 
 root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 tables_output_folder <- paste(root_folder, "/tables", sep="")
@@ -62,7 +61,7 @@ data <- tbl(con, "openai_analyzation") %>%
     nf3b = nf3
   )
 data_aggregated <- aggregate_model(data)
-#db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, model_version)
 
 create_essay_histograms(data, model_version, 27)
 create_essay_histograms(data, model_version, 42)
@@ -198,6 +197,13 @@ data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
   collect() %>% 
   drop_na("of1")
 
+data_temp0 <- data %>% 
+  filter(temperature == 0)
+
+create_essay_histograms(data_temp0, model_version, 27)
+create_essay_histograms(data_temp0, model_version, 42)
+create_essay_histograms(data_temp0, model_version, 112)
+
 data_aggregated <- data %>% 
   filter(temperature == 0) %>% 
   aggregate_model()
@@ -273,6 +279,155 @@ analyze_factor_loadings(data_aggregated, model_version)
 analyze_item_statistics(data_aggregated, model_version)
 
 create_all_graphics(data_aggregated, model_version)
+
+data$temp <- as.factor(data$temperature)
+## Grouped by temperature
+all_factors <- data %>% select(
+  starts_with("o_"),
+  starts_with("c_"),
+  starts_with("e_"),
+  starts_with("a_"),
+  starts_with("n_")) %>% names()
+o_facets <- data %>% select(starts_with(("of"))) %>% names()
+c_facets <- data %>% select(starts_with(("cf"))) %>% names()
+e_facets <- data %>% select(starts_with(("ef"))) %>% names()
+a_facets <- data %>% select(starts_with(("af"))) %>% names()
+n_facets <- data %>% select(starts_with(("nf"))) %>% names()
+all_facet_names <- c(names(o_facets), names(c_facets), names(e_facets), 
+                     names(a_facets), names(n_facets))
+
+
+
+data_temp <- data %>% 
+  rowwise() %>% 
+  mutate(
+    o_llm = mean(c_across(all_of(o_facets)), na.rm = TRUE),
+    c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
+    e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
+    a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
+    n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE),
+  )
+
+data_temp_aggr <- data %>% 
+  group_by(essay_id, temp) %>% 
+  summarise(
+    across(all_of(all_facet_names), ~ mean(.x, na.rm = TRUE)),
+    o_llm = mean(c_across(all_of(o_facets)), na.rm = TRUE),
+    c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
+    e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
+    a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
+    n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE),
+    .groups = "drop"
+)
+
+
+data_temp <- data_temp_aggr
+
+model_oneway <- aov(o_llm ~ temp, data = data_temp)
+summary(model_oneway)
+model_oneway <- aov(c_llm ~ temp, data = data_temp)
+summary(model_oneway)
+model_oneway <- aov(e_llm ~ temp, data = data_temp)
+summary(model_oneway)
+model_oneway <- aov(a_llm ~ temp, data = data_temp)
+summary(model_oneway)
+model_oneway <- aov(n_llm ~ temp, data = data_temp)
+summary(model_oneway)
+
+
+
+data_temp %>% 
+  ggplot(aes(x=o_llm, group=temp, fill=temp))+
+  geom_boxplot()
+data_temp %>% 
+  ggplot(aes(x=c_llm, group=temp, fill=temp))+
+  geom_boxplot()
+data_temp %>% 
+  ggplot(aes(x=e_llm, group=temp, fill=temp))+
+  geom_boxplot()
+data_temp %>% 
+  ggplot(aes(x=a_llm, group=temp, fill=temp))+
+  geom_boxplot()
+data_temp %>% 
+  ggplot(aes(x=n_llm, group=temp, fill=temp))+
+  geom_boxplot()
+
+# Speziell Analyse Temperatur Faktoren
+plots <- list()
+palette <- "Oranges"
+alpha <- 0.4
+
+plots[[1]] <- data_temp %>% 
+  ggplot(aes(x = o_llm, group=temp, fill=temp)) +
+  geom_density(alpha = alpha,
+               color = "black") +
+  scale_fill_brewer(type = "qual", palette = palette, guide = "none") +
+  labs(title = variable_names[["O"]],
+       x = "",
+       y = "") +
+  scale_x_continuous(breaks = 1:9, limits = c(1, 9)) +
+  theme_minimal() 
+
+plots[[2]] <- data_temp %>% 
+  ggplot(aes(x = c_llm, group=temp, fill=temp)) +
+  geom_density(alpha = alpha,
+               color = "black") +
+  scale_fill_brewer(type = "qual", palette = palette, guide = "none") +
+  labs(title = variable_names[["C"]],
+       x = "",
+       y = "") +
+  scale_x_continuous(breaks = 1:9, limits = c(1, 9)) +
+  theme_minimal() 
+
+plots[[3]] <- data_temp %>% 
+  ggplot(aes(x = e_llm, group=temp, fill=temp)) +
+  geom_density(alpha = alpha,
+               color = "black") +
+  scale_fill_brewer(type = "qual", palette = palette, guide = "none") +
+  labs(title = variable_names[["E"]],
+       x = "",
+       y = "") +
+  scale_x_continuous(breaks = 1:9, limits = c(1, 9)) +
+  theme_minimal() 
+
+plots[[4]] <- data_temp %>% 
+  ggplot(aes(x = a_llm, group=temp, fill=temp)) +
+  geom_density(alpha = alpha,
+               color = "black") +
+  scale_fill_brewer(type = "qual", palette = palette, guide = "none") +
+  labs(title = variable_names[["A"]],
+       x = "",
+       y = "") +
+  scale_x_continuous(breaks = 1:9, limits = c(1, 9)) +
+  theme_minimal() 
+
+plots[[5]] <- data_temp %>% 
+  ggplot(aes(x = n_llm, group=temp, fill=temp)) +
+  geom_density(alpha = alpha,
+               color = "black") +
+  scale_fill_brewer(type = "qual", palette = palette, guide = "none") +
+  labs(title = variable_names[["N"]],
+       x = "",
+       y = "") +
+  scale_x_continuous(breaks = 1:9, limits = c(1, 9)) +
+  theme_minimal() 
+
+library(cowplot)
+# Legend only
+temp_plot <- ggplot(data_temp, aes(fill = temp)) +
+  geom_density(aes(x = n_llm), alpha = 0.6) +
+  scale_fill_brewer(type = "qual", palette = palette)+
+  labs(title = "",
+       x = "",
+       y = "",
+       fill = "Temperatur")
+plots[[6]] <- get_legend(temp_plot)
+
+combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plots[[6]] + plot_layout(ncol = 3)
+combined_plot
+
+ggsave(paste(graphics_output_folder, "/density_with_temperature_", model_version, ".png"), plot = combined_plot, dpi=300, width = 8, height = 5)
+
 
 
 

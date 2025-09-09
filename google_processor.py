@@ -39,9 +39,11 @@ def process_google(batch_size: int, max_num: int, repeats: int=2, temperature: i
             #         .all()
             #         #.filter(GoogleAnalyzation.essay_id.is_(None))\
             essays = db.query(Essay)\
-                    .filter(Essay.id ==14)\
+                    .outerjoin(GoogleAnalyzation)\
+                    .filter(GoogleAnalyzation.essay_id.is_(None))\
+                    .filter(Essay.id <=250)\
+                    .limit(batch_size)\
                     .all()
-                    #.filter(GoogleAnalyzation.essay_id.is_(None))\
             if not essays:
                 print("DONE! All Essays processed.")
                 return
@@ -112,8 +114,8 @@ if __name__ == "__main__":
     # process_google(5, 50, repeats=5, temperature=1.0) 
     # process_google(5, 50, repeats=5, temperature=0.8)
     #process_google(5, 50, repeats=5, temperature=0.6)
-    process_google(1, 1, repeats=150, temperature=1.0, model="gemini-2.5-flash-lite") 
+    # process_google(1, 1, repeats=150, temperature=1.0, model="gemini-2.5-flash-lite") 
     # process_google(5, 50, repeats=5, temperature=0.2)
-    # process_google(5, 50, repeats=5, temperature=0.0)
+    process_google(5, 5000, repeats=3, temperature=0.0)
 
 
