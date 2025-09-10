@@ -205,7 +205,21 @@ create_q_q_plot <- function(data, model_version)
          plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
 }
 
-
+# plot 5-times Q-Q-Plot
+q_q_plot <- function(vec)
+{
+  data <- data.frame(x=vec)
+  
+  plot <- data %>%
+      ggplot(aes(sample = x)) +
+      stat_qq() +
+      stat_qq_line(color = "red") +
+      labs(title = "", 
+           x = "", 
+           y = "") +
+      theme_minimal()
+  return(plot)
+}
 
 
 # Correlation matrices

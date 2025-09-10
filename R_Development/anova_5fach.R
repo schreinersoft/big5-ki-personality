@@ -16,8 +16,17 @@ essays <- tbl(con, "essays") %>%
   select(-text, -author, -all_of(ends_with("binary")))
 
 models <- list()
-model_list <- c("v1.0","v1.1","v1.2","v2.0","v2.1","v2.2","v2.3","v3.0","v4.000")
+model_list <- c("liwc", "v1.0","v1.1","v1.2","v2.0","v2.1","v2.2","v2.3","v3.0","v4.000", "v4.002", "v4.004", "v4.006", "v4.008", "v4.010", "v4.1")
+#model_list <- c("liwc", "v1.0","v1.1")
 factor_names <- c("O", "C", "E", "A", "N")
+
+# read all data of all models
+for (model in model_list)
+{
+  models[[model]] <- left_join(essays, db_read_model(model), by = c("id" = "essay_id")) %>% rename(essay_id = id)
+}
+
+
 
 # Funktion zum Extrahieren der Statistiken
 extract_stats <- function(aov_result, data) {
@@ -40,11 +49,14 @@ extract_stats <- function(aov_result, data) {
   n <- nrow(data)
   hedges_g <- cohens_d * (1 - (3 / (4 * (n - 2) - 1)))
   
+  scores <- create_scores_frame(data)
+  
   return(list(
     p = p_value,
     F = f_value,
     d = cohens_d,
-    g = hedges_g
+    g = hedges_g,
+    sc = mean(scores$SCORE)
   ))
 }
 
@@ -53,17 +65,16 @@ format_p_psych <- function(p_value) {
 }
 
 
-# read all data of all models
-for (model in model_list)
-{
-  models[[model]] <- left_join(essays, db_read_model(model), by = c("id" = "essay_id"))
-}
+
 
 anova_results <- list()
+kruskal_wallis_results <- list()
 
 for (model in model_list)
 {
   anova_results[[model]] <- list()
+  kruskal_wallis_results[[model]] <- list()
+  
   all_factors <- models[[model]] %>% 
     select(
       starts_with("o_"),
@@ -84,24 +95,22 @@ for (model in model_list)
       aov = aov(reformulate(all_factors[i], outcomes[i]), data = models[[model]]),
       data = models[[model]]
     )
+    kruskal_wallis_results[[model]][[factor_names[i]]] <- list(
+      aov = kruskal.test(reformulate(all_factors[i], outcomes[i]), data = models[[model]]),
+      data = models[[model]]
+    )
   }
 }
 
 es <- extract_stats(anova_results[["v1.0"]][["O"]]$aov, anova_results[["v1.0"]][["O"]]$data)
 
+kw <- kruskal_wallis_results[["v1.0"]][["O"]]$aov
+
+
 es$p < 0.001
 
-# Wenn du bereits eine verschachtelte Liste hast, verwende etwa so:
-# for(model_name in names(deine_anova_liste)) {
-#   for(measure_name in names(deine_anova_liste[[model_name]])) {
-#     stats <- extract_stats(deine_anova_liste[[model_name]][[measure_name]])
-
-
-
-
-# Statistiken für alle Modelle und Messgrößen extrahieren
-results_df <- data.frame()
-
+# ANOVA Statistiken für alle Modelle und Messgrößen extrahieren
+anova_results_df <- data.frame()
 for(model in model_list) {
   row_data <- c(Modell = model)
   
@@ -116,29 +125,59 @@ for(model in model_list) {
                   format_p_psych(stats$p),
                   sprintf("%.2f", stats$F),
                   sprintf("%.2f", stats$d),
-                  sprintf("%.2f", stats$g))
+                  sprintf("%.2f", stats$g),
+                  sprintf("%.2f", stats$sc)
+                  )
   }
-  
-  results_df <- rbind(results_df, row_data, stringsAsFactors = FALSE)
+  anova_results_df <- rbind(anova_results_df, row_data, stringsAsFactors = FALSE)
 }
 
+# Kruskal-Wallis-H-Test Statistiken für alle Modelle und Messgrößen extrahieren
+htest_results_df <- data.frame()
+for(model in model_list) {
+  row_data <- c(Modell = model)
+  
+  for(measure in factor_names) {
+    stats <- extract_stats(
+      kruskal_wallis_results[[model]][[measure]]$aov,
+      kruskal_wallis_results[[model]][[measure]]$data
+    )
+    
+    # Statistiken formatieren
+    row_data <- c(row_data,
+                  format_p_psych(stats$p),
+                  sprintf("%.2f", stats$F),
+                  sprintf("%.2f", stats$d),
+                  sprintf("%.2f", stats$g),
+                  sprintf("%.2f", stats$sc)
+    )
+  }
+  anova_results_df <- rbind(anova_results_df, row_data, stringsAsFactors = FALSE)
+}
+
+
+
+
+
+
+
 # Spaltennamen setzen
-colnames(results_df) <- c("Modell",
-                          paste0(rep(measures, each = 4), "_", rep(c("p", "F", "d", "g"), 5)))
+colnames(anova_results_df) <- c("Modell",
+                          paste0(rep(factor_names, each = 5), "_", rep(c("p", "F", "d", "g", "SC"), 5)))
 
 # flextable erstellen
-ft <- flextable(results_df) %>%
+ft <- flextable(anova_results_df) %>%
   # Unterheader für Statistiken (wird zur zweiten Zeile)
-  add_header_row(values = c("Modell", rep(c("p", "F", "d", "g"), 5)), colwidths = rep(1, 21)) %>%
+  add_header_row(values = c("Modell", rep(c("p", "F", "d", "g", "SC"), 5)), colwidths = rep(1, 26)) %>%
   # Hauptheader hinzufügen (wird zur ersten Zeile)
-  add_header_row(values = c("", factor_names), colwidths = c(1, rep(4, 5))) %>%
+  add_header_row(values = c("", factor_names), colwidths = c(1, rep(5, 5))) %>%
   # Erste Spalte in der ersten Zeile mit "Modell" füllen
   #merge_v(j = 1, part = "header") %>%
   # Layout anpassen
   theme_box() %>%
   # Spaltenbreiten anpassen
   width(j = 1, width = 1.2) %>%
-  width(j = 2:21, width = 0.6) %>%
+  width(j = 2:26, width = 0.6) %>%
   # Zentrierung
   align(align = "center", part = "all") %>%
   align(j = 1, align = "left", part = "body") %>%
