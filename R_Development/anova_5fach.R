@@ -74,13 +74,10 @@ extract_stats_kruskal <- function(aov_result, data) {
   # Umrechnung von eta² zu Cohen's d (approximativ)
   eta2_value <- (chi2_value - k + 1) / (n - k)
 
-  scores <- create_scores_frame(data)
-  
   return(list(
     p = p_value,
     chi2 = chi2_value,
-    eta2 = eta2_value,
-    sc = mean(scores$SCORE)
+    eta2 = eta2_value
   ))
 }
 
@@ -133,15 +130,21 @@ kw <- kruskal_wallis_results[["v1.0"]][["O"]]$kw
 es$p < 0.001
 
 # ANOVA Statistiken für alle Modelle und Messgrößen extrahieren
+score_results <- list()
 anova_results_df <- data.frame()
 for(model in model_list) {
   row_data <- c(Modell = model)
+
+  scores <- create_scores_frame(models[[model]])
+  score_results[[model]] <- mean(scores$SCORE)
   
-  for(measure in factor_names) {
+  for(factor in factor_names) {
     stats <- extract_stats_anova(
-      anova_results[[model]][[measure]]$aov,
-      anova_results[[model]][[measure]]$data
+      anova_results[[model]][[factor]]$aov,
+      anova_results[[model]][[factor]]$data
     )
+    
+    normrow <- paste("S", factor, sep="")
     
     # Statistiken formatieren
     row_data <- c(row_data,
@@ -149,7 +152,7 @@ for(model in model_list) {
                   sprintf("%.2f", stats$F),
                   sprintf("%.2f", stats$d),
                   sprintf("%.2f", stats$g),
-                  sprintf("%.2f", stats$sc)
+                  sprintf("%.1f", mean(scores[[normrow]]))
                   )
   }
   anova_results_df <- rbind(anova_results_df, row_data, stringsAsFactors = FALSE)
@@ -160,44 +163,47 @@ kruskal_wallis_results_df <- data.frame()
 for(model in model_list) {
   row_data <- c(Modell = model)
   
-  for(measure in factor_names) {
+  scores <- create_scores_frame(models[[model]])
+  
+  for(factor in factor_names) {
     stats <- extract_stats_kruskal(
-      kruskal_wallis_results[[model]][[measure]]$kw,
-      kruskal_wallis_results[[model]][[measure]]$data
+      kruskal_wallis_results[[model]][[factor]]$kw,
+      kruskal_wallis_results[[model]][[factor]]$data
     )
+    
+    normrow <- paste("S", factor, sep="")
     
     # Statistiken formatieren
     row_data <- c(row_data,
                   format_p_psych(stats$p),
                   sprintf("%.2f", stats$chi2),
                   sprintf("%.3f", stats$eta2),
-                  sprintf("%.2f", stats$sc)
+                  sprintf("%.1f", mean(scores[[normrow]]))
                   )
   }
   kruskal_wallis_results_df <- rbind(kruskal_wallis_results_df, row_data, stringsAsFactors = FALSE)
 }
 
-
-
-
+anova_results_df$SCORE <- unlist(map(score_results, ~ sprintf("%.1f", .x)))
+kruskal_wallis_results_df$SCORE <- unlist(map(score_results, ~ sprintf("%.1f", .x)))
 
 
 # ANOVA Auswertungen als Tabelle
 # Spaltennamen setzen
-colnames(anova_results_df) <- c("Modell", paste0(rep(factor_names, each = 5), "_", rep(c("p", "F", "d", "g", "SC"), 5)))
+colnames(anova_results_df) <- c("Modell", paste0(rep(factor_names, each = 5), "_", rep(c("p", "F", "d", "g", "S"), 5)), "SCORE")
 # flextable erstellen
 ft <- flextable(anova_results_df) %>%
   # Unterheader für Statistiken (wird zur zweiten Zeile)
-  add_header_row(values = c("Modell", rep(c("p", "F", "d", "g", "SC"), 5)), colwidths = rep(1, 26)) %>%
+  add_header_row(values = c("Modell", rep(c("p", "F", "d", "g", "SC"), 5), "SCORE"), colwidths = rep(1, 27)) %>%
   # Hauptheader hinzufügen (wird zur ersten Zeile)
-  add_header_row(values = c("", factor_names), colwidths = c(1, rep(5, 5))) %>%
+  add_header_row(values = c("", factor_names, "Ø"), colwidths = c(1, rep(5, 5), 1)) %>%
   # Erste Spalte in der ersten Zeile mit "Modell" füllen
   #merge_v(j = 1, part = "header") %>%
   # Layout anpassen
   theme_box() %>%
   # Spaltenbreiten anpassen
   width(j = 1, width = 1.2) %>%
-  width(j = 2:26, width = 0.6) %>%
+  width(j = 2:27, width = 0.6) %>%
   # Zentrierung
   align(align = "center", part = "all") %>%
   align(j = 1, align = "left", part = "body") %>%
@@ -220,20 +226,20 @@ save_as_docx(ft, path=paste(tables_output_folder, "/anovas.docx",sep=""))
 
 # Kruskal-Wallis-H-Tests Auswertungen als Tabelle
 # Spaltennamen setzen
-colnames(kruskal_wallis_results_df) <- c("Modell", paste0(rep(factor_names, each = 4), "_", rep(c("p", "χ²", "η²", "SC"), 5)))
+colnames(kruskal_wallis_results_df) <- c("Modell", paste0(rep(factor_names, each = 4), "_", rep(c("p", "χ²", "η²", "SC"), 5)), "SCORE")
 # flextable erstellen
 ft <- flextable(kruskal_wallis_results_df) %>%
   # Unterheader für Statistiken (wird zur zweiten Zeile)
-  add_header_row(values = c("Modell", rep(c("p", "χ²", "η²", "SC"), 5)), colwidths = rep(1, 21)) %>%
+  add_header_row(values = c("Modell", rep(c("p", "χ²", "η²", "SC"), 5), "SCORE"), colwidths = rep(1, 22)) %>%
   # Hauptheader hinzufügen (wird zur ersten Zeile)
-  add_header_row(values = c("", factor_names), colwidths = c(1, rep(4, 5))) %>%
+  add_header_row(values = c("", factor_names, "Ø"), colwidths = c(1, rep(4, 5), 1), 1) %>%
   # Erste Spalte in der ersten Zeile mit "Modell" füllen
   #merge_v(j = 1, part = "header") %>%
   # Layout anpassen
   theme_box() %>%
   # Spaltenbreiten anpassen
   width(j = 1, width = 1.2) %>%
-  width(j = 2:21, width = 0.6) %>%
+  width(j = 2:22, width = 0.6) %>%
   # Zentrierung
   align(align = "center", part = "all") %>%
   align(j = 1, align = "left", part = "body") %>%

@@ -55,17 +55,17 @@ create_scores_frame <- function(d)
     rowwise() %>% 
     mutate(
       rowmax = max(abs(c_across(all_of(all_factors)))),
-      No = (get(all_factors[1])/rowmax),
-      Nc = (get(all_factors[2])/rowmax),
-      Ne = (get(all_factors[3])/rowmax),
-      Na = (get(all_factors[4])/rowmax),
-      Nn = (get(all_factors[5])/rowmax),
-      So = 1 - sqrt((get(all_bin[1]) - No)^2),
-      Sc = 1 - sqrt((get(all_bin[2]) - Nc)^2),
-      Se = 1 - sqrt((get(all_bin[3]) - Ne)^2),
-      Sa = 1 - sqrt((get(all_bin[4]) - Na)^2),
-      Sn = 1 - sqrt((get(all_bin[5]) - Nn)^2),
-      SCORE = (So + Sc + Se + Sa + Sn)/5
+      NormO = (get(all_factors[1])/rowmax),
+      NormC = (get(all_factors[2])/rowmax),
+      NormE = (get(all_factors[3])/rowmax),
+      NormA = (get(all_factors[4])/rowmax),
+      NormN = (get(all_factors[5])/rowmax),
+      SO = (1 - sqrt((get(all_bin[1]) - NormO)^2))*100,
+      SC = (1 - sqrt((get(all_bin[2]) - NormC)^2))*100,
+      SE = (1 - sqrt((get(all_bin[3]) - NormE)^2))*100,
+      SA = (1 - sqrt((get(all_bin[4]) - NormA)^2))*100,
+      SN = (1 - sqrt((get(all_bin[5]) - NormN)^2))*100,
+      SCORE = (SO + SC + SE + SA + SN)/5
     )
   return (d_z)
 }
