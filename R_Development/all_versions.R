@@ -131,10 +131,7 @@ data_aggregated <- data %>%
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -222,10 +219,7 @@ data_aggregated <- data %>%
   aggregate_model()
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -248,10 +242,7 @@ data_aggregated <- data %>%
   aggregate_model()
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -261,10 +252,7 @@ data_aggregated <- data %>%
   aggregate_model()
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -274,10 +262,7 @@ data_aggregated <- data %>%
   aggregate_model()
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 data$temp <- as.factor(data$temperature)
@@ -449,10 +434,7 @@ data_aggregated <- data %>%
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -467,10 +449,8 @@ create_all_graphics(data_aggregated, model_version)
 
 
 
-
-
-################################################# V5.0
-model_version <- "v5.0"
+################################################# V5.X
+model_version <- "v5.X"
 o_facets <- c("of3b", "of1", "of2", "of5")
 c_facets <- c("cf2b", "cf3b", "cf3", "cf5")
 e_facets <- c("ef2", "ef3b", "ef4", "ef5")
@@ -522,25 +502,31 @@ data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id"
     e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
     a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
     n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE)
-  )
-create_correlation_matrices(data_aggregated, model_version)
-create_facet_densities(data_aggregated, model_version)
-create_factor_densities(data_aggregated, model_version)
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
+  ) %>% 
+  rename(essay_id = essay_idb)
 
+db_write_model(data_aggregated, model_version)
 
-################################################# V5.1
-model_version <- "v5.1"
-data_raw_v5 <- fetch_raw_data("openai_analyzation_v5")
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
 
-data <- data_raw_v5 %>% 
+################################################# V5.0
+model_version <- "v5.0"
+data <- tbl(con, "openai_analyzation_v5") %>% 
+  select(-updated_at) %>%
   filter(model=="gpt-5-mini-2025-08-07") %>% 
-  filter(essay_id <=250)
-data_aggregated <- aggregate_model(data)
+  filter(essay_id <= 250) %>% 
+  collect()
+
+data_aggregated <- aggregate_model(data) %>% 
+  select(where(~ all(!is.na(.))))
+
+db_write_model(data_aggregated, model_version)
 
 create_essay_histograms(data, model_version, 27)
 create_essay_histograms(data, model_version, 42)
 create_essay_histograms(data, model_version, 112)
-create_all(data_aggregated, model_version)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
 
