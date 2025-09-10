@@ -430,6 +430,43 @@ ggsave(paste(graphics_output_folder, "/density_with_temperature_", model_version
 
 
 
+################################################# V4.1
+model_version <- "v4.1"
+data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
+  collect() %>% 
+  drop_na("of1")
+
+data_temp0 <- data %>% 
+  filter(temperature == 0)
+
+create_essay_histograms(data_temp0, model_version, 27)
+create_essay_histograms(data_temp0, model_version, 42)
+create_essay_histograms(data_temp0, model_version, 112)
+
+data_aggregated <- data %>% 
+  filter(temperature == 0) %>% 
+  aggregate_model()
+
+db_write_model(data_aggregated, model_version)
+
+analyze_alpha_omega(data_aggregated, model_version)
+analyze_factor_loadings(data_aggregated, model_version)
+analyze_item_statistics(data_aggregated, model_version)
+
+create_all_graphics(data_aggregated, model_version)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ################################################# V5.0

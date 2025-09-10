@@ -61,6 +61,9 @@ cor.test(liwc_data$o_bin, liwc_data$o_liwc)
 cor.test(liwc_data$o_bin, liwc_data$o_liwc, method = "spearman")
 
 
+
+
+
 ####################### Bilde Scores
 score_analyze <- liwc_data %>% 
   select(id, o_bin_z, c_bin_z, e_bin_z, a_bin_z, n_bin_z, o_liwc_z, c_liwc_z, e_liwc_z, a_liwc_z, n_liwc_z) %>% 

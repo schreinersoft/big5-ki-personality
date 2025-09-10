@@ -11,7 +11,11 @@ essays <- tbl(con, "essays")  %>% select(-text, -author) %>% collect()
 liwc <- tbl(con, "liwc_analyzation")  %>% select(-updated_at, -liwc_all) %>% collect
 liwc_data <- left_join(essays, liwc, by = c("id" = "essay_id")) %>% 
   drop_na(o_liwc)
+liwc_model <- liwc %>% 
+  filter(essay_id <= 250) %>% 
+  select(-id)
 
+db_write_model(liwc_model, "liwc")
 
 # z-Normalisierung
 liwc_data$o_liwc_z <- as.numeric(scale(liwc_data$o_liwc))
