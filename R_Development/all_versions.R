@@ -530,3 +530,24 @@ create_essay_histograms(data, model_version, 112)
 analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
+
+################################################# V5.0n
+model_version <- "v5.0n"
+data <- tbl(con, "openai_analyzation_v5") %>% 
+  select(-updated_at) %>%
+  filter(model=="gpt-5-nano-2025-08-07") %>% 
+  filter(essay_id <= 250) %>% 
+  collect()
+
+data_aggregated <- aggregate_model(data) %>% 
+  select(where(~ all(!is.na(.))))
+
+db_write_model(data_aggregated, model_version)
+
+create_essay_histograms(data, model_version, 27)
+create_essay_histograms(data, model_version, 42)
+create_essay_histograms(data, model_version, 112)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
