@@ -8,43 +8,74 @@ from database.base import upsert_corpus_entry
 
 
 # Walter Benjamin Basic Data
-author_name='Walter Benjamin'
-birth_year = 1892
-author_sex = "m"
-language = 'de'
-text_type = "letter"
+author_name='Virginia Woolf'
+birth_year = 1882
+author_sex = "f"
+language = 'en'
+text_type = "diary"
 
-in_filename = "c:/temp/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.pdf"
-out_filename = "c:/temp/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.json"
+in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.pdf"
+out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.json"
+start_page = 34
+end_page = 60
+
+weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+month_upper = [m.upper() for m in month]
 
 
-
-def clean_text(text):
+def clean_page(text):
     """
     Removes page numbers and footnotes from the text of a single letter.
     - Page numbers are assumed to be lines containing only digits.
     - Footnotes are assumed to start with a digit, followed by a space,
       and are typically at the end of the text sections.
+    - TOP line can be removed, because it only contains the actual date
     """
     lines = text.strip().split('\n')
+    year = "2015"  # default year, will be updated when found
+
     cleaned_lines = []
     for line in lines:
-        # Remove page numbers (lines that are just digits)
         line = line.replace("\n", "")
+        line = line.strip()
+
+        if not line:
+            continue
+        # Stop if footnotes are reached (lines starting with a number)
+        if re.match(r'^\d+\.', line):
+            break
+
+        if line.split(" ")[0] in month_upper:
+            # special case, add line with top_date tag
+            year = line.split(" ")[-1]
+            continue
+
+        if line.split(" ")[0] in weekdays:
+            # special case, add line with date in <date> tag
+            line = line[line.find(" ")+1:]
+            cleaned_lines.append(f"<diarydate>{line} {year}</diarydate>")
+            continue
+
+        # Remove page numbers (lines that are just digits)
         if line.strip().isdigit():
             continue
-        # Remove footnotes (lines starting with a number, but not containing "an", "!" sometimes an ocr problem)
-        if re.match(r'^\d+\s.*', line.strip()) or line.startswith("!"):
-            if not ("an" in line.lower() or ")" in line.lower()):
-                # only footnotes from here, break
-                break
-        if stripped:= line.strip():
-            if (stripped.rfind("-") is (len(stripped)-1)):
-                # remove umbruch
-                stripped = stripped[:-1]
-            cleaned_lines.append(stripped+" ")
+
+        # replace footnote references in text
+        line = re.sub(r'\.\d+', '.', line)
+
+        # replace & with and (used very very often in this text)
+        line = line.replace("&", "and")
+
+        line = line.replace("  ", " ")
+
+        if line.endswith("-"):
+            # remove umbruch
+            line = line[:-1]
+
+        cleaned_lines.append(line)
     
-    return ''.join(cleaned_lines).strip()
+    return cleaned_lines
 
 def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
     """
@@ -66,26 +97,35 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
 
     # Concatenate all text from the PDF into a single string
     full_text = ""
-    for page in doc:
-        full_text += page.get_text("text")
-        full_text += "\n" # Add a newline to separate page content
+    actual_page = 0
 
-    # Split the full text into individual letters.
-    # Each letter starts with a pattern like "1 An Herbert Belmore".
+    for page in doc:
+        actual_page += 1
+        if actual_page < start_page:
+            # skip first pages
+            continue
+        if actual_page > end_page:
+            # stop after last page
+            break
+        page_cleaned_lines = clean_page(page.get_text())
+        full_text += " ".join(page_cleaned_lines)
+
+    # Split the full text into individual letters by <diarydate> tags
     # We use a positive lookahead (?=...) to keep the delimiter.
-    letter_chunks = re.split(r'(?=\n\d+\s+An\s)', full_text)
+    letter_chunks = re.split(r'(?=<diarydate>.*?</diarydate>)', full_text)
 
     extracted_letters = []
     
-    # Regex to find the date, which can be in various formats
-    # e.g., "[Vaduz], 15. 7. 10" or "Weggis, den 18. 7. 11" or "Wengen, 24. Juli 1911"
-    date_pattern = re.compile(
-        r"^(\d+)(.*?)(\d+)$",
-        re.MULTILINE
-    )
 
     for chunk in letter_chunks:
-        entry = BenjaminEntry(
+        if not chunk.strip():
+            # empty content
+            continue
+        if not chunk.startswith("<diarydate>"):
+            # skip content before first letter
+            continue
+
+        entry = WoolfEntry(
                     author_name=author_name,
                     language = language,
                     author_sex = author_sex,
@@ -93,29 +133,15 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
                     scrape_comment = ""
                      )           
 
-        if not chunk.strip():
-            continue
-
-        lines = chunk.strip().split('\n')
-        
-        # The first line should contain the receiver info
-        receiver_line = lines.pop(0).strip()
-        try:
-            receiver = receiver_line[receiver_line.lower().find("an ")+3:].strip()
-            entry.receiver_name = receiver
-        except:
-            entry.scrape_comment += f"Unclear receiver line: {receiver_line}"
-        
-        # second line should be the date
-        date_line = lines.pop(0).strip()
         try:       
-            date_match =re.search(r"\d.*\d", date_line)
-            
+            date_match = re.match(r'<diarydate>(.*?)</diarydate>', chunk)
+
             # The full matched date string
-            date_info = date_match.group(0).strip()
-            if date_info[-3:] == "101":
-                # correction in one case
-                date_info = date_info[:-1]
+            date_info = date_match.groups()[0].strip()
+            # ocr mistakes
+            date_info = date_info.replace("l ", "1 ")
+            date_info = date_info.replace("j ", "3 ")
+        
             # Remove the date line from the letter's main content
             dateandtime = dateparser.parse(date_info)
             entry.day = dateandtime.day
@@ -128,24 +154,16 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
         except:
             entry.scrape_comment += f"Unparsable Date"
 
-
+        chunk = chunk[chunk.find("</diarydate>")+13:].strip()
         # The rest of the chunk is the body of the letter
-        body_text = '\n'.join(lines)
-
-        # Clean the extracted content to remove footnotes and page numbers
-        cleaned_content = clean_text(body_text)
 
         entry.scrape_state = 1
-        entry.text_raw = cleaned_content
+        entry.text_raw = chunk
 
         if store_to_database:
             upsert_corpus_entry(entry)
 
-        extracted_letters.append({
-            "receiver": receiver,
-            "date": date_info,
-            "text": cleaned_content
-        })
+        extracted_letters.append(entry)
 
     return extracted_letters
 
@@ -154,20 +172,13 @@ if __name__ == "__main__":
 
     if letters:
         print(f"Successfully extracted {len(letters)} letters.\n")
-        # Print the extracted data for each letter
-        for i, letter in enumerate(letters, 1):
-            print("-" * 40)
-            print(f"LETTER {i}")
-            print(f"Receiver: {letter['receiver']}")
-            print(f"Date: {letter['date']}")
-            print("\n--- Text ---\n")
-            print(letter['text'])
-            print("\n" + "-" * 40 + "\n")
             
-        # You can also save this to a JSON file for later use
         try:
             with open(out_filename, "wt", encoding="utf-8") as file:
-                json.dump(letters, file, indent=2, ensure_ascii=False)
+                for letter in letters:
+                    file.write(f"{letter.year}-{letter.month}-{letter.day}\n")
+                    file.write(letter.text_raw)
+                    file.write("\n\n")
             print(f"Successfully saved extracted data to {out_filename}")
         except Exception as e:
             print(f"Error saving to JSON file: {e}")

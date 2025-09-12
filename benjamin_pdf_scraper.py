@@ -14,8 +14,8 @@ author_sex = "m"
 language = 'de'
 text_type = "letter"
 
-in_filename = "c:/temp/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.pdf"
-out_filename = "c:/temp/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.json"
+in_filename = "c:/temp/thesis/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.pdf"
+out_filename = "c:/temp/thesis/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.json"
 
 
 
