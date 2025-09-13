@@ -14,11 +14,6 @@ author_sex = "f"
 language = 'en'
 text_type = "diary"
 
-in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.pdf"
-out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.json"
-start_page = 34
-end_page = 60
-
 weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 month_upper = [m.upper() for m in month]
@@ -77,7 +72,7 @@ def clean_page(text):
     
     return cleaned_lines
 
-def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
+def parse_letters_from_pdf(pdf_path, start_page, end_page, store_to_database: bool = True):
     """
     Parses a PDF file to extract individual letters, including their
     receiver, date, and cleaned text content.
@@ -168,7 +163,13 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
     return extracted_letters
 
 if __name__ == "__main__":
-    letters = parse_letters_from_pdf(in_filename, store_to_database = False)
+    in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.pdf"
+    out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.json"
+    letters = parse_letters_from_pdf(in_filename, 
+                                     out_filename, 
+                                     start_page=34, 
+                                     end_page=350, 
+                                     store_to_database = False)
 
     if letters:
         print(f"Successfully extracted {len(letters)} letters.\n")
@@ -181,5 +182,5 @@ if __name__ == "__main__":
                     file.write("\n\n")
             print(f"Successfully saved extracted data to {out_filename}")
         except Exception as e:
-            print(f"Error saving to JSON file: {e}")
+            print(f"Error saving to file: {e}")
 
