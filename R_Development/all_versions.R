@@ -5,7 +5,7 @@ source("graphics_functions.R")
 source("tables_functions.R")
 source("transformation_functions.R")
 
-root_folder <- "C:/Users/bernd schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
+root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 tables_output_folder <- paste(root_folder, "/tables", sep="")
 graphics_output_folder <- paste(root_folder, "/graphics", sep="")
 stats_output_folder <- paste(root_folder, "/outputs", sep="")

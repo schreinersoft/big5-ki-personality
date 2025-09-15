@@ -33,7 +33,7 @@ get_variable_name <- function(var) {
 }
 
 format_p_psych <- function(p_value) {
-  ifelse(p_value < 0.001, "<.001", format_psych(sprintf("%.3f", p_value)))
+  ifelse(p_value < 0.001, "<.001", format_psych(sprintf("%.3f", as.numeric(p_value))))
 }
 
 format_psych <- function(value) {
@@ -58,8 +58,8 @@ create_scores_frame <- function(d)
   
   d_z <- d %>% 
     select(essay_id, all_of(all_bins),all_of(all_factors)) %>% 
-    mutate(across(all_of(all_bins), scale)) %>% 
     mutate(across(all_of(all_bins), as.numeric)) %>% 
+    mutate(across(all_of(all_bins), scale)) %>% 
     mutate(across(all_of(all_factors), scale)) %>% 
     mutate(across(all_of(all_factors), as.numeric)) %>% 
     rowwise() %>% 

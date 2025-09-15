@@ -1,6 +1,7 @@
 import fitz  # PyMuPDF
 import re
 import json
+import string
 import dateparser
 import tiktoken
 tokenizer = tiktoken.encoding_for_model("gpt-5-mini")
@@ -20,7 +21,6 @@ weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", 
 month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 month_upper = [m.upper() for m in month]
 
-
 def clean_page(text):
     """
     Removes page numbers and footnotes from the text of a single letter.
@@ -33,7 +33,11 @@ def clean_page(text):
     year = "2015"  # default year, will be updated when found
 
     cleaned_lines = []
-    for line in lines:
+    # stop if too few lines
+    if len(lines) < 2:
+        return cleaned_lines
+
+    for i, line in enumerate(lines):
         line = line.replace("\n", "")
         line = line.strip()
 
@@ -47,9 +51,17 @@ def clean_page(text):
         if re.match(r'^\d+\.', line):
             break
 
-        if line.split(" ")[0] in month_upper:
-            # special case, add line with top_date tag
-            year = line.split(" ")[-1]
+        # Remove page numbers (lines that are just digits)
+        if line.strip().isdigit():
+            continue
+
+        if line.split(" ")[0] in month_upper or i == 0:
+            # special case, add line with top_date tag, this ist normally the first line
+            line_melted = line.replace(" ", "")
+            if len(line_melted) > 4 and line_melted[-4].isdigit():
+                year = line_melted[-4:]
+            else:
+                year = line.split(" ")[-1]
             continue
 
         splits = line.split(" ")
@@ -57,10 +69,6 @@ def clean_page(text):
             # special case, add line with date in <date> tag
             line = line[line.find(" ")+1:]
             cleaned_lines.append(f"<diarydate>{line} {year}</diarydate>")
-            continue
-
-        # Remove page numbers (lines that are just digits)
-        if line.strip().isdigit():
             continue
 
         if line.endswith("-"):
@@ -72,16 +80,26 @@ def clean_page(text):
     return cleaned_lines
 
 
+printable_pattern = re.compile("[\W_]")
 def basic_clean(text: str):
     # ocr problems
     text = text.replace("·", ".")  
+    text = text.replace("®", "")
+    text = text.replace(r"\V", "W")
+    text = text.replace(r"\v", "W")
     
+
     # remove footnote references in text
     text = re.sub(r'\.\d+', '.', text)
     text = re.sub(r'\;\d+', ';', text)
+    text = re.sub(r'\"\d+', '"', text)
+    
+    # remove everything that is not char-ish
+    text = ''.join([ch for ch in text if ch in string.printable])
 
     # replace & with and (used very very often in this text)
     text = text.replace("&", "and")
+
 
     # replace long distances
     text = text.replace("  ", " ")
@@ -269,8 +287,8 @@ if __name__ == "__main__":
 
 
     # VOLUME FOUR
-    scrape = True
-    store_to_database = False
+    scrape = False
+    store_to_database = False # DONE!!
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Four 1931-1935.pdf"
     out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Four 1931-1935.txt"
     if scrape:
@@ -297,7 +315,7 @@ if __name__ == "__main__":
 
 
     # VOLUME FIVE
-    scrape = True
+    scrape = False
     store_to_database = False
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.pdf"
     out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.txt"
@@ -319,3 +337,8 @@ if __name__ == "__main__":
                 print(f"Successfully saved extracted data to {out_filename}")
             except Exception as e:
                 print(f"Error saving to file: {e}")
+
+
+
+    # REFRESH everything
+    
