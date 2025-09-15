@@ -169,7 +169,7 @@ if __name__ == "__main__":
                                      out_filename, 
                                      start_page=34, 
                                      end_page=350, 
-                                     store_to_database = False)
+                                     store_to_database = True)
 
     if letters:
         print(f"Successfully extracted {len(letters)} letters.\n")
@@ -177,7 +177,8 @@ if __name__ == "__main__":
         try:
             with open(out_filename, "wt", encoding="utf-8") as file:
                 for letter in letters:
-                    file.write(f"{letter.year}-{letter.month}-{letter.day}\n")
+                    file.write(f"{letter.year}-{letter.month}-{letter.day}")
+                    if l
                     file.write(letter.text_raw)
                     file.write("\n\n")
             print(f"Successfully saved extracted data to {out_filename}")
