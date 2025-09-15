@@ -33,9 +33,7 @@ get_variable_name <- function(var) {
 }
 
 format_p_psych <- function(p_value) {
-  formatted <- ifelse(p_value < 0.001, "<.001", sprintf("%.3f", p_value))
-  # Entferne führende "0" vor dem Dezimalkomma
-  format_psych(formatted)
+  ifelse(p_value < 0.001, "<.001", format_psych(sprintf("%.3f", p_value)))
 }
 
 format_psych <- function(value) {
