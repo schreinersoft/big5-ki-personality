@@ -316,7 +316,7 @@ if __name__ == "__main__":
 
     # VOLUME FIVE
     scrape = False
-    store_to_database = False
+    store_to_database = False # DONE!!
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.pdf"
     out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.txt"
     if scrape:
@@ -340,5 +340,34 @@ if __name__ == "__main__":
 
 
 
-    # REFRESH everything
-    
+    # REFRESH hashes & tokens
+    store_to_database = True
+    bulk = 100
+    i = 0
+    with get_session() as db:
+        entries = db.query(WoolfEntry)\
+                .all()
+        
+        for entry in entries:
+            entry.text = basic_clean(entry.text_raw)
+
+            if store_to_database:
+                oldhash = str(entry.hash)
+                entry.generate_hash() # Ensure hash is generated
+                if oldhash == entry.hash:
+                    # nothing to update
+                    continue
+                entry.text_raw_numtokens = len(tokenizer.encode(entry.text_raw))
+                entry.text_numtokens = len(tokenizer.encode(entry.text))
+                entry.scrape_state = 2
+                i += 1
+                if i >= bulk:
+                    print(f"commiting bulk until entry: {entry.id}")
+                    db.commit()
+                    i = 0
+        if store_to_database:
+            db.commit()
+
+
+                
+

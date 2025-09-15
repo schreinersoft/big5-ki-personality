@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -51,6 +52,9 @@ def upsert(entry):
 def upsert_corpus_entry(entry):
     """ Adds or alters a Corpus Entry in the database """
     entry.generate_hash() # Ensure hash is generated
+    entry.text_raw_numtokens = len(tokenizer.encode(entry.text_raw))
+    if entry.text:
+        entry.text_numtokens = len(tokenizer.encode(entry.text))
 
     with get_session() as db:  # Use SessionLocal to create the session
       existing_entry = db.query(entry.__class__).filter(entry.__class__.hash == entry.hash).first()
@@ -70,4 +74,3 @@ def upsert_corpus_entry(entry):
           db.commit()
           db.refresh(entry)
           return entry
-
