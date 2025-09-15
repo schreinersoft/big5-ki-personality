@@ -9,8 +9,16 @@ essays <- tbl(con, "essays")  %>% select(-text, -author) %>% collect()
 minej <- tbl(con, "minej_analyzation")  %>% select(-updated_at,) %>% collect
 minej_joined <- left_join(essays, minej, by = c("id" = "essay_id")) %>% 
   drop_na(o_minej)
-minej_truncated <- minej_joined %>% filter(classification_type == "truncated")
+minej_truncated <- minej_joined %>% filter(classification_type == "truncated") %>% 
+  rename(essay_id = id) %>% 
+  select(-ends_with("binary"))
 minej_sliding <- minej_joined %>% filter(classification_type == "slidingWindow")
+
+minej_model <- aggregate_model(minej_truncated)
+
+db_write_model(minej_truncated, "minej")
+
+
 
 # suboptimal!
 verteilung_factornames_minej <- function(data, variable, group=NULL) {

@@ -5,7 +5,7 @@ source("graphics_functions.R")
 source("tables_functions.R")
 source("transformation_functions.R")
 
-root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
+root_folder <- "C:/Users/bernd schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 tables_output_folder <- paste(root_folder, "/tables", sep="")
 graphics_output_folder <- paste(root_folder, "/graphics", sep="")
 stats_output_folder <- paste(root_folder, "/outputs", sep="")
@@ -535,6 +535,51 @@ create_all_graphics(data_aggregated, model_version)
 model_version <- "v5.0n"
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(-updated_at) %>%
+  filter(model=="gpt-5-nano-2025-08-07") %>% 
+  filter(essay_id <= 250) %>% 
+  collect()
+
+data_aggregated <- aggregate_model(data) %>% 
+  select(where(~ all(!is.na(.))))
+
+db_write_model(data_aggregated, model_version)
+
+create_essay_histograms(data, model_version, 27)
+create_essay_histograms(data, model_version, 42)
+create_essay_histograms(data, model_version, 112)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
+
+
+################################################# V5.1
+model_version <- "v5.1"
+data <- tbl(con, "openai_analyzation_v5") %>% 
+  select(-updated_at) %>%
+  select(-af1) %>% 
+  filter(model=="gpt-5-mini-2025-08-07") %>% 
+  filter(essay_id <= 250) %>% 
+  collect()
+
+data_aggregated <- aggregate_model(data) %>% 
+  select(where(~ all(!is.na(.))))
+
+db_write_model(data_aggregated, model_version)
+
+create_essay_histograms(data, model_version, 27)
+create_essay_histograms(data, model_version, 42)
+create_essay_histograms(data, model_version, 112)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V5.1n
+model_version <- "v5.1n"
+data <- tbl(con, "openai_analyzation_v5") %>% 
+  select(-updated_at) %>%
+  select(-af1) %>% 
   filter(model=="gpt-5-nano-2025-08-07") %>% 
   filter(essay_id <= 250) %>% 
   collect()

@@ -32,6 +32,18 @@ get_variable_name <- function(var) {
   deparse(substitute(var))
 }
 
+format_p_psych <- function(p_value) {
+  formatted <- ifelse(p_value < 0.001, "<.001", sprintf("%.3f", p_value))
+  # Entferne führende "0" vor dem Dezimalkomma
+  format_psych(formatted)
+}
+
+format_psych <- function(value) {
+  # Entferne führende "0" vor dem Dezimalkomma
+  gsub("^(-?)0\\.", ".", value)
+}
+
+
 # needs dataframe with essay_id bins and o_x as input
 create_scores_frame <- function(d)
 {
@@ -60,11 +72,11 @@ create_scores_frame <- function(d)
       NormE = (get(all_factors[3])/rowmax),
       NormA = (get(all_factors[4])/rowmax),
       NormN = (get(all_factors[5])/rowmax),
-      SO = (1 - sqrt((get(all_bin[1]) - NormO)^2))*100,
-      SC = (1 - sqrt((get(all_bin[2]) - NormC)^2))*100,
-      SE = (1 - sqrt((get(all_bin[3]) - NormE)^2))*100,
-      SA = (1 - sqrt((get(all_bin[4]) - NormA)^2))*100,
-      SN = (1 - sqrt((get(all_bin[5]) - NormN)^2))*100,
+      SO = (1 - sqrt((get(all_bins[1]) - NormO)^2))*100,
+      SC = (1 - sqrt((get(all_bins[2]) - NormC)^2))*100,
+      SE = (1 - sqrt((get(all_bins[3]) - NormE)^2))*100,
+      SA = (1 - sqrt((get(all_bins[4]) - NormA)^2))*100,
+      SN = (1 - sqrt((get(all_bins[5]) - NormN)^2))*100,
       SCORE = (SO + SC + SE + SA + SN)/5
     )
   return (d_z)

@@ -1,6 +1,7 @@
 library(flextable)
 library(effectsize)
 library(tidyverse)
+library(writexl)
 
 source("connect_database.R")
 
@@ -16,11 +17,12 @@ essays <- tbl(con, "essays") %>%
   select(-text, -author, -all_of(ends_with("binary")))
 
 models <- list()
-model_list <- c("liwc", "v1.0","v1.1","v1.2",
+model_list <- c("liwc", "minej",
+                "v1.0","v1.1","v1.2",
                 "v2.0","v2.1","v2.2","v2.3",
                 "v3.0",
                 "v4.000", "v4.002", "v4.004", "v4.006", "v4.008", "v4.010", "v4.1",
-                "v5.X", "v5.0", "v5.0n")
+                "v5.X", "v5.0", "v5.0n", "v5.1", "v5.1n")
 #model_list <- c("liwc", "v1.0","v1.1")
 factor_names <- c("O", "C", "E", "A", "N")
 
@@ -84,14 +86,6 @@ extract_stats_kruskal <- function(aov_result, data) {
   ))
 }
 
-
-format_p_psych <- function(p_value) {
-  ifelse(p_value < 0.001, "<0.001", sprintf("%.3f", p_value))
-}
-
-
-
-
 anova_results <- list()
 kruskal_wallis_results <- list()
 
@@ -152,10 +146,10 @@ for(model in model_list) {
     # Statistiken formatieren
     row_data <- c(row_data,
                   format_p_psych(stats$p),
-                  sprintf("%.2f", stats$F),
-                  sprintf("%.2f", stats$d),
-                  sprintf("%.2f", stats$g),
-                  sprintf("%.1f", mean(scores[[normrow]]))
+                  format_psych(sprintf("%.2f", stats$F)),
+                  format_psych(sprintf("%.2f", stats$d)),
+                  format_psych(sprintf("%.2f", stats$g)),
+                  format_psych(sprintf("%.1f", mean(scores[[normrow]])))
                   )
   }
   anova_results_df <- rbind(anova_results_df, row_data, stringsAsFactors = FALSE)
@@ -179,9 +173,9 @@ for(model in model_list) {
     # Statistiken formatieren
     row_data <- c(row_data,
                   format_p_psych(stats$p),
-                  sprintf("%.2f", stats$chi2),
-                  sprintf("%.3f", stats$eta2),
-                  sprintf("%.1f", mean(scores[[normrow]]))
+                  format_psych(sprintf("%.2f", stats$chi2)),
+                  format_psych(sprintf("%.3f", stats$eta2)),
+                  format_psych(sprintf("%.1f", mean(scores[[normrow]])))
                   )
   }
   kruskal_wallis_results_df <- rbind(kruskal_wallis_results_df, row_data, stringsAsFactors = FALSE)
@@ -223,7 +217,7 @@ ft <- flextable(anova_results_df) %>%
 # Tabelle anzeigen
 print(ft)
 save_as_docx(ft, path=paste(tables_output_folder, "/anovas.docx",sep=""))
-
+write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/anovas.xlsx",sep=""))
 
 
 
@@ -259,4 +253,6 @@ ft <- flextable(kruskal_wallis_results_df) %>%
 # Tabelle anzeigen
 print(ft)
 save_as_docx(ft, path=paste(tables_output_folder, "/h-tests.docx",sep=""))
+write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/h-tests.xlsx",sep=""))
+
 
