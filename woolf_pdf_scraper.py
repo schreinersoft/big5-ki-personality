@@ -2,6 +2,8 @@ import fitz  # PyMuPDF
 import re
 import json
 import dateparser
+import tiktoken
+tokenizer = tiktoken.encoding_for_model("gpt-5-mini")
 
 from database import *
 from database.base import upsert_corpus_entry
@@ -37,6 +39,10 @@ def clean_page(text):
 
         if not line:
             continue
+
+        # do basic cleaning
+        line = basic_clean(line)
+
         # Stop if footnotes are reached (lines starting with a number)
         if re.match(r'^\d+\.', line):
             break
@@ -46,7 +52,8 @@ def clean_page(text):
             year = line.split(" ")[-1]
             continue
 
-        if line.split(" ")[0] in weekdays:
+        splits = line.split(" ")
+        if splits[0] in weekdays and len(splits) < 5:
             # special case, add line with date in <date> tag
             line = line[line.find(" ")+1:]
             cleaned_lines.append(f"<diarydate>{line} {year}</diarydate>")
@@ -56,14 +63,6 @@ def clean_page(text):
         if line.strip().isdigit():
             continue
 
-        # replace footnote references in text
-        line = re.sub(r'\.\d+', '.', line)
-
-        # replace & with and (used very very often in this text)
-        line = line.replace("&", "and")
-
-        line = line.replace("  ", " ")
-
         if line.endswith("-"):
             # remove umbruch
             line = line[:-1]
@@ -72,7 +71,32 @@ def clean_page(text):
     
     return cleaned_lines
 
-def parse_letters_from_pdf(pdf_path, start_page, end_page, store_to_database: bool = True):
+
+def basic_clean(text: str):
+    # ocr problems
+    text = text.replace("·", ".")  
+    
+    # remove footnote references in text
+    text = re.sub(r'\.\d+', '.', text)
+    text = re.sub(r'\;\d+', ';', text)
+
+    # replace & with and (used very very often in this text)
+    text = text.replace("&", "and")
+
+    # replace long distances
+    text = text.replace("  ", " ")
+
+    # remove square braces
+    text = text.replace("[", "")
+    text = text.replace("]", "")
+
+    
+
+    return text 
+
+
+
+def parse_letters_from_pdf(in_path, start_page, end_page, store_to_database: bool = True):
     """
     Parses a PDF file to extract individual letters, including their
     receiver, date, and cleaned text content.
@@ -85,7 +109,7 @@ def parse_letters_from_pdf(pdf_path, start_page, end_page, store_to_database: bo
               a letter with its metadata and content.
     """
     try:
-        doc = fitz.open(pdf_path)
+        doc = fitz.open(in_path)
     except Exception as e:
         print(f"Error opening or reading PDF file: {e}")
         return []
@@ -125,7 +149,8 @@ def parse_letters_from_pdf(pdf_path, start_page, end_page, store_to_database: bo
                     language = language,
                     author_sex = author_sex,
                     text_type = text_type,
-                    scrape_comment = ""
+                    scrape_comment = "",
+                    scrape_state = 1
                      )           
 
         try:       
@@ -136,6 +161,12 @@ def parse_letters_from_pdf(pdf_path, start_page, end_page, store_to_database: bo
             # ocr mistakes
             date_info = date_info.replace("l ", "1 ")
             date_info = date_info.replace("j ", "3 ")
+            date_info = date_info.replace("Apri1", "April")
+            date_info = date_info.replace("i5 ", "15 ")
+            date_info = date_info.replace("17 ", "ly ")
+            date_info = date_info.replace("z5 ", "25 ")
+
+            
         
             # Remove the date line from the letter's main content
             dateandtime = dateparser.parse(date_info)
@@ -147,13 +178,13 @@ def parse_letters_from_pdf(pdf_path, start_page, end_page, store_to_database: bo
             else:
                 entry.year = year
         except:
-            entry.scrape_comment += f"Unparsable Date"
+            entry.scrape_comment += f"'{date_info}': Unparsable date"
+            entry.scrape_state = 0
 
-        chunk = chunk[chunk.find("</diarydate>")+13:].strip()
         # The rest of the chunk is the body of the letter
-
-        entry.scrape_state = 1
+        chunk = chunk[chunk.find("</diarydate>")+13:].strip()
         entry.text_raw = chunk
+        entry.text_raw_numtokens = len(tokenizer.encode(chunk))
 
         if store_to_database:
             upsert_corpus_entry(entry)
@@ -163,25 +194,128 @@ def parse_letters_from_pdf(pdf_path, start_page, end_page, store_to_database: bo
     return extracted_letters
 
 if __name__ == "__main__":
+    # VOLUME ONE
+    scrape = False
+    store_to_database = False # !!! DONE!
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.pdf"
-    out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.json"
-    letters = parse_letters_from_pdf(in_filename, 
-                                     out_filename, 
-                                     start_page=34, 
-                                     end_page=350, 
-                                     store_to_database = True)
+    out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.txt"
+    if scrape:
+        letters = parse_letters_from_pdf(in_filename, 
+                                        start_page=34, 
+                                        end_page=350, 
+                                        store_to_database = store_to_database)
 
-    if letters:
-        print(f"Successfully extracted {len(letters)} letters.\n")
-            
-        try:
-            with open(out_filename, "wt", encoding="utf-8") as file:
-                for letter in letters:
-                    file.write(f"{letter.year}-{letter.month}-{letter.day}")
-                    if l
-                    file.write(letter.text_raw)
-                    file.write("\n\n")
-            print(f"Successfully saved extracted data to {out_filename}")
-        except Exception as e:
-            print(f"Error saving to file: {e}")
+        if letters:
+            print(f"Successfully extracted {len(letters)} letters.\n")
+                
+            try:
+                with open(out_filename, "wt", encoding="utf-8") as file:
+                    for letter in letters:
+                        file.write(f"{letter.year}-{letter.month}-{letter.day}\n")
+                        file.write(letter.text_raw)
+                        file.write("\n\n")
+                print(f"Successfully saved extracted data to {out_filename}")
+            except Exception as e:
+                print(f"Error saving to file: {e}")
 
+    # VOLUME TWO
+    scrape = False
+    store_to_database = False # !!! DONE
+    in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Two 1920-1924.pdf"
+    out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Two 1920-1924.txt"
+    if scrape:
+        letters = parse_letters_from_pdf(in_filename, 
+                                        start_page=19, 
+                                        end_page=344, 
+                                        store_to_database = store_to_database)
+
+        if letters:
+            print(f"Successfully extracted {len(letters)} letters.\n")
+                
+            try:
+                with open(out_filename, "wt", encoding="utf-8") as file:
+                    for letter in letters:
+                        file.write(f"{letter.year}-{letter.month}-{letter.day}\n")
+                        file.write(letter.text_raw)
+                        file.write("\n\n")
+                print(f"Successfully saved extracted data to {out_filename}")
+            except Exception as e:
+                print(f"Error saving to file: {e}")
+
+
+    # VOLUME THREE
+    scrape = False
+    store_to_database = False # !!!DONE
+    in_filename = "c:/Temp/thesis/The diary of Virginia Woolf Volume Three 1925-1930.pdf"
+    out_filename = "c:/Temp/thesis/The diary of Virginia Woolf Volume Three 1925-1930.txt"
+    if scrape:
+        letters = parse_letters_from_pdf(in_filename, 
+                                        start_page=19, 
+                                        end_page=344, 
+                                        store_to_database = store_to_database)
+
+        if letters:
+            print(f"Successfully extracted {len(letters)} letters.\n")
+                
+            try:
+                with open(out_filename, "wt", encoding="utf-8") as file:
+                    for letter in letters:
+                        file.write(f"{letter.year}-{letter.month}-{letter.day}\n")
+                        file.write(letter.text_raw)
+                        file.write("\n\n")
+                print(f"Successfully saved extracted data to {out_filename}")
+            except Exception as e:
+                print(f"Error saving to file: {e}")
+
+
+    # VOLUME FOUR
+    scrape = True
+    store_to_database = False
+    in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Four 1931-1935.pdf"
+    out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Four 1931-1935.txt"
+    if scrape:
+        letters = parse_letters_from_pdf(in_filename, 
+                                        start_page=18, 
+                                        end_page=376, 
+                                        store_to_database = store_to_database)
+
+        if letters:
+            print(f"Successfully extracted {len(letters)} letters.\n")
+                
+            try:
+                with open(out_filename, "wt", encoding="utf-8") as file:
+                    for letter in letters:
+                        file.write(f"{letter.year}-{letter.month}-{letter.day}\n")
+                        file.write(letter.text_raw)
+                        file.write("\n\n")
+                print(f"Successfully saved extracted data to {out_filename}")
+            except Exception as e:
+                print(f"Error saving to file: {e}")
+
+
+
+
+
+    # VOLUME FIVE
+    scrape = True
+    store_to_database = False
+    in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.pdf"
+    out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.txt"
+    if scrape:
+        letters = parse_letters_from_pdf(in_filename, 
+                                        start_page=19, 
+                                        end_page=375, 
+                                        store_to_database = store_to_database)
+
+        if letters:
+            print(f"Successfully extracted {len(letters)} letters.\n")
+                
+            try:
+                with open(out_filename, "wt", encoding="utf-8") as file:
+                    for letter in letters:
+                        file.write(f"{letter.year}-{letter.month}-{letter.day}\n")
+                        file.write(letter.text_raw)
+                        file.write("\n\n")
+                print(f"Successfully saved extracted data to {out_filename}")
+            except Exception as e:
+                print(f"Error saving to file: {e}")
