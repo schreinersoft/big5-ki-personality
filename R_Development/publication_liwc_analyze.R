@@ -14,8 +14,8 @@ liwc_data <- left_join(essays, liwc, by = c("id" = "essay_id")) %>%
 
 liwc_ocean <- c("o_liwc_z", "c_liwc_z", "e_liwc_z", "a_liwc_z", "n_liwc_z")
 
-liwc_data <- liwc_data %>% 
-  filter(id <= 250)
+#liwc_data <- liwc_data %>% 
+#  filter(id <= 250)
 
 
 # z-Normalisierung
@@ -49,18 +49,9 @@ liwc_data <- liwc_data %>%
     )
   )
 
-####################### Analysiere Fähigkeit zur Differenzierung
-anova_o <- model_oneway <- aov(o_liwc ~ o_binary, data = liwc_data)
-summary(anova_o)
 
-anova_o$terms
-  
-  
 ####################### Korrelationen der 5 Faktoren mit LIWC
 cor.test(liwc_data$o_bin, liwc_data$o_liwc)
-cor.test(liwc_data$o_bin, liwc_data$o_liwc, method = "spearman")
-
-
 
 
 
@@ -96,7 +87,9 @@ score_analyze %>%
   geom_density(aes(x=Ne)) +
   geom_density(aes(x=Na)) +
   geom_density(aes(x=Nn)) + 
-  geom_density(aes(x=SCORE, color="red"))
+  geom_density(aes(x=SCORE, color="red")) +
+  theme_minimal()
+
 
 # Alle Sfs
 score_analyze %>% 
@@ -113,6 +106,7 @@ score_analyze %>%
   ggplot(aes(x = value, color = "darkgrey", fill = variable)) +
   geom_density(alpha=0.7)+
   scale_fill_brewer(type = "qual", palette = "Oranges")
+
 
 score_analyze %>% 
   ggplot +
@@ -147,7 +141,7 @@ essays_filtered %>%
 
 
 # empirisch: Schwelle bei ca. 0.6
-thr <- 0.5
+thr <- 0.45
 
 # insgesamt?
 score_analyze %>% 
@@ -171,9 +165,15 @@ enhanced_essays <- score_analyze %>%
 
 mean(enhanced_essays$SCORE)
 
-score_analyze %>% 
-  arrange(SCORE)
+best <- score_analyze %>% 
+  arrange(desc(SCORE)) %>% 
+  select(essay_id, So, Sc, Se, Sa, Sn, SCORE)
 
+# Write data
+dbWriteTable(con, "liwc_best", best, 
+             overwrite = TRUE, row.names = FALSE)
+
+best %>% filter(essay_id <= 250)
 
 
 # Tests auf Normalverteilung
