@@ -1,9 +1,11 @@
 import os
+import hashlib
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
+import tiktoken
+tokenizer = tiktoken.encoding_for_model("gpt-5-mini")
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -48,13 +50,9 @@ def upsert(entry):
           db.refresh(entry)
           return entry
 
-
 def upsert_corpus_entry(entry):
     """ Adds or alters a Corpus Entry in the database """
-    entry.generate_hash() # Ensure hash is generated
-    entry.text_raw_numtokens = len(tokenizer.encode(entry.text_raw))
-    if entry.text:
-        entry.text_numtokens = len(tokenizer.encode(entry.text))
+    entry = refresh_entry(entry) # Ensure hash is generated & token counted
 
     with get_session() as db:  # Use SessionLocal to create the session
       existing_entry = db.query(entry.__class__).filter(entry.__class__.hash == entry.hash).first()
@@ -74,3 +72,26 @@ def upsert_corpus_entry(entry):
           db.commit()
           db.refresh(entry)
           return entry
+
+
+
+# Add a method to generate the hash from the 'text' field
+# used for referencing analyzed results
+def refresh_entry(entry):
+    if entry.text:
+        entry.hash = hashlib.sha256(entry.text.encode('utf-8')).hexdigest()
+    elif entry.text_raw:
+        entry.hash = hashlib.sha256(entry.text_raw.encode('utf-8')).hexdigest()
+    
+    if entry.text:
+        entry.text_numtokens = len(tokenizer.encode(entry.text))
+    if entry.text_raw:        
+        entry.text_raw_numtokens = len(tokenizer.encode(entry.text_raw))
+
+
+    return entry
+
+    # elif self.href:
+    #     self.hash = hashlib.sha256(self.href.encode('utf-8')).hexdigest()
+    # Remove the line below
+    # self.hash = None

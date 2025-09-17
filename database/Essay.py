@@ -24,4 +24,3 @@ class Essay(Base):
     openai_analyzation_v3 = relationship("OpenAIAnalyzationV3", back_populates="essay", cascade="all, delete-orphan")    
     google_analyzation = relationship("GoogleAnalyzation", back_populates="essay", cascade="all, delete-orphan")    
     openai_analyzation_v5 = relationship("OpenAIAnalyzationV5", back_populates="essay", cascade="all, delete-orphan")    
-    openai_analyzation_v6 = relationship("OpenAIAnalyzationV6", back_populates="essay", cascade="all, delete-orphan")

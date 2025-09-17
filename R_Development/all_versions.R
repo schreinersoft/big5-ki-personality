@@ -4,11 +4,8 @@ source("connect_database.R")
 source("graphics_functions.R")
 source("tables_functions.R")
 source("transformation_functions.R")
+source("output_folders.R")
 
-root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
-tables_output_folder <- paste(root_folder, "/tables", sep="")
-graphics_output_folder <- paste(root_folder, "/graphics", sep="")
-stats_output_folder <- paste(root_folder, "/outputs", sep="")
 
 fetch_raw_data <- function(table_name)
 {
@@ -517,6 +514,24 @@ data <- tbl(con, "openai_analyzation_v5") %>%
   filter(model=="gpt-5-mini-2025-08-07") %>% 
   filter(essay_id <= 250) %>% 
   collect()
+
+pre <- data %>% 
+  select(where(~ all(!is.na(.))))
+o_facets <- pre %>% select(starts_with(("of")))
+c_facets <- pre %>% select(starts_with(("cf")))
+e_facets <- pre %>% select(starts_with(("ef")))
+a_facets <- pre %>% select(starts_with(("af")))
+n_facets <- pre %>% select(starts_with(("nf")))
+
+all_facet_names <- c(names(o_facets), names(c_facets), names(e_facets), 
+                     names(a_facets), names(n_facets))
+summ <- data %>% 
+  select(where(~ all(!is.na(.)))) %>% 
+  group_by(essay_id) %>% 
+  summarize(across(all_of(all_facet_names), ~ sd(.x, na.rm = TRUE)),
+            .groups = "drop")
+
+
 
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))

@@ -6,7 +6,7 @@ from .OpenAIAnalyzation import OpenAIAnalyzation
 from .OpenAIAnalyzationV2 import OpenAIAnalyzationV2
 from .OpenAIAnalyzationV3 import OpenAIAnalyzationV3
 from .OpenAIAnalyzationV5 import OpenAIAnalyzationV5
-from .OpenAIAnalyzationV6 import OpenAIAnalyzationV6
+from .OpenAIAnalyzationCorpus import OpenAIAnalyzationCorpus
 from .MinejAnalyzation import MinejAnalyzation
 from .GoogleAnalyzation import GoogleAnalyzation
 from .BenjaminEntry import BenjaminEntry
@@ -25,6 +25,7 @@ __all__ = [
     'MinejAnalyzation',
     'GoogleAnalyzation',
     'OpenAIAnalyzationV5',
+    'OpenAIAnalyzationCorpus',
     'BenjaminEntry',
     'WoolfEntry'
 ]

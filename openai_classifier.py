@@ -6,13 +6,6 @@ load_dotenv()
 
 client = OpenAI()
 
-# | Temperature | Effect                                                                    | Recommendation                             |
-# | ----------- | ------------------------------------------------------------------------- | ------------------------------------------ |
-# | 0.0 – 0.2   | Almost deterministic; same text gives nearly identical ratings every time | ✅ Best for bulk scoring                    |
-# | 0.3 – 0.5   | Slight variation, still stable                                            | Acceptable if some minor variation is okay |
-# | 0.6 – 1.0   | More randomness; ratings may vary across runs                             | ❌ Not recommended for numeric scoring      |
-# | >1.0        | Highly unpredictable                                                      | ❌ Avoid                                    |
-
 def classify(input_text: str, system_prompt: str, service_tier: str = "flex", temperature: int = 0.0) -> dict:
     # Call API
     attempt = 1

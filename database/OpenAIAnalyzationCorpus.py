@@ -5,11 +5,11 @@ from sqlalchemy.orm import relationship
 from database.base import Base
 
 
-class OpenAIAnalyzationV6(Base):
-    __tablename__ = 'openai_analyzation_v5'
+class OpenAIAnalyzationCorpus(Base):
+    __tablename__ = 'openai_analyzation_corpus'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    essay_id = Column(Integer, ForeignKey('essays.id'), nullable=False)    # if reference to essay_id
-    hash = Column(String),   # if analyzed a corpus text with unique hash
+    hash = Column(String)   # if analyzed this measures a corpus text with unique hash
+    entry_id = Column(Integer)  # reference to entry for convenience
     repeat = Column(Integer)     # added repeat count
     # leave columns for compatibility
     of1b = Column(Double)
@@ -58,9 +58,10 @@ class OpenAIAnalyzationV6(Base):
     nf5 = Column(Double)
     nf6 = Column(Double)
     model = Column(String)
+    state = Column(Integer)
     input_tokens = Column(Double)
     output_tokens= Column(Double)
     error_response = Column(String)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    finished_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    essay = relationship("Essay", back_populates="openai_analyzation_v6")
