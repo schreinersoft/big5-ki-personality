@@ -12,6 +12,7 @@ from .GoogleAnalyzation import GoogleAnalyzation
 from .BenjaminEntry import BenjaminEntry
 from .WoolfEntry import WoolfEntry
 from .NoiseEntry import NoiseEntry
+from .OrwellEntry import OrwellEntry
 
 
 # Optionally, define what gets imported with import *
@@ -31,5 +32,6 @@ __all__ = [
     'OpenAIAnalyzationCorpus',
     'BenjaminEntry',
     'WoolfEntry',
-    'NoiseEntry'
+    'NoiseEntry',
+    'OrwellEntry'
 ]

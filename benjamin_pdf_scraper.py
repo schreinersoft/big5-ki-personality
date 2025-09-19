@@ -3,6 +3,9 @@ import re
 import json
 import dateparser
 import yaml
+import hashlib
+import tiktoken
+tokenizer = tiktoken.encoding_for_model("gpt-5-mini")
 
 from database import *
 from database.base import upsert_corpus_entry
@@ -58,9 +61,16 @@ replaces = {
 "nsthaI": "nsthal"
 }
 
-
-
-
+# Add a method to generate the hash from the 'text' field
+# used for referencing analyzed results
+def generate_hash(object):
+    if object.text:
+        object.hash = hashlib.sha256(object.text.encode('utf-8')).hexdigest()
+    elif object.text_raw:
+        object.hash = hashlib.sha256(object.text_raw.encode('utf-8')).hexdigest()
+    elif object.href:
+        object.hash = hashlib.sha256(object.href.encode('utf-8')).hexdigest()
+    return object
 
 def clean_receiver(rec):
     for k, v in replaces.items():
@@ -196,12 +206,12 @@ def printout_letters(letters, out_filename):
 
 
 if __name__ == "__main__":
-    letters = parse_letters_from_pdf(in_filename, store_to_database = True)
+    #letters = parse_letters_from_pdf(in_filename, store_to_database = True)
 
 
-    if letters:
-        print(f"Successfully extracted {len(letters)} letters.\n")
-        printout_letters(letters, out_filename)
+    #if letters:
+    #    print(f"Successfully extracted {len(letters)} letters.\n")
+    #    printout_letters(letters, out_filename)
 
         # Print the extracted data for each letter
         # for i, letter in enumerate(letters, 1):
@@ -220,4 +230,30 @@ if __name__ == "__main__":
         #     print(f"Successfully saved extracted data to {out_filename}")
         # except Exception as e:
         #     print(f"Error saving to JSON file: {e}")
-
+    # REFRESH hashes & tokens
+    store_to_database = True
+    bulk = 100
+    i = 0
+    if store_to_database:
+        with get_session() as db:
+            entries = db.query(BenjaminEntry)\
+                    .filter(BenjaminEntry.scrape_state<23)\
+                    .all()
+        
+            for entry in entries:
+                #entry.text = basic_clean(entry.text_raw)
+                entry.author_age = entry.year - birth_year
+                #oldhash = str(entry.hash)
+                entry = generate_hash(entry) # Ensure hash is generated
+                #     # nothing to update
+                #     continue
+                entry.text_raw_numtokens = len(tokenizer.encode(entry.text_raw))
+                if entry.text:
+                    entry.text_numtokens = len(tokenizer.encode(entry.text))
+                entry.scrape_state = 2
+                i += 1
+                if i >= bulk:
+                    print(f"commiting bulk until entry: {entry.id}")
+                    db.commit()
+                    i = 0
+            db.commit()
