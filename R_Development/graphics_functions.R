@@ -158,7 +158,42 @@ create_factor_densities <- function(data, model_version)
       theme_minimal() 
     i <- i + 1
   }
+
+# plot OCEAN factors of all essays
+create_factor_densities_z <- function(data, model_version)
+{
+  all_factors <- data %>% select(
+    starts_with("o_"),
+    starts_with("c_"),
+    starts_with("e_"),
+    starts_with("a_"),
+    starts_with("n_")) %>% names()
   
+  plots <- list()
+  i <- 1
+
+  for (factor in all_factors){
+    plots[[i]] <- data %>%
+      mutate(across(ends_with("_llm"), ~ as.numeric(scale(.x)))) %>% 
+      ggplot(aes(x = .data[[factor]])) +
+      xlim(-2.5, 2.5) +
+      geom_density(color = "black",
+                   fill = "orange") +   # XXX factor colors?
+      labs(title = variable_names[[factor]] %||% factor,
+           #x = "Value",
+           y = "") +
+      stat_function(
+        fun = dnorm,  # Normal distribution function
+        args = list(mean = mean(data[[factor]], na.rm = TRUE), 
+                    sd = sd(data[[factor]], na.rm = TRUE)), 
+        color = "blue", linewidth = 0.5, linetype = "dashed"
+      ) +
+      theme_minimal() 
+    i <- i + 1
+  }
+    
+  
+    
   # Calculate layout dimensions after all plots are created
   n_plots <- length(plots)
   n_cols <- min(n_plots, 3)
@@ -166,7 +201,7 @@ create_factor_densities <- function(data, model_version)
   
   combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
   combined_plot
-  ggsave(paste(graphics_output_folder, "/density_", model_version, "_factors.png", sep=""),
+  ggsave(paste(graphics_output_folder, "/density_z_", model_version, "_factors.png", sep=""),
          plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
 }
 
