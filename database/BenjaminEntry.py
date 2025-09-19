@@ -20,8 +20,6 @@ class BenjaminEntry(Base):
     text_raw_numtokens = Column(Integer)
     text = Column(String)
     text_numtokens = Column(Integer)
-    # Remove the old 'text_hash' field
-    # text_hash = Column(String)
     year = Column(Integer)
     month = Column(Integer)
     day = Column(Integer)

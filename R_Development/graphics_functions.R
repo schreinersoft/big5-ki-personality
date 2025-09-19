@@ -184,8 +184,7 @@ create_factor_densities_z <- function(data, model_version)
            y = "") +
       stat_function(
         fun = dnorm,  # Normal distribution function
-        args = list(mean = mean(data[[factor]], na.rm = TRUE), 
-                    sd = sd(data[[factor]], na.rm = TRUE)), 
+
         color = "blue", linewidth = 0.5, linetype = "dashed"
       ) +
       theme_minimal() 

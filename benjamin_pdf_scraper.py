@@ -2,6 +2,7 @@ import fitz  # PyMuPDF
 import re
 import json
 import dateparser
+import yaml
 
 from database import *
 from database.base import upsert_corpus_entry
@@ -15,9 +16,9 @@ language = 'de'
 text_type = "letter"
 
 in_filename = "c:/temp/thesis/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.pdf"
-out_filename = "c:/temp/thesis/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.json"
+out_filename = "c:/temp/thesis/walter-benjamin-gesammelte-briefe-baende_1_bis_2_027-874.txt"
 
-
+receivers = {}
 
 def clean_text(text):
     """
@@ -46,6 +47,33 @@ def clean_text(text):
     
     return ''.join(cleaned_lines).strip()
 
+replaces = {
+"H ann": "Hann",
+"H erb": "Herb",
+"H'erb": "Herb",
+"BeZmore": "Belmore",
+"Buher": "Buber",
+"MaxHorkheimer": "Max Horkheimer",
+"Monnier 1": "Monnier",
+"nsthaI": "nsthal"
+}
+
+
+
+
+
+def clean_receiver(rec):
+    for k, v in replaces.items():
+        rec = rec.replace(k,v)
+
+    if rec in receivers.keys():
+        receivers[rec] +=1
+    else:
+        receivers[rec] =1
+    return rec
+
+
+
 def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
     """
     Parses a PDF file to extract individual letters, including their
@@ -58,11 +86,9 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
         list: A list of dictionaries, where each dictionary represents
               a letter with its metadata and content.
     """
-    try:
-        doc = fitz.open(pdf_path)
-    except Exception as e:
-        print(f"Error opening or reading PDF file: {e}")
-        return []
+
+    doc = fitz.open(pdf_path)
+
 
     # Concatenate all text from the PDF into a single string
     full_text = ""
@@ -84,7 +110,7 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
         re.MULTILINE
     )
 
-    for chunk in letter_chunks:
+    for i, chunk in enumerate(letter_chunks):
         entry = BenjaminEntry(
                     author_name=author_name,
                     language = language,
@@ -95,17 +121,24 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
 
         if not chunk.strip():
             continue
-
+        if (i==207):
+            pass
         lines = chunk.strip().split('\n')
         
         # The first line should contain the receiver info
         receiver_line = lines.pop(0).strip()
+        if receiver_line.lower().find("an ") == -1:
+            # try next line
+            receiver_line = lines.pop(0).strip()
         try:
             receiver = receiver_line[receiver_line.lower().find("an ")+3:].strip()
-            entry.receiver_name = receiver
+
+            entry.receiver_name = clean_receiver(receiver)
         except:
             entry.scrape_comment += f"Unclear receiver line: {receiver_line}"
         
+
+
         # second line should be the date
         date_line = lines.pop(0).strip()
         try:       
@@ -126,7 +159,7 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
             else:
                 entry.year = year
         except:
-            entry.scrape_comment += f"Unparsable Date"
+            entry.scrape_comment += f"{date_line} letter {i}: Unparsable Date"
 
 
         # The rest of the chunk is the body of the letter
@@ -141,34 +174,50 @@ def parse_letters_from_pdf(pdf_path, store_to_database: bool = True):
         if store_to_database:
             upsert_corpus_entry(entry)
 
-        extracted_letters.append({
-            "receiver": receiver,
-            "date": date_info,
-            "text": cleaned_content
-        })
+        extracted_letters.append(entry)
 
     return extracted_letters
 
+
+def printout_letters(letters, out_filename):
+    with open(out_filename, "wt", encoding="utf-8") as file:
+        for letter in [l for l in letters if l.scrape_comment]:
+            file.write(f"{letter.year}-{letter.month}-{letter.day}. Errors: {letter.scrape_comment}\n")
+        
+        file.write(yaml.dump(receivers, default_flow_style=False, allow_unicode=True, indent=2))
+
+        for i, letter in enumerate(letters):
+            file.write("-" * 40)
+            file.write(f"LETTER {i}\n")
+            file.write(f"Receiver: {letter.receiver_name}\n")
+            file.write(f"Date: {letter.year}-{letter.month}-{letter.day}\n")
+            file.write(letter.text_raw)
+            file.write("\n" + "-" * 40 + "\n")
+
+
 if __name__ == "__main__":
-    letters = parse_letters_from_pdf(in_filename, store_to_database = False)
+    letters = parse_letters_from_pdf(in_filename, store_to_database = True)
+
 
     if letters:
         print(f"Successfully extracted {len(letters)} letters.\n")
+        printout_letters(letters, out_filename)
+
         # Print the extracted data for each letter
-        for i, letter in enumerate(letters, 1):
-            print("-" * 40)
-            print(f"LETTER {i}")
-            print(f"Receiver: {letter['receiver']}")
-            print(f"Date: {letter['date']}")
-            print("\n--- Text ---\n")
-            print(letter['text'])
-            print("\n" + "-" * 40 + "\n")
+        # for i, letter in enumerate(letters, 1):
+        #     print("-" * 40)
+        #     print(f"LETTER {i}")
+        #     print(f"Receiver: {letter['receiver']}")
+        #     print(f"Date: {letter['date']}")
+        #     print("\n--- Text ---\n")
+        #     print(letter['text'])
+        #     print("\n" + "-" * 40 + "\n")
             
-        # You can also save this to a JSON file for later use
-        try:
-            with open(out_filename, "wt", encoding="utf-8") as file:
-                json.dump(letters, file, indent=2, ensure_ascii=False)
-            print(f"Successfully saved extracted data to {out_filename}")
-        except Exception as e:
-            print(f"Error saving to JSON file: {e}")
+        # # You can also save this to a JSON file for later use
+        # try:
+        #     with open(out_filename, "wt", encoding="utf-8") as file:
+        #         json.dump(letters, file, indent=2, ensure_ascii=False)
+        #     print(f"Successfully saved extracted data to {out_filename}")
+        # except Exception as e:
+        #     print(f"Error saving to JSON file: {e}")
 
