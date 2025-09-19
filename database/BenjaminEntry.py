@@ -29,15 +29,3 @@ class BenjaminEntry(Base):
     scrape_state = Column(Integer) # Assuming 0 for failure, 1 for raw text, 2 for complete text
     scrape_comment = Column(String) # For problem log while parsing
 
-
-    # Add a method to generate the hash from the 'text' field
-    # used for referencing analyzed results
-    def generate_hash(self):
-        if self.text:
-            self.hash = hashlib.sha256(self.text.encode('utf-8')).hexdigest()
-        elif self.text_raw:
-            self.hash = hashlib.sha256(self.text_raw.encode('utf-8')).hexdigest()
-        elif self.href:
-            self.hash = hashlib.sha256(self.href.encode('utf-8')).hexdigest()
-        # Remove the line below
-        # self.hash = None

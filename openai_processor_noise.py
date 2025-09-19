@@ -1,11 +1,22 @@
 import signal
 import sys
 import logging
+import hashlib
 from pathlib import Path
 from datetime import datetime
 
 from database import *
 import openai_classifier
+
+import random
+import tiktoken
+tokenizer = tiktoken.encoding_for_model("gpt-5-mini")
+
+random.seed()
+
+def get_random_token():
+    max = tokenizer.max_token_value
+    return random.randint(0, max)
 
 # Configure logging to write to both console and file
 logging.basicConfig(
@@ -51,7 +62,37 @@ The features are:"""
     json += "}"
     return f"{instruction}\n{numbers}\nYour output must ONLY be valid JSON, with no extra commentary or text, in the following format:\n{json}\nDo not output anything else."
 
-def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str = "flex"):
+
+def create_noise_samples(num):
+    with get_session() as db:
+        ready = db.query(NoiseEntry).count()
+        i = 0
+        while(i < num-ready):
+            numtokens = random.randint(250, 750)
+            random_stream =  [random.randint(0, tokenizer.max_token_value) for x in range(numtokens)]
+            try:
+                text = tokenizer.decode(random_stream)
+
+                noise = NoiseEntry(
+                    text_numtokens = numtokens,
+                    author_name = "Noise",
+                    text = text,
+                    hash = hashlib.sha256(text.encode('utf-8')).hexdigest()
+                )
+                db.add(noise)
+                db.commit()
+                i+=1
+            except KeyError:
+                continue
+            except Exception as e:
+                logging.warning(f"Generation failed: {e}")
+                db.rollback()
+                continue
+        
+            
+
+
+def process_openai_noise(max_entries = 1000, repeats: int=3, service_tier: str = "flex"):
     system_prompt = make_system_prompt()
     i = 0
     exc_counter = 0
@@ -59,10 +100,9 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
         with get_session() as db:
             excluded_hashes_query = db.query(OpenAIAnalyzationCorpus.hash)
 
-            entries = db.query(WoolfEntry)\
-                .filter(WoolfEntry.hash.is_not(None))\
-                .filter(~WoolfEntry.hash.in_(excluded_hashes_query))\
-                .filter(WoolfEntry.scrape_state < 10)\
+            entries = db.query(NoiseEntry)\
+                .filter(NoiseEntry.hash.is_not(None))\
+                .filter(~NoiseEntry.hash.in_(excluded_hashes_query))\
                 .limit(1)\
                 .all()
 
@@ -79,10 +119,6 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
             for entry in entries:
                 logging.info(f"Corpus: Processing Entry {entry.id}... Exception Counter: {exc_counter}")
 
-                # mark for actual processing for parallel processing possibility
-                entry.scrape_state = entry.scrape_state + 10   
-                db.commit()
-                db.refresh(entry)
 
                 try:
                     for repeat in range(repeats):
@@ -127,17 +163,11 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
                         new_openai.finished_at = datetime.now()
                         db.add(new_openai)
                 except KeyboardInterrupt:
-                    if db and entry:
-                        entry.scrape_state = entry.scrape_state - 10   
-                        db.commit()
                     sys.exit(0)
                 except Exception as e:
                     logging.info(f"Error processing on Entry {entry.id}: {e}")
                     exc_counter += 1
                 finally:
-                    if entry.scrape_state > 10 or entry.scrape_state < 0:
-                        # reset scrape state
-                        entry.scrape_state = (entry.scrape_state+1000) % 10   
                     db.commit()
                     logging.info("committed!")                    
                     i += 1
@@ -148,8 +178,5 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
 
                 
 if __name__ == "__main__":
-    process_openai_corpus(max_entries=500, repeats=3)
-
-
-
-
+    create_noise_samples(250)
+    process_openai_noise(max_entries=250, repeats=3)

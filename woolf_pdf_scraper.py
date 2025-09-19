@@ -1,6 +1,7 @@
 import fitz  # PyMuPDF
 import re
 import json
+import hashlib
 import string
 import dateparser
 import tiktoken
@@ -20,6 +21,20 @@ text_type = "diary"
 weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 month_upper = [m.upper() for m in month]
+
+
+
+# Add a method to generate the hash from the 'text' field
+# used for referencing analyzed results
+def generate_hash(object):
+    if object.text:
+        object.hash = hashlib.sha256(object.text.encode('utf-8')).hexdigest()
+    elif object.text_raw:
+        object.hash = hashlib.sha256(object.text_raw.encode('utf-8')).hexdigest()
+    elif object.href:
+        object.hash = hashlib.sha256(object.href.encode('utf-8')).hexdigest()
+    return object
+
 
 def clean_page(text, page):
     """
@@ -250,8 +265,8 @@ def printout_letters(letters, out_filename):
 
 if __name__ == "__main__":
     # VOLUME ONE
-    scrape = True
-    store_to_database = True # !!! DONE!
+    scrape = False
+    store_to_database = False # !!! DONE!
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.pdf"
     out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume One 1915-1919.txt"
     if scrape:
@@ -266,8 +281,8 @@ if __name__ == "__main__":
             printout_letters(letters, out_filename)
 
     # VOLUME TWO
-    scrape = True
-    store_to_database = True # !!! DONE
+    scrape = False
+    store_to_database = False # !!! DONE
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Two 1920-1924.pdf"
     out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Two 1920-1924.txt"
     if scrape:
@@ -283,8 +298,8 @@ if __name__ == "__main__":
 
 
     # VOLUME THREE
-    scrape = True
-    store_to_database = True # !!!DONE
+    scrape = False
+    store_to_database = False # !!!DONE
     in_filename = "c:/Temp/thesis/The diary of Virginia Woolf Volume Three 1925-1930.pdf"
     out_filename = "c:/Temp/thesis/The diary of Virginia Woolf Volume Three 1925-1930.txt"
     if scrape:
@@ -300,8 +315,8 @@ if __name__ == "__main__":
 
 
     # VOLUME FOUR
-    scrape = True
-    store_to_database = True # DONE!!
+    scrape = False
+    store_to_database = False # DONE!!
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Four 1931-1935.pdf"
     out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Four 1931-1935.txt"
     if scrape:
@@ -320,8 +335,8 @@ if __name__ == "__main__":
 
 
     # VOLUME FIVE
-    scrape = True
-    store_to_database = True # DONE!!
+    scrape = False
+    store_to_database = False # DONE!!
     in_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.pdf"
     out_filename = "c:/Temp/thesis/The Diary of Virginia Woolf Volume Five 1936-1941.txt"
     if scrape:
@@ -338,24 +353,27 @@ if __name__ == "__main__":
 
 
     # REFRESH hashes & tokens
-    store_to_database = False
+    store_to_database = True
     bulk = 100
     i = 0
     if store_to_database:
         with get_session() as db:
             entries = db.query(WoolfEntry)\
+                    .filter(WoolfEntry.scrape_state<3)\
                     .all()
         
             for entry in entries:
-                entry.text = basic_clean(entry.text_raw)
-                oldhash = str(entry.hash)
-                entry.generate_hash() # Ensure hash is generated
-                if oldhash == entry.hash:
-                    # nothing to update
-                    continue
+                #entry.text = basic_clean(entry.text_raw)
+                #entry.author_age = entry.year - birth_year
+                #oldhash = str(entry.hash)
+                #entry = generate_hash(entry) # Ensure hash is generated
+                # if oldhash == entry.hash:
+                #     # nothing to update
+                #     continue
                 entry.text_raw_numtokens = len(tokenizer.encode(entry.text_raw))
-                entry.text_numtokens = len(tokenizer.encode(entry.text))
-                entry.scrape_state = 2
+                if entry.text:
+                    entry.text_numtokens = len(tokenizer.encode(entry.text))
+                #entry.scrape_state = 2
                 i += 1
                 if i >= bulk:
                     print(f"commiting bulk until entry: {entry.id}")

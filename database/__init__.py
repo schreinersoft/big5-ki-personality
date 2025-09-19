@@ -1,4 +1,4 @@
-from .base import get_session, create_tables
+from .base import get_session, create_tables, refresh_entry
 from .Essay import Essay
 from .WangAnalyzation import WangAnalyzation
 from .LIWCAnalyzation import LIWCAnalyzation
@@ -11,11 +11,14 @@ from .MinejAnalyzation import MinejAnalyzation
 from .GoogleAnalyzation import GoogleAnalyzation
 from .BenjaminEntry import BenjaminEntry
 from .WoolfEntry import WoolfEntry
+from .NoiseEntry import NoiseEntry
+
 
 # Optionally, define what gets imported with import *
 __all__ = [
     'get_session',
     'create_tables',
+    'refresh_entry',
     'Essay', 
     'WangAnalyzation',
     'LIWCAnalyzation', 
@@ -27,5 +30,6 @@ __all__ = [
     'OpenAIAnalyzationV5',
     'OpenAIAnalyzationCorpus',
     'BenjaminEntry',
-    'WoolfEntry'
+    'WoolfEntry',
+    'NoiseEntry'
 ]

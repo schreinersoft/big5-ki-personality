@@ -1,5 +1,37 @@
 library("tidyverse")
 
+
+# calculate all means of factors by hash
+aggregate_model_by_hash <- function(d)
+{
+  o_facets <- d %>% select(starts_with(("of"))) %>% names()
+  c_facets <- d %>% select(starts_with(("cf"))) %>% names()
+  e_facets <- d %>% select(starts_with(("ef"))) %>% names()
+  a_facets <- d %>% select(starts_with(("af"))) %>% names()
+  n_facets <- d %>% select(starts_with(("nf"))) %>% names()
+  
+  all_facet_names <- c(o_facets,c_facets, e_facets, 
+                       a_facets, n_facets)
+  
+  # Aggregate the data to obtain 1 measurement per hash
+  da <- d %>%
+    select(hash, all_of(all_facet_names)) %>% 
+    group_by(hash) %>%
+    summarise(
+      across(all_of(all_facet_names), ~ mean(.x, na.rm = TRUE)),
+      o_llm = mean(c_across(all_of(o_facets)), na.rm = TRUE),
+      c_llm = mean(c_across(all_of(c_facets)), na.rm = TRUE),
+      e_llm = mean(c_across(all_of(e_facets)), na.rm = TRUE),
+      a_llm = mean(c_across(all_of(a_facets)), na.rm = TRUE),
+      n_llm = mean(c_across(all_of(n_facets)), na.rm = TRUE),
+      .groups = "drop") %>% 
+    select(hash, all_of(ends_with("_llm")))
+  
+  return(da)
+}
+
+
+
 # calculate all means of facets and factors
 aggregate_model <- function(d)
 {

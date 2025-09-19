@@ -39,7 +39,10 @@ woolf <- tbl(con, "woolf") %>%
   select(hash, year, month, text_raw_numtokens, text_numtokens) %>% 
   collect()
 
-sum(woolf$text_raw_numtokens)
+hist(woolf$text_raw_numtokens, na.rm = TRUE)
+
+describe(woolf$text_raw_numtokens, na.rm = TRUE)
+
 
 woolf_analyzation <- tbl(con, "openai_analyzation_corpus") %>% 
   collect() %>%
@@ -58,7 +61,7 @@ desc.stats <- data %>%
 print(desc.stats)
 
 
-stats <- joined %>% 
+stats <- data %>% 
   group_by(year, month) %>% 
   summarize(
     n = n()
