@@ -12,6 +12,10 @@ data <- consolidate_data(table_name)
 
 factors <- data %>% select(ends_with("llm")) %>% names()
 
+model <- data %>% 
+  rename(essay_id = id)
+
+db_write_model(model, "noise")
 
 # also possible: group_by(year, month) %>%
 # DESCRIPTIVES

@@ -19,13 +19,12 @@ essays <- tbl(con, "essays") %>%
   select(-text, -author, -all_of(ends_with("binary")))
 
 models <- list()
-model_list <- c("liwc", "minej",
+model_list <- c("noise", "liwc", "minej",
                 "v1.0","v1.1","v1.2",
                 "v2.0","v2.1","v2.2","v2.3",
                 "v3.0",
                 "v4.000", "v4.002", "v4.004", "v4.006", "v4.008", "v4.010", "v4.1",
                 "v5.X", "v5.0", "v5.0n", "v5.1", "v5.1n")
-#model_list <- c("liwc", "v1.0","v1.1")
 factor_names <- c("O", "C", "E", "A", "N")
 
 # read all data of all models
