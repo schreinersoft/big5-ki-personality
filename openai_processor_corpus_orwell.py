@@ -62,9 +62,10 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
             entries = db.query(OrwellEntry)\
                 .filter(OrwellEntry.hash.is_not(None))\
                 .filter(~OrwellEntry.hash.in_(excluded_hashes_query))\
-                .filter(OrwellEntry.scrape_state < 10)\
                 .limit(1)\
                 .all()
+
+            #                 .filter(OrwellEntry.scrape_state < 10)\
 
             if not entries:
                 logging.info("DONE! All Entries processed.")
@@ -73,7 +74,10 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
                 logging.info(f"Corpus: Processing Entry {entry.id}... Exception Counter: {exc_counter}")
 
                 # mark for actual processing for parallel processing possibility
-                entry.scrape_state = entry.scrape_state + 10   
+                if not entry.scrape_state:
+                    entry.scrape_state = 11
+                else:
+                    entry.scrape_state = entry.scrape_state + 10   
                 db.commit()
                 db.refresh(entry)
 

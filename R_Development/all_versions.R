@@ -611,3 +611,16 @@ create_essay_histograms(data, model_version, 112)
 analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
+
+
+
+
+
+
+
+
+#################### XXX corpus Korrelationskontrolle
+corpus <- analyzation %>% 
+aggregate_model_hash()
+
+des <- psych::describe(corpus)
