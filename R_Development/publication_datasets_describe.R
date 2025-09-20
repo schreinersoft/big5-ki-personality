@@ -21,13 +21,15 @@ y_m_stats <- dataset_exploration %>%
   arrange(year, month)
 
 y_stats <- dataset_exploration %>% 
-  group_by(year) %>% 
+  group_by(author_age) %>% 
   summarize(
     n = n()
   ) %>% 
-  arrange(year)
+  arrange(author_age)
 describe(y_stats)
 describe(y_stats$n)
+
+dataset_exploration %>% filter(text_raw_numtokens < 150)
 
 
 
