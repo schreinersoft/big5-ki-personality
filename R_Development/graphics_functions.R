@@ -158,6 +158,7 @@ create_factor_densities <- function(data, model_version)
       theme_minimal() 
     i <- i + 1
   }
+}
 
 # plot OCEAN factors of all essays
 create_factor_densities_z <- function(data, model_version)

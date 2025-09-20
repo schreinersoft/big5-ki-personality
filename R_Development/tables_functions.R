@@ -211,8 +211,9 @@ analyze_factor_loadings <- function(data, model_version)
     select(all_of(facets_list))
   
   # Faktorenanalyse
-  faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "ml", residuals=TRUE)
-
+  faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "pa", residuals=TRUE)
+  #faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "ml", residuals=TRUE)
+  
   sink(paste(stats_output_folder, "/factor_analysis_", model_version, ".txt", sep=""))
   print(faModel)
   

@@ -624,3 +624,36 @@ corpus <- analyzation %>%
 aggregate_model_hash()
 
 des <- psych::describe(corpus)
+model_version <- "woolf"
+data <- corpus
+
+analyze_alpha_omega(data, model_version)
+analyze_factor_loadings(data, model_version)
+analyze_item_statistics(data, model_version)
+create_correlation_matrices(data, model_version)
+create_facet_densities(data, model_version)
+create_factor_densities(data, model_version)
+create_q_q_plot(data, model_version)
+# -> sehr hohe Korrelationen!
+
+woolf <- tbl(con, "woolf") %>% 
+  collect()
+
+data <- left_join(woolf, corpus, by = c("hash" = "hash")) %>% 
+  select(-text_raw)
+
+mintokens <- seq(0,500, 50)
+for (mintoken in mintokens) {
+  model_name <- paste(model_version, "_min_",mintoken, sep="")
+  data_min <- data %>% 
+    filter(as.integer(text_raw_numtokens) > as.integer(mintoken))
+  
+  #analyze_factor_loadings(data_min, model_name)
+  create_correlation_matrices(data_min, model_name)
+  create_facet_densities(data_min, model_name)
+  create_factor_densities(data_min, model_name)
+}
+
+mintokens <-200
+data_min <- data %>% 
+  filter(as.integer(text_raw_numtokens) > as.integer(mintokens))
