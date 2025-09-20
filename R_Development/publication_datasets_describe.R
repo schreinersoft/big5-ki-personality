@@ -11,6 +11,7 @@ dataset_exploration <- tbl(con, "woolf") %>%
   collect()
 
 
+
 ## Datensatzexploration
 # Anzahl nach Zeit
 y_m_stats <- dataset_exploration %>% 

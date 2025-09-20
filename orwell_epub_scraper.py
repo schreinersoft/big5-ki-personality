@@ -13,6 +13,7 @@ from database.base import upsert_corpus_entry
 # Basic data
 author_name='George Orwell'
 birth_year = 1903
+birth_month = 6
 author_sex = "m"
 language = 'en'
 text_type = "letter"
@@ -174,29 +175,33 @@ if __name__ == "__main__":
 
     all_results = []
 
-    for file_name in os.listdir(in_dir):
-        file_path = os.path.join(in_dir, file_name)
-        with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
-            data = file.read()
-            result = scrape_multiple_letters(data, store_to_database = True, file_name=file_name)
-            all_results.extend(result)
+    if False:
+        for file_name in os.listdir(in_dir):
+            file_path = os.path.join(in_dir, file_name)
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
+                data = file.read()
+                result = scrape_multiple_letters(data, store_to_database = True, file_name=file_name)
+                all_results.extend(result)
 
-    printout_letters(all_results, out_filename)
+        printout_letters(all_results, out_filename)
 
 
     # REFRESH hashes & tokens
-    store_to_database = False
+    store_to_database = True
     bulk = 100
     i = 0
     if store_to_database:
         with get_session() as db:
-            entries = db.query(WoolfEntry)\
-                    .filter(WoolfEntry.scrape_state<3)\
+            entries = db.query(OrwellEntry)\
+                    .filter(OrwellEntry.scrape_state<3)\
                     .all()
         
             for entry in entries:
                 #entry.text = basic_clean(entry.text_raw)
-                entry.author_age = entry.year - birth_year
+                if not entry.month:
+                    entry.month = 6
+                    entry.scrape_comment += "set to month 6 "
+                entry.author_age = int(((entry.year*12)+entry.month - (birth_year*12)+birth_month) / 12)
                 #oldhash = str(entry.hash)
                 entry = generate_hash(entry) # Ensure hash is generated
                 # if oldhash == entry.hash:
@@ -205,7 +210,7 @@ if __name__ == "__main__":
                 entry.text_raw_numtokens = len(tokenizer.encode(entry.text_raw))
                 if entry.text:
                     entry.text_numtokens = len(tokenizer.encode(entry.text))
-                #entry.scrape_state = 2
+                entry.scrape_state = 2
                 i += 1
                 if i >= bulk:
                     print(f"commiting bulk until entry: {entry.id}")

@@ -8,12 +8,12 @@ source("output_folders_measurement.R")
 source("factor-names-EN.R")
 
 
-table_name <- "woolf"
+table_name <- "orwell"
 data <- consolidate_data(table_name)
 
 table_name <- paste(table_name, "_min_150", sep="")
-data <- data %>% 
-  filter(text_raw_numtokens >= 150)
+#data <- data %>% 
+#  filter(text_raw_numtokens >= 150)
 
 factors <- data %>% select(ends_with("llm")) %>% names()
 

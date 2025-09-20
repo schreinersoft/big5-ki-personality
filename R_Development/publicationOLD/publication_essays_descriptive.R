@@ -14,6 +14,8 @@ essays$a_bin <- ifelse(essays$a_binary == "1", 1, 0)
 essays$n_bin <- ifelse(essays$n_binary == "1", 1, 0)
 
 
+
+
 summ <- essays %>% 
   summarise(
     n = n(),
