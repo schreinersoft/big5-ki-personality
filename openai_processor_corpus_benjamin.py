@@ -31,7 +31,6 @@ def signal_handler(sig, frame):
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
 
-
 def make_system_prompt():
     facets = ['Creative Imagination', 'Fantasy', 'Aesthetics', 'Ideas',
               'Productiveness', 'Responsibility', 'Dutifulness', 'Self-Discipline', 'Order',
