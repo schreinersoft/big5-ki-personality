@@ -1,4 +1,5 @@
 library(tidyverse)
+library(corrr)
 
 source("connect_database.R")
 source("graphics_functions.R")
@@ -11,7 +12,7 @@ source("factor-names-EN.R")
 table_name <- "orwell"
 data <- consolidate_data(table_name)
 
-table_name <- paste(table_name, "_min_150", sep="")
+#table_name <- paste(table_name, "_min_150", sep="")
 #data <- data %>% 
 #  filter(text_raw_numtokens >= 150)
 
@@ -28,11 +29,11 @@ stats <- data %>%
   ungroup()
 
 stats_monthly <- data %>%
-  mutate(auhor_age_months = (author_age * 12)+month) %>% 
-  group_by(auhor_age_months) %>%
+  mutate(author_age_months = (author_age * 12)+month) %>% 
+  group_by(author_age_months) %>%
   group_modify(~ describe(select(.x, ends_with("_llm"))) %>%
                  rownames_to_column("variable")) %>%
-  arrange(variable, auhor_age_months) %>% 
+  arrange(variable, author_age_months) %>% 
   ungroup()
 
 
@@ -45,7 +46,12 @@ data %>%
   as.data.frame() %>% 
   flextable()
 
-mean(stats$se)
+corr_stats <- data %>% 
+  select(all_of(factors)) %>% 
+  corr.test() 
+  
+round(corr_stats$r, 2)
+round(corr_stats$p, 3)
 
 # GRAPHICS
 create_factor_densities(data, table_name)
@@ -53,21 +59,35 @@ create_factor_densities(data, table_name)
 
 # Lebensereignisse definieren
 ereignisse <- data.frame(
-  author_age = c(43, 52, 58, 59),
-  ereignis = c("Liebesbeziehung Sackville-West", "Tod Roger Fry", "Bombenangriff auf London")
+  author_age = 
+    c(30,
+      33,
+      40,
+      42,
+      44,
+      46
+      ),
+  ereignis = 
+    c("Erstes Buch",
+      "Heirat, Bürgerkrieg",
+      "Ende BBC",
+      "Tod der Ehefrau",
+      "Schottland",
+      "Zweite Heirat"
+      )
 )
 
 ### trendlines jährlich
 
 trendlines <- stats %>% 
-  filter(author_age >34) %>% 
+  filter(author_age > 20) %>% 
   mutate(
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
   ggplot(aes(x = author_age, y = mean, color = variable, fill = variable)) +
   geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
-  geom_line(size = 1.0, linejoin="round") +
-  geom_point(size=1.2) +
+  geom_line(linewidth = 1.0, linejoin="round") +
+  geom_point(size = 1.2) +
   facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = factor_names)) +
   geom_smooth(aes(group = variable), method = "loess", linetype = "solid", alpha = 0.2, se = TRUE, size = 0.6, fill="darkgrey") +
   scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
@@ -85,7 +105,7 @@ ggsave(paste(graphics_output_folder,"/lines_with_trend_", table_name, ".jpg", se
 
 # alle zusammen
 trendlines_flat <- stats %>% 
-  filter(author_age >34) %>% 
+  filter(author_age > 20) %>% 
   mutate(
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
@@ -113,7 +133,7 @@ trendlines_flat <- stats %>%
     y = "M"
   ) +
   theme_minimal() #+
-  #theme(legend.position = "none")  # Remove legend since facets show the variables
+  #theme(legend.position = "none")
 trendlines_flat
 ggsave(paste(graphics_output_folder,"/lines_flat_", table_name, ".jpg", sep = ""), 
        plot = trendlines_flat, dpi = 600, width = 6, height = 4)
@@ -159,11 +179,12 @@ ggsave(paste(graphics_output_folder,"/lines_flat_annotation_", table_name, ".jpg
 ################################################# monatlich
 # alle zusammen  --  nun ja...
 trendlines_flat_monthly <- stats_monthly %>% 
-  filter(auhor_age_months > (34+12)) %>% 
+  filter(author_age_months > 450) %>%
+  filter(author_age_months < 550) %>% 
   mutate(
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
-  ggplot(aes(x = auhor_age_months, y = mean, color = variable, fill = variable)) +
+  ggplot(aes(x = author_age_months, y = mean, color = variable, fill = variable)) +
   geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
   geom_line(size = 1.0, linejoin="round") +
   geom_point(size=1.2) +

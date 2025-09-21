@@ -45,7 +45,12 @@ data %>%
   as.data.frame() %>% 
   flextable()
 
-mean(stats$se)
+corr_stats <- data %>% 
+  select(all_of(factors)) %>% 
+  corr.test() 
+
+round(corr_stats$r, 2)
+round(corr_stats$p, 3)
 
 # GRAPHICS
 create_factor_densities(data, table_name)
