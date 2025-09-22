@@ -6,6 +6,7 @@ library(writexl)
 
 source("connect_database.R")
 source("transformation_functions.R")
+source("combined_names_EN.R")
 
 essays <- tbl(con, "essays") %>% 
   filter(id <=250) %>% 
@@ -26,6 +27,8 @@ model_list <- c("noise", "liwc", "minej",
                 "v4.000", "v4.002", "v4.004", "v4.006", "v4.008", "v4.010", "v4.1",
                 "v5.X", "v5.0", "v5.0n", "v5.1", "v5.1n")
 factor_names <- c("O", "C", "E", "A", "N")
+
+model_list <- c("noise", "liwc")
 
 # read all data of all models
 for (model in model_list) {
@@ -88,13 +91,39 @@ extract_stats_kruskal <- function(object) {
   ))
 }
 
+
+
+rFromWilcox <- function(wilcoxModel, N) {
+  z <- qnorm(wilcoxModel$p.value/2) 
+  r <- z/ sqrt(N)
+  return(r)
+}
+# Funktion zum Extrahieren der Statistiken
+extract_stats_wilcoxon <- function(object) {
+  
+  u_result <- object$wc
+  N <- length(object$data)
+  
+  return(list(
+    W = u_result$statistic[["W"]],
+    p = u_result$p.value,
+    r = rFromWilcox(u_result, N)
+  ))
+}
+
+
+
+
+
 anova_results <- list()
 kruskal_wallis_results <- list()
+wilcoxon_results <- list()
 
 for (model in model_list)
 {
   anova_results[[model]] <- list()
   kruskal_wallis_results[[model]] <- list()
+  wilcoxon_results[[model]] <- list()
   
   all_factors <- models[[model]] %>% 
     select(
@@ -124,6 +153,11 @@ for (model in model_list)
       eta2 = rank_eta_squared(formula, data = data),
       data = models[[model]]
     )
+    wilcoxon_results[[model]][[factor_names[i]]] <- list(
+      wc = wilcox.test(formula, data = data),
+      data = models[[model]]
+    )
+    
   }
 }
 
@@ -131,8 +165,10 @@ es <- extract_stats_anova(anova_results[["v1.0"]][["O"]])
 
 kw <- extract_stats_kruskal(kruskal_wallis_results[["v1.0"]][["O"]])
 
+wc <- extract_stats_wilcoxon(wilcoxon_results[["noise"]][["O"]])
 
-es$p < 0.001
+wc$r
+
 
 # ANOVA Statistiken für alle Modelle und Messgrößen extrahieren
 score_results <- list()
@@ -185,8 +221,35 @@ for(model in model_list) {
   kruskal_wallis_results_df <- rbind(kruskal_wallis_results_df, row_data, stringsAsFactors = FALSE)
 }
 
+
+# Mann-Whitney/Wolcoxon-U-Test Statistiken für alle Modelle und Messgrößen extrahieren
+wilcoxon_results_df <- data.frame()
+for(model in model_list) {
+  row_data <- c(Modell = model)
+  
+  scores <- create_scores_frame(models[[model]])
+  
+  for(factor in factor_names) {
+    stats <- extract_stats_wilcoxon(wilcoxon_results[[model]][[factor]])
+    
+    normrow <- paste("S", factor, sep="")
+  
+    
+    # Statistiken formatieren
+    row_data <- c(row_data,
+                  format_psych(sprintf("%.0f", stats$W)),
+                  format_p_psych(stats$p),
+                  format_psych(sprintf("%.3f", stats$r)),
+                  format_psych(sprintf("%.1f", mean(scores[[normrow]])))
+    )
+  }
+  wilcoxon_results_df <- rbind(wilcoxon_results_df, row_data, stringsAsFactors = FALSE)
+}
+
+
 anova_results_df$SCORE <- unlist(map(score_results, ~ sprintf("%.1f", .x)))
 kruskal_wallis_results_df$SCORE <- unlist(map(score_results, ~ sprintf("%.1f", .x)))
+wilcoxon_results_df$SCORE <- unlist(map(score_results, ~ sprintf("%.1f", .x)))
 
 
 # ANOVA Auswertungen als Tabelle
@@ -230,8 +293,35 @@ write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/an
 colnames(kruskal_wallis_results_df) <- c("Modell", paste0(rep(factor_names, each = 4), "_", rep(c("χ²", "p", "η²", "SC"), 5)), "SCORE")
 # flextable erstellen
 ft <- flextable(kruskal_wallis_results_df) %>%
-  # Unterheader für Statistiken (wird zur zweiten Zeile)
   add_header_row(values = c("Modell", rep(c("χ²", "p", "η²", "SC"), 5), "SCORE"), colwidths = rep(1, 22)) %>%
+  add_header_row(values = c("", factor_names, "Ø"), colwidths = c(1, rep(4, 5), 1), 1) %>%
+   theme_box() %>%
+  width(j = 1, width = 1.2) %>%
+  width(j = 2:22, width = 0.6) %>%
+  align(align = "center", part = "all") %>%
+  align(j = 1, align = "left", part = "body") %>%
+  fontsize(size = 9, part = "all") %>%
+  fontsize(j = 1, size = 10, part = "body") %>%
+  bold(part = "header") %>%
+  # Hintergrundfarben für bessere Lesbarkeit
+  bg(i = 1, part = "header", bg = "#4472C4") %>%
+  bg(i = 2, part = "header", bg = "#8DB4E2") %>%
+  color(part = "header", color = "white")
+
+# Tabelle anzeigen
+print(ft)
+save_as_docx(ft, path=paste(tables_output_folder, "/h-tests.docx",sep=""))
+write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/h-tests.xlsx",sep=""))
+
+
+
+# U-Tests Auswertungen als Tabelle
+# Spaltennamen setzen
+colnames(wilcoxon_results_df) <- c("Modell", paste0(rep(factor_names, each = 4), "_", rep(c("W", "p", "r", "SC"), 5)), "SCORE")
+# flextable erstellen
+ft <- flextable(kruskal_wallis_results_df) %>%
+  # Unterheader für Statistiken (wird zur zweiten Zeile)
+  add_header_row(values = c("Modell", rep(c("W", "p", "r", "SC"), 5), "SCORE"), colwidths = rep(1, 22)) %>%
   # Hauptheader hinzufügen (wird zur ersten Zeile)
   add_header_row(values = c("", factor_names, "Ø"), colwidths = c(1, rep(4, 5), 1), 1) %>%
   # Erste Spalte in der ersten Zeile mit "Modell" füllen
@@ -256,7 +346,7 @@ ft <- flextable(kruskal_wallis_results_df) %>%
 
 # Tabelle anzeigen
 print(ft)
-save_as_docx(ft, path=paste(tables_output_folder, "/h-tests.docx",sep=""))
+save_as_docx(ft, path=paste(tables_output_folder, "/u-tests.docx",sep=""))
 write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/h-tests.xlsx",sep=""))
 
 
