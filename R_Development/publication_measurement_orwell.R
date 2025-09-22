@@ -11,7 +11,8 @@ source("output_folders_measurement.R")
 source("factor-names-EN.R")
 
 corpus_name <- "orwell"
-data <- consolidate_data(corpus_name)
+data <- consolidate_data(corpus_name) %>% 
+  filter(text_raw_numtokens >= 150) 
 
 #table_name <- paste(table_name, "_min_150", sep="")
 #data <- data %>% 
