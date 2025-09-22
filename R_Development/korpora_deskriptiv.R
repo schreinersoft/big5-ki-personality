@@ -2,7 +2,7 @@ library(tidyverse)
 
 source("connect_database.R")
 
-korpora = c("woolf", "orwell", "benjamin")
+korpora = c("woolf", "orwell", "benjamin", "noise")
 
 for (k in korpora) {
   korpus <- wang <- tbl(con, k) %>% 

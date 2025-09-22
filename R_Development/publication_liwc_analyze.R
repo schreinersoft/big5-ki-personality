@@ -14,9 +14,6 @@ liwc_data <- left_join(essays, liwc, by = c("id" = "essay_id")) %>%
 
 liwc_ocean <- c("o_liwc_z", "c_liwc_z", "e_liwc_z", "a_liwc_z", "n_liwc_z")
 
-#liwc_data <- liwc_data %>% 
-#  filter(id <= 250)
-
 
 # z-Normalisierung
 liwc_data$o_liwc_z <- as.numeric(scale(liwc_data$o_liwc))

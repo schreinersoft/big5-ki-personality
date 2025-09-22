@@ -657,3 +657,40 @@ for (mintoken in mintokens) {
 mintokens <-200
 data_min <- data %>% 
   filter(as.integer(text_raw_numtokens) > as.integer(mintokens))
+
+
+################################################# Noise
+model_version <- "noise"
+noise <- tbl(con, "noise") %>% 
+  select(hash) %>% 
+  collect()
+
+#generate essay ids
+gen_years <- function(from, to, total) {
+  years <- seq(from, to)
+  repeats <- total %/% length(years)  # Integer division
+  result <- rep(years, each = repeats)
+}
+essay_ids <- gen_years(1, 250, 750)
+essay_ids <- essay_ids[-c((length(essay_ids)-1):length(essay_ids))]
+
+data <- tbl(con, "openai_analyzation_corpus") %>% 
+  select(-updated_at) %>%
+  filter(model=="gpt-5-mini-2025-08-07") %>% 
+  semi_join(tbl(con, "noise"), by = "hash") %>% 
+  collect()
+data <- data %>% 
+  mutate(essay_id = essay_ids)
+
+data_aggregated <- aggregate_model(data) %>% 
+  select(where(~ all(!is.na(.))))
+
+db_write_model(data_aggregated, model_version)
+
+create_essay_histograms(data, model_version, 27)
+create_essay_histograms(data, model_version, 42)
+create_essay_histograms(data, model_version, 112)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
