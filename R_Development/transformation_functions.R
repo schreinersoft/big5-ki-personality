@@ -94,12 +94,13 @@ get_variable_name <- function(var) {
 }
 
 format_p_psych <- function(p_value) {
-  ifelse(p_value < 0.001, "<.001", format_psych(sprintf("%.3f", as.numeric(p_value))))
+  ifelse(p_value < 0.001, "<.001", format_psych(p_value, 3))
 }
 
-format_psych <- function(value) {
+format_psych <- function(value, do_round=2) {
   # Entferne führende "0" vor dem Dezimalkomma
-  gsub("^(-?)0\\.", ".", value)
+  #'round(gsub("^(-?)0\\.", ".", as.character(value)), do_round)
+  gsub("^(-?)0\\.", ".", as.character(round(value, do_round)))
 }
 
 

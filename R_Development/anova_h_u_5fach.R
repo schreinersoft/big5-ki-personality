@@ -4,6 +4,10 @@ library(effectsize)
 library(tidyverse)
 library(writexl)
 
+root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
+
+source("output_folders.R")
+
 source("connect_database.R")
 source("transformation_functions.R")
 source("combined_names_EN.R")
@@ -28,7 +32,7 @@ model_list <- c("noise", "liwc", "minej",
                 "v5.X", "v5.0", "v5.0n", "v5.1", "v5.1n")
 factor_names <- c("O", "C", "E", "A", "N")
 
-model_list <- c("noise", "liwc")
+#model_list <- c("noise", "liwc")
 
 # read all data of all models
 for (model in model_list) {

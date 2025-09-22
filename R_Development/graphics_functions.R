@@ -334,3 +334,38 @@ create_correlation_matrices <- function(data, model_version)
   sink()
 }
 
+#################################################### measurement
+create_factor_violins <- function(data, group, lim_down = 1, lim_up= 9)
+{
+  all_factors <- data %>% select(
+    starts_with("o_"),
+    starts_with("c_"),
+    starts_with("e_"),
+    starts_with("a_"),
+    starts_with("n_")) %>% names()
+  
+  plots <- list()
+  i <- 1
+  for (factor in all_factors){
+    print(factor)
+    plots[[i]] <- data %>%
+      ggplot(aes(y = .data[[factor]], x=.data[[group]], fill=.data[[group]])) +
+      ylim(lim_down, lim_up) +
+      geom_violin() +
+      geom_boxplot(width = 0.3)+
+      labs(title = variable_names[[factor]] %||% factor) +
+      guides(
+        fill = "none",
+        x = "none",
+        y = "none") +
+      theme_minimal() 
+    i <- i + 1
+  }
+  
+  # Calculate layout dimensions after all plots are created
+  n_plots <- length(plots)
+  n_cols <- min(n_plots, 3)
+  n_rows <- ceiling(n_plots / n_cols)
+  
+  combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
+}

@@ -3,7 +3,6 @@ library(corrr)
 
 root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
 
-
 source("connect_database.R")
 source("graphics_functions.R")
 source("tables_functions.R")
