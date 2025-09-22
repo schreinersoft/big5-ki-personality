@@ -5,10 +5,40 @@ library(tidyverse)
 source("transformation_functions.R")
 
 
-create_stats_anova <- function(data, var, group, name) {
+create_stats_anova_without_effectsizes <- function(data, var, group, name) {
   
   formula <- reformulate(group, var)
   
+  aov_result = aov(formula, data = data)
+  aov_summary <- summary(aov_result)
+  
+  f_value <- aov_summary[[1]][1, "F value"]
+  p_value <- aov_summary[[1]][1, "Pr(>F)"]
+  df_groups <- aov_summary[[1]][1, "Df"]  
+  df_measures <- aov_summary[[1]][2, "Df"]
+  
+  ################
+  residuals <- residuals(aov_result)
+  shapiro_test <- shapiro.test(residuals)
+  # Levene-Test für Varianzhomogenität
+  formula_obj <- formula(aov_result)
+  levene_test <- leveneTest(formula_obj, data = data)
+  
+  return(list(
+    name = name,
+    p = format_p_psych(p_value),
+    F = format_psych(f_value, 3),
+    dfg = df_groups,
+    dfm = df_measures,
+    sw = format_p_psych(shapiro_test$p.value),
+    lev = format_p_psych(as.numeric(levene_test$`Pr(>F)`[1]))
+  ))
+}
+
+create_stats_anova <- function(data, var, group, name) {
+  
+  formula <- reformulate(group, var)
+
   aov_result = aov(formula, data = data)
   aov_summary <- summary(aov_result)
 

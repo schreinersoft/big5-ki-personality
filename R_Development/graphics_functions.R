@@ -353,11 +353,11 @@ create_factor_violins <- function(data, group, lim_down = 1, lim_up= 9)
       ylim(lim_down, lim_up) +
       geom_violin() +
       geom_boxplot(width = 0.3)+
-      labs(title = variable_names[[factor]] %||% factor) +
-      guides(
-        fill = "none",
-        x = "none",
-        y = "none") +
+      labs(
+        title = variable_names[[factor]] %||% factor,
+        x = "",
+        y = "") +
+      guides(fill = "none") +
       theme_minimal() 
     i <- i + 1
   }
