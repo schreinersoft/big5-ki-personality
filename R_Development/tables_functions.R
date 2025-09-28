@@ -297,3 +297,27 @@ analyze_factor_loadings <- function(data, model_version)
   ggsave(paste(graphics_output_folder, "/screeplot_" , model_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
 }
 
+create_corr_matrix <- function(matrix) {
+  
+  rcorr_result <- rcorr(data_matrix, type = "pearson")
+
+  cor_matrix <- rcorr_result$r
+  p_matrix <- rcorr_result$P 
+  
+  cor_matrix <- apply(cor_matrix, c(1,2), format_psych)
+  p_matrix <- apply(p_matrix, c(1,2), format_p_psych)
+  
+  combined_matrix <- cor_matrix
+  combined_matrix[lower.tri(combined_matrix)] <- p_matrix[lower.tri(p_matrix)]
+  diag(combined_matrix) <- NA
+  
+  result_df <- combined_matrix %>% 
+    as.data.frame()
+  
+  # Variablennamen als erste Spalte hinzufügen
+  result_df <- result_df %>%
+    mutate(Variable = rownames(.), .before = 1)
+  
+  return (result_df)
+}
+

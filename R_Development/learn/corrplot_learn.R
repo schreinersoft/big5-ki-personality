@@ -1,3 +1,15 @@
+library(corrr)
+library(tidyverse)
+library(Hmisc)
+
+result <- rcorr(as.matrix(deine_daten))
+print(result)
+
+cor_matrix <- mtcars %>% 
+  select(mpg, hp, wt, qsec) %>%
+  correlate(method = "pearson")
+
+
   data_facets <- data_aggregated %>%
     select(starts_with(("of")),
            starts_with(("cf")),
@@ -17,4 +29,6 @@
   corrplot(cor_matrix_rounded, method = "color", type = "upper", 
            addCoef.col = "black", tl.cex = 0.8)#
   dev.off()
+  
+
   

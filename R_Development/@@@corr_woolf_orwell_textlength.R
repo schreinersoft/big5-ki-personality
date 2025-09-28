@@ -46,8 +46,6 @@ data_test <- data_woolf %>%
          starts_with(("n_")),
          text_raw_numtokens)
 
-sink(paste(stats_output_folder, "/output_analyzation_", model_version, ".txt", sep=""))
-
 cor_matrix <- corr.test(data_test, use = "complete.obs", method="spearman")
 cor_matrix_rounded <- round(cor_matrix$r, 2)
 print("Correlation Matrix (Spearmans's rho):")
@@ -74,9 +72,31 @@ print(round(cor_matrix$p, 3))
 
 cor_matrix_rounded %>% 
   as.data.frame() %>%
+  mutate(across(where(is.numeric), ~ format_psych(.x)))
   flextable()
 
 round(cor_matrix$p, 3) %>% 
   as.data.frame() %>%
+  mutate(across(where(is.numeric), ~ format_p_psych(.x)))
   flextable()
 
+data_test %>% 
+    ggplot(aes(x=text_raw_numtokens, y=o_llm)) + 
+    geom_point() +
+  theme_minimal()
+data_test %>% 
+  ggplot(aes(x=text_raw_numtokens, y=c_llm)) + 
+  geom_point() +
+  theme_minimal()
+data_test %>% 
+  ggplot(aes(x=text_raw_numtokens, y=e_llm)) + 
+  geom_point() +
+  theme_minimal()
+data_test %>% 
+  ggplot(aes(x=text_raw_numtokens, y=a_llm)) + 
+  geom_point() +
+  theme_minimal()
+data_test %>% 
+  ggplot(aes(x=text_raw_numtokens, y=n_llm)) + 
+  geom_point() +
+  theme_minimal()
