@@ -258,11 +258,11 @@ analyze_factor_loadings <- function(data, model_version)
   ft <- ft %>%
     set_header_labels(
       Item = model_version,
-      PA1 = "Faktor 1",
-      PA2 = "Faktor 2", 
-      PA3 = "Faktor 3",
-      PA4 = "Faktor 4",
-      PA5 = "Faktor 5",
+      PA1 = "FA 1",
+      PA2 = "FA 2", 
+      PA3 = "FA 3",
+      PA4 = "FA 4",
+      PA5 = "FA 5",
       h2 = "h²"
     ) %>%
     theme_vanilla() %>%
@@ -297,9 +297,37 @@ analyze_factor_loadings <- function(data, model_version)
   ggsave(paste(graphics_output_folder, "/screeplot_" , model_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
 }
 
-create_corr_matrix <- function(matrix) {
+analyze_correlations <- function(data, model_version) {
+  # analyze factors
+  factor_matrix <- data %>% 
+    select(ends_with("_llm"))
+  matrix <- create_corr_matrix(factor_matrix)
+  ft <- matrix %>% 
+    flextable() %>% 
+    theme_vanilla() %>% 
+    autofit()
+  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_factors_", model_version, ".docx", sep=""))
+
+  facet_matrix <- data %>% 
+    select(starts_with(("of")), 
+           starts_with(("cf")), 
+           starts_with(("ef")),
+           starts_with(("af")),
+           starts_with(("nf")))
+  matrix <- create_corr_matrix(facet_matrix)
+  ft <- matrix %>% 
+    flextable() %>% 
+    theme_vanilla() %>% 
+    autofit()
+  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_facets_", model_version, ".docx", sep=""))
   
-  rcorr_result <- rcorr(data_matrix, type = "pearson")
+  
+}
+
+
+create_corr_matrix <- function(corrdata) {
+  
+  rcorr_result <- rcorr(as.matrix(corrdata), type = "pearson")
 
   cor_matrix <- rcorr_result$r
   p_matrix <- rcorr_result$P 

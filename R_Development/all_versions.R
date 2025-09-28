@@ -21,6 +21,7 @@ analyze_all <- function(data, model_version)
   analyze_alpha_omega(data, model_version)
   analyze_factor_loadings(data, model_version)
   analyze_item_statistics(data, model_version)
+  analyze_correlations(data, model_version)
 }
 
 create_all_graphics <- function(data, model_version)

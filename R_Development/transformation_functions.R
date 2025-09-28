@@ -100,7 +100,8 @@ format_p_psych <- function(p_value) {
 format_psych <- function(value, do_round=2) {
   # Entferne führende "0" vor dem Dezimalkomma
   #'round(gsub("^(-?)0\\.", ".", as.character(value)), do_round)
-  gsub("^(-?)0\\.", ".", as.character(round(value, do_round)))
+  format <- sprintf(paste0("%.", do_round, "f"), value)
+  gsub("^(-?)0\\.", ".", format)
 }
 
 
