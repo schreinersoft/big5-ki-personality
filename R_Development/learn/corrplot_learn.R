@@ -1,10 +1,46 @@
 library(corrr)
 library(tidyverse)
 library(Hmisc)
+library(flextable)
 
-result <- rcorr(as.matrix(deine_daten))
+source("transformation_functions.R")
+
+result <- rcorr(as.matrix(mtcars))
 print(result)
 
+
+result$r
+
+
+##################
+data_matrix <- as.matrix(mtcars[, c("mpg", "hp", "wt", "qsec", "disp")])
+
+create_corr_matrix <- function(matrix) {
+
+# Korrelationen und p-Werte berechnen
+rcorr_result <- rcorr(data_matrix, type = "pearson")
+
+# Matrizen extrahieren
+cor_matrix <- rcorr_result$r  # Korrelationen
+p_matrix <- rcorr_result$P    # p-Werte
+
+cor_matrix <- apply(cor_matrix, c(1,2), format_psych)
+p_matrix <- apply(p_matrix, c(1,2), format_p_psych)
+
+# Kombinierte Matrix erstellen
+combined_matrix <- cor_matrix
+
+# Unteres Dreieck mit p-Werten füllen
+combined_matrix[lower.tri(combined_matrix)] <- p_matrix[lower.tri(p_matrix)]
+
+# Diagonale leeren (optional)
+diag(combined_matrix) <- NA
+
+return (combined_matrix %>% 
+  as.data.frame() %>% 
+  flextable())
+
+}
 cor_matrix <- mtcars %>% 
   select(mpg, hp, wt, qsec) %>%
   correlate(method = "pearson")

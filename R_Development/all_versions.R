@@ -6,6 +6,10 @@ source("tables_functions.R")
 source("transformation_functions.R")
 source("output_folders.R")
 
+#source("combined_names_EN.R")
+source("combined_names_EN_DE.R")
+
+
 
 fetch_raw_data <- function(table_name)
 {
@@ -76,10 +80,7 @@ data_aggregated <- data %>%
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -92,10 +93,7 @@ data_aggregated <- data %>%
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -113,10 +111,7 @@ data_aggregated <- aggregate_model(data)
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -142,10 +137,7 @@ data_aggregated <- data %>%
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 ################################################# V2.3
@@ -157,10 +149,7 @@ data_aggregated <- data %>%
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -178,10 +167,7 @@ data_aggregated <- data %>%
 
 db_write_model(data_aggregated, model_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
-
+analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
@@ -631,6 +617,7 @@ data <- corpus
 analyze_alpha_omega(data, model_version)
 analyze_factor_loadings(data, model_version)
 analyze_item_statistics(data, model_version)
+analyze_correlations(data, model_version)
 create_correlation_matrices(data, model_version)
 create_facet_densities(data, model_version)
 create_factor_densities(data, model_version)

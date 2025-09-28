@@ -2,8 +2,6 @@ library(tidyverse)
 library(psych)
 library(flextable)
 
-source("combined_names_EN.R")
-
 # environmental variables:
 ## tables_output_folder
 
@@ -36,32 +34,39 @@ analyze_alpha_omega <- function(data, model_version)
   alpha_a <- alpha(data_n)
   alpha_n <- alpha(data_o)
   
-  omega_results <- tibble(
-    factor = c("O", "C", "E", "A", "N", "Mean"),
+  omega_results <- data.frame(
+    factor = c("O", "C", "E", "A", "N", "Mittelwert"),
     alpha = c(
-      round(alpha_o$total$raw_alpha, 2),
-      round(alpha_c$total$raw_alpha, 2),
-      round(alpha_e$total$raw_alpha, 2),
-      round(alpha_a$total$raw_alpha, 2),
-      round(alpha_n$total$raw_alpha, 2),
-      round(mean(c(alpha_o$total$raw_alpha, 
+      format_psych(alpha_o$total$raw_alpha, 2),
+      format_psych(alpha_c$total$raw_alpha, 2),
+      format_psych(alpha_e$total$raw_alpha, 2),
+      format_psych(alpha_a$total$raw_alpha, 2),
+      format_psych(alpha_n$total$raw_alpha, 2),
+      format_psych(mean(c(alpha_o$total$raw_alpha, 
                    alpha_c$total$raw_alpha, 
                    alpha_e$total$raw_alpha,
                    alpha_a$total$raw_alpha,
                    alpha_n$total$raw_alpha)), 2)),
     omega = c(
-      round(omega_o$omega.tot, 2),
-      round(omega_c$omega.tot, 2),
-      round(omega_e$omega.tot, 2),
-      round(omega_a$omega.tot, 2),
-      round(omega_n$omega.tot, 2),
-      round(mean(c(omega_o$omega.tot, 
+      format_psych(omega_o$omega.tot, 2),
+      format_psych(omega_c$omega.tot, 2),
+      format_psych(omega_e$omega.tot, 2),
+      format_psych(omega_a$omega.tot, 2),
+      format_psych(omega_n$omega.tot, 2),
+      format_psych(mean(c(omega_o$omega.tot, 
                    omega_c$omega.tot,
                    omega_e$omega.tot,
                    omega_a$omega.tot,
                    omega_n$omega.tot)),2))
-  )
-
+  ) %>% 
+    setNames(c("Faktor", "\u03B1", "\u03C9"))
+  
+  ft <- omega_results %>% 
+    flextable() %>% 
+    theme_vanilla() %>% 
+    autofit()
+  save_as_docx(ft, path = paste(tables_output_folder, "/alpha_omega_", model_version, ".docx", sep=""))
+  
   #print detailed outputs
   sink(paste(stats_output_folder, "/alpha_omega_analyzation_", model_version, ".txt", sep=""))
   print(omega_results)
@@ -154,8 +159,8 @@ analyze_item_statistics <- function(data, model_version)
            sw = shapiro.test(data[[Variable]])$p.value) %>% 
     select(Variable, Name, n, mean, sd, median, min, max, ks, sw, difficulty) %>%
     mutate(
-      across(c(mean, sd, median, min, max), ~round(.x, 2)),
-      across(c(ks, sw), ~round(.x, 2))
+      across(c(mean, sd, median, min, max), ~format_psych(.x)),
+      across(c(ks, sw), ~format_p_psych(.x))
     )
   
   desc_df <- desc_df %>%
@@ -163,8 +168,8 @@ analyze_item_statistics <- function(data, model_version)
       all_item_stats %>% 
         select(Variable, r.cor, r.drop) %>%
         mutate(
-          r.cor = round(r.cor, 3),
-          r.drop = round(r.drop, 3)
+          r.cor = format_psych(r.cor),
+          r.drop = format_psych(r.drop)
         ),
       by = "Variable"
     )
@@ -228,8 +233,10 @@ analyze_factor_loadings <- function(data, model_version)
   
   # Convert to data frame and add item names
   loadings_df <- as.data.frame(loadings_matrix)
+
   loadings_df$h2 = faModel$communality
-  loadings_df <- round(loadings_df, 2)  # Round to 3 decimal places
+  loadings_df <- round(loadings_df, 2)  # Round to 2 decimal places
+
   
   # Add item names as first column (adjust item names as needed)
   loadings_df$Item <- rownames(loadings_matrix)
@@ -238,6 +245,7 @@ analyze_factor_loadings <- function(data, model_version)
     mutate(
       Name = variable_names[[Item]]
     )
+  
   loadings_df <- loadings_df[, c("Item", "Name", paste0("PA", 1:5), "h2")]  # Reorder columns
   
   # Row mit Eigenwerten einfügen
@@ -252,6 +260,7 @@ analyze_factor_loadings <- function(data, model_version)
             PA5 = eigenwerte[5],
             h2 = NULL,
             .before=1)
+          
   
   # Tabelle mit fettgedruckten Werten erstellen
   ft <- flextable(loadings_df)
@@ -300,7 +309,8 @@ analyze_factor_loadings <- function(data, model_version)
 analyze_correlations <- function(data, model_version) {
   # analyze factors
   factor_matrix <- data %>% 
-    select(ends_with("_llm"))
+    select(ends_with("_llm")) %>% 
+    setNames(c("O", "C", "E", "A", "N"))
   matrix <- create_corr_matrix(factor_matrix)
   ft <- matrix %>% 
     flextable() %>% 
@@ -344,7 +354,8 @@ create_corr_matrix <- function(corrdata) {
   
   # Variablennamen als erste Spalte hinzufügen
   result_df <- result_df %>%
-    mutate(Variable = rownames(.), .before = 1)
+    mutate(Variable = rownames(.), .before = 1) %>% 
+    rename(" " = Variable)
   
   return (result_df)
 }

@@ -8,8 +8,6 @@ library(patchwork)
 library(purrr)
 library(flextable)
 
-source("combined_names_EN.R")
-
 # environmental variables:
 ## graphics_output_folder
 ## tables_output_folder
