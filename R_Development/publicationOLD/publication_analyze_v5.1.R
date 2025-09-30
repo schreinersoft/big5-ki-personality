@@ -1,9 +1,9 @@
 # Model version for printing
 model_version <- "v5.1"
 
-source("connect_database.R")
-source("functions.R")
-source("Factor-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/Factor-Names-EN.R")
 all_factors <- c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm")
 all_factor_names <- factor_names[all_factors]
 
@@ -32,22 +32,22 @@ data <- tbl(con, "openai_analyzation_v5") %>%
   collect()
 
 
-source("aggregate_v5.R")
+source("sources/aggregate_v5.R")
 
 data_facets <- data_aggregated %>% 
   select(all_of(all_facets))
 data_factors <- data_aggregated %>% 
   select(all_of(all_factors))
 
-source("ocean_plot.R")
+source("sources/ocean_plot.R")
 
 sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
-source("omega.R")
+source("sources/omega.R")
 sink()
 
 sink(paste("outputs/output_analyzation_", model_version, ".txt"))
 
-source("macros_v5.R")
+source("sources/macros_v5.R")
 
 sink()
 

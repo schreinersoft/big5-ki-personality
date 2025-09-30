@@ -1,9 +1,9 @@
 library(psych)
 library(flextable)
 
-source("connect_database.R")
-source("functions.R")
-source("BFI-2-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/BFI-2-Names-EN.R")
 
 # Hole Messungen
 data <- tbl(con, "openai_analyzation") %>% 

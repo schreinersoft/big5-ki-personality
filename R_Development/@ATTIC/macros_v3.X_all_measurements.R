@@ -4,7 +4,7 @@ print("Using facets:")
 print(all_facets)
 print("")
 
-#source("aggregate_v2_NEO.R")
+#source("sources/aggregate_v2_NEO.R")
 
 data_facets <- data %>% 
   select(all_of(all_facets)) %>% 

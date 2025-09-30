@@ -4,13 +4,13 @@ library(writexl)
 
 root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
 
-source("connect_database.R")
-source("graphics_functions.R")
-source("tables_functions.R")
-source("measurement_functions.R")
-source("output_folders_measurement.R")
-source("difference_functions.R")
-source("combined_names_EN.R")
+source("sources/connect_database.R")
+source("sources/graphics_functions.R")
+source("sources/tables_functions.R")
+source("sources/measurement_functions.R")
+source("sources/output_folders_measurement.R")
+source("sources/difference_functions.R")
+source("sources/combined_names_EN.R")
 
 corpus_name <- "orwell"
 data_orwell_raw <- consolidate_data(corpus_name)

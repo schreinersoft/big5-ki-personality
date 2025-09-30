@@ -1,9 +1,9 @@
 # Model version for printing
 model_version <- "v5.0"
 
-source("connect_database.R")
-source("functions.R")
-source("Factor-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/Factor-Names-EN.R")
 
 o_facets <- c("of3b", "of1", "of2", "of5")
 c_facets <- c("cf2b", "cf3b", "cf3", "cf5")
@@ -83,11 +83,11 @@ data_factors <- data_aggregated %>%
   select(all_of(all_factors))
 
 sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
-source("omega.R")
+source("sources/omega.R")
 sink()
 
 sink(paste("outputs/output_analyzation_", model_version, ".txt"))
 
-source("macros_v5.R")
+source("sources/macros_v5.R")
 
 sink()

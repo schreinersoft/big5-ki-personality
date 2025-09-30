@@ -3,9 +3,9 @@ library(rstatix)
 library(psych)
 library(flextable)
 
-source("connect_database.R")
-source("functions.R")
-source("Factor-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/Factor-Names-EN.R")
 
 essays <- tbl(con, "essays")  %>% select(-author) %>% collect()
 liwc <- tbl(con, "liwc_analyzation")  %>% select(-updated_at, -liwc_all) %>% collect

@@ -7,9 +7,9 @@ library(corrplot)
 library(patchwork)
 library(purrr)
 
-source("connect_database.R")
-source("functions.R")
-source("BFI-2-Names.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/BFI-2-Names.R")
 # Ergänze durch NEO-PI-R:
 facet_names$ef1 <- 'Warmth'
 facet_names$ef2 <- 'Gregariousness'

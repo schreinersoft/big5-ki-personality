@@ -3,7 +3,7 @@ library(tidyverse)
 library(Hmisc)
 library(flextable)
 
-source("transformation_functions.R")
+source("sources/transformation_functions.R")
 
 result <- rcorr(as.matrix(mtcars))
 print(result)

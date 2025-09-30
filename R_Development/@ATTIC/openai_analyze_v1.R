@@ -5,8 +5,8 @@ library(knitr)
 library(semTools)
 library(corrplot)
 
-source("connect_database.R")
-source("functions.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
 
 # combine datasets
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()

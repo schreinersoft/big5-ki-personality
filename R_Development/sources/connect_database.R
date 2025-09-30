@@ -1,6 +1,7 @@
 library(DBI)
 library(dplyr)
 library(dbplyr)
+library(tidyverse)
 library(dotenv)
 
 load_dot_env(file="../.env")

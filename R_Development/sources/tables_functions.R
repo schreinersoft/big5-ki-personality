@@ -5,6 +5,41 @@ library(flextable)
 # environmental variables:
 ## tables_output_folder
 
+
+create_essay_item_statistics <- function(data, model_version, essay_number=NULL) {
+
+  if (is.null(essay_number)) {
+    facets <- data %>% 
+      select(starts_with(("of")),
+            starts_with(("cf")),
+            starts_with(("ef")),
+            starts_with(("af")),
+            starts_with(("nf")))
+
+    essay_number <- "ALL"
+  } else {
+    facets <- data %>% 
+      filter(essay_id == essay_number) %>% 
+      select(starts_with(("of")),
+             starts_with(("cf")),
+             starts_with(("ef")),
+             starts_with(("af")),
+             starts_with(("nf")))
+  }
+
+  stats <- facets %>% 
+    psych::describe() %>% 
+    round(2)
+  ft <- stats %>% 
+    as.data.frame() %>% 
+    rownames_to_column("Variable") %>%
+    flextable() %>% 
+    theme_vanilla() %>% 
+    autofit()
+  save_as_docx(ft, path = paste(tables_output_folder, "/item_raw_statistics_", model_version, "_essay_", essay_number, ".docx", sep=""))
+}
+
+
 analyze_alpha_omega <- function(data, model_version)
 {
   data_o <- data %>% 

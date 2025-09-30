@@ -2,9 +2,9 @@ library(tidyverse)
 library(psych)
 library(flextable)
 
-source("connect_database.R")
-source("functions.R")
-source("Factor-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/Factor-Names-EN.R")
 
 essays <- tbl(con, "essays")  %>% select(-text) %>% collect()
 essays$o_bin <- ifelse(essays$o_binary == "1", 1, 0)

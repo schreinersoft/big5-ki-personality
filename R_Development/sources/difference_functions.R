@@ -2,7 +2,7 @@ library(car)
 library(effectsize)
 library(tidyverse)
 
-source("transformation_functions.R")
+source("sources/transformation_functions.R")
 
 
 create_stats_anova_without_effectsizes <- function(data, var, group, name) {

@@ -7,9 +7,9 @@ library(corrplot)
 library(patchwork)
 library(purrr)
 
-source("connect_database.R")
-source("functions.R")
-source("NEO-PI-R-Names.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/NEO-PI-R-Names.R")
 
 
 # Hole nur ein Essay mit 150 Messungen

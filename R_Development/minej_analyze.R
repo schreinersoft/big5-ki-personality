@@ -1,9 +1,9 @@
 library(tidyverse)
 library(rstatix)
 
-source("connect_database.R")
-source("functions.R")
-source("Factor-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/Factor-Names-EN.R")
 
 essays <- tbl(con, "essays")  %>% select(-text, -author) %>% collect()
 minej <- tbl(con, "minej_analyzation")  %>% select(-updated_at,) %>% collect

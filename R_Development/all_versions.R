@@ -1,13 +1,15 @@
 ### Collector for all models, data and analyzations
 
-source("connect_database.R")
-source("graphics_functions.R")
-source("tables_functions.R")
-source("transformation_functions.R")
-source("output_folders.R")
+root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 
-#source("combined_names_EN.R")
-source("combined_names_EN_DE.R")
+source("sources/connect_database.R")
+source("sources/graphics_functions.R")
+source("sources/tables_functions.R")
+source("sources/transformation_functions.R")
+source("sources/output_folders.R")
+
+#source("sources/combined_names_EN.R")
+source("sources/combined_names_EN_DE.R")
 
 
 
@@ -64,6 +66,11 @@ data <- tbl(con, "openai_analyzation") %>%
   )
 data_aggregated <- aggregate_model(data)
 db_write_model(data_aggregated, model_version)
+
+
+create_essay_item_statistics(data, model_version)
+
+create_essay_item_statistics(data, model_version, 42)
 
 create_essay_histograms(data, model_version, 27)
 create_essay_histograms(data, model_version, 42)
@@ -524,6 +531,8 @@ data_aggregated <- aggregate_model(data) %>%
   select(where(~ all(!is.na(.))))
 
 db_write_model(data_aggregated, model_version)
+
+m51 <- db_read_model("v5.0")
 
 create_essay_histograms(data, model_version, 27)
 create_essay_histograms(data, model_version, 42)

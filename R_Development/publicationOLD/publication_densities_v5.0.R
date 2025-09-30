@@ -1,4 +1,4 @@
-source("Factor-Names-EN.R")
+source("sources/Factor-Names-EN.R")
 
 all_factors <- c("O", "C", "E", "A", "N")
 all_factor_names <- factor_names[all_factors]

@@ -1,6 +1,6 @@
 library(tidyverse)
 
-source("connect_database.R")
+source("sources/connect_database.R")
 
 korpora = c("woolf", "orwell", "benjamin", "noise")
 

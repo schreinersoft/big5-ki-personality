@@ -1,9 +1,9 @@
 # Model version for printing
 model_version <- "v3.X"
 
-source("connect_database.R")
-source("functions.R")
-source("NEO-PI-R-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/NEO-PI-R-Names-EN.R")
 
 #! TEST ! Analyzation of all, not aggregated measurements! -> no effect!
 
@@ -48,7 +48,7 @@ all_names <- facet_names[all_facets]
 
 sink(paste("outputs/output_analyzation_", model_version, ".txt"))
 
-source("macros_v3.X_all_measurements.R")
+source("sources/macros_v3.X_all_measurements.R")
 
 sink()
 

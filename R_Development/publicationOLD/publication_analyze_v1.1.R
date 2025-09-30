@@ -1,9 +1,9 @@
 # Model version for printing
 model_version <- "v1.1"
 
-source("connect_database.R")
-source("functions.R")
-source("BFI-2-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/BFI-2-Names-EN.R")
 
 # combine datasets
 essays <- tbl(con, "essays") %>% select(-text, -author) %>% collect()
@@ -34,15 +34,15 @@ facet_table <- openai_joined %>%
   select(all_of(all_facets)) %>% 
   as_tibble()
 
-source("aggregate_v1_BFI.R")
+source("sources/aggregate_v1_BFI.R")
 
 sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
-source("omega.R")
+source("sources/omega.R")
 sink()
 
 
 sink(paste("outputs/output_analyzation_", model_version, ".txt"))
 
-source("macros_v1.R")
+source("sources/macros_v1.R")
 
 sink()

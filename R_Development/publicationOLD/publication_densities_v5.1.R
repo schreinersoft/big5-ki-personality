@@ -1,6 +1,6 @@
 library(purrr)
 
-source("Factor-Names-EN.R")
+source("sources/Factor-Names-EN.R")
 
 all_factors <- c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm")
 all_factor_names <- factor_names[all_factors]

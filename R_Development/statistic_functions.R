@@ -1,38 +1,12 @@
 library(car)
-library(flextable)
 library(effectsize)
 library(tidyverse)
-library(writexl)
-
-root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
 
 source("sources/output_folders.R")
 
 source("sources/connect_database.R")
 source("sources/transformation_functions.R")
 source("sources/combined_names_EN.R")
-
-essays <- tbl(con, "essays") %>%
-  filter(id <=250) %>%
-  collect() %>%
-  mutate(
-    bin_o = as.factor(ifelse(o_binary == "1", 1, 0)),
-    bin_c = as.factor(ifelse(c_binary == "1", 1, 0)),
-    bin_e = as.factor(ifelse(e_binary == "1", 1, 0)),
-    bin_a = as.factor(ifelse(a_binary == "1", 1, 0)),
-    bin_n = as.factor(ifelse(n_binary == "1", 1, 0))) %>% 
-  select(-text, -author, -all_of(ends_with("binary")))
-
-models <- list()
-model_list <- c("noise", "liwc", "minej",
-                "v1.0","v1.1","v1.2",
-                "v2.0","v2.1","v2.2","v2.3",
-                "v3.0",
-                "v4.000", "v4.002", "v4.004", "v4.006", "v4.008", "v4.010", "v4.1",
-                "v5.X", "v5.0", "v5.0n", "v5.1", "v5.1n")
-factor_names <- c("O", "C", "E", "A", "N")
-
-#model_list <- c("noise", "liwc")
 
 # read all data of all models
 for (model in model_list) {
@@ -46,41 +20,31 @@ for (model in model_list) {
 # https://www.statistikwunder.de/post/ergebnisse-einer-einfaktoriellen-anova-im-apa-stil-berichten
 
 # Funktion zum Extrahieren der Statistiken
-extract_stats_anova <- function(object) {
-  # ANOVA Zusammenfassung
-  aov_result <- object$aov
-  aov_summary <- summary(aov_result)
-  
-  # F-Wert und p-Wert extrahieren
-  f_value <- aov_summary[[1]][1, "F value"]
-  p_value <- aov_summary[[1]][1, "Pr(>F)"]
-  df_groups <- aov_summary[[1]][1, "Df"]  
-  df_measures <- aov_summary[[1]][2, "Df"]
-  
-  # Cohen's d und Hedge's g berechnen
-  effect_size <- effectsize::eta_squared(aov_result)
-  cohens_d <- effectsize::cohens_d(formula(aov_result), data = object$data)
-  
-  ################
-  residuals <- residuals(aov_result)
-  shapiro_test <- shapiro.test(residuals)
-  # Levene-Test für Varianzhomogenität
-  formula_obj <- formula(aov_result)
-  levene_test <- leveneTest(formula_obj, data = object$data)
+extract_stats_anova <- function(crit, pred, data) {
 
-  scores <- create_scores_frame(object$data)
+  formula <- reformulate(crit, pred)
+  aov_result <- aov(formula, data = data)
+  aov_summary <- summary(aov_result)
+  result <- list()
   
-  return(list(
-    p = p_value,
-    F = f_value,
-    dfg = df_groups,
-    dfm = df_measures,
-    eta2 = effect_size$Eta2,
-    d = abs(cohens_d$Cohens_d),
-    sw = shapiro_test$p.value,
-    lev = as.numeric(levene_test$`Pr(>F)`[1]),
-    sc = mean(scores$SCORE)
-  ))
+  result$f <- aov_summary[[1]][1, "F value"]
+  result$p <- aov_summary[[1]][1, "Pr(>F)"]
+  result$df_groups <- aov_summary[[1]][1, "Df"]  
+  result$df_measures <- aov_summary[[1]][2, "Df"]
+  result$eta2 <- effectsize::eta_squared(aov_result)$Eta2
+  result$d <- abs(effectsize::cohens_d(formula(aov_result), data = data)$Cohens_d)
+
+  residuals <- residuals(aov_result)
+  results$sw <- shapiro.test(residuals)$p.value
+  result$lev <- as.numeric(leveneTest(formula(aov_result), data = data)$`Pr(>F)`[1])
+
+  vec <- data %>%
+    select(!!sym(pred)) %>% 
+    pull(!!sym(pred))
+  result$ks <- ks.test(vec, "pnorm", mean(vec), sd(vec))
+
+
+  return(result)
 }
 
 # Funktion zum Extrahieren der Statistiken
@@ -161,7 +125,6 @@ for (model in model_list)
       wc = wilcox.test(formula, data = data),
       data = models[[model]]
     )
-    
   }
 }
 

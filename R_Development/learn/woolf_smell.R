@@ -1,9 +1,9 @@
 library(tidyverse)
 
-source("connect_database.R")
-source("graphics_functions.R")
-source("tables_functions.R")
-source("output_folders.R")
+source("sources/connect_database.R")
+source("sources/graphics_functions.R")
+source("sources/tables_functions.R")
+source("sources/output_folders.R")
 
 # calculate all means of facets and factors
 aggregate_model_by_hash <- function(d)

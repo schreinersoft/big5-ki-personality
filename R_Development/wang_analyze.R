@@ -6,7 +6,7 @@ wang_joined <- left_join(essays, wang, by = c("id" = "essay_id"))
 wang_truncated <- wang_joined %>% filter(classification_type == "truncated")
 wang_sliding <- wang_joined %>% filter(classification_type == "slidingWindow")
 
-source("functions.R")
+source("sources/functions.R")
 
 # ANOVA der Binärgruppen
 # -> truncated etwas besser, warum auch immer???

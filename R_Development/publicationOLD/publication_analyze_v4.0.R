@@ -1,10 +1,10 @@
 # Model version for printing
 model_version <- "v4.0"
 
-source("connect_database.R")
-source("functions.R")
-source("NEO-PI-R-Names-EN.R")
-source("Factor-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/NEO-PI-R-Names-EN.R")
+source("sources/Factor-Names-EN.R")
 
 # get data
 data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
@@ -24,7 +24,7 @@ all_names <- facet_names[all_facets]
 all_factors <- c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm")
 all_factor_names <- factor_names[all_factors]
 
-source("aggregate_v4_NEO_temperature.R")
+source("sources/aggregate_v4_NEO_temperature.R")
 
 data_facets <- data_aggregated %>% 
   filter(temperature==0.0) %>% 
@@ -36,12 +36,12 @@ data_factors <- data_aggregated %>%
 
 
 sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
-source("omega.R")
+source("sources/omega.R")
 sink()
 
 
 
-source("macros_v4.R")
+source("sources/macros_v4.R")
 
 # Speziell Analyse Temperatur Faktoren
 data_aggregated$temp.factor <- as.factor(data_aggregated$temperature)

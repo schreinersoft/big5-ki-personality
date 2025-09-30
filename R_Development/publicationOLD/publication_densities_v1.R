@@ -1,10 +1,10 @@
 library(psych)
 library(flextable)
 
-source("connect_database.R")
-source("functions.R")
-source("BFI-2-Names.R")
-source("Factor-Names.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/BFI-2-Names.R")
+source("sources/Factor-Names.R")
 
 # get data
 data <- tbl(con, "openai_analyzation") %>% 

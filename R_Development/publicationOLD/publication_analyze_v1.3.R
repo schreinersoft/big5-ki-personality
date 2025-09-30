@@ -1,9 +1,9 @@
 # Model version for printing
 model_version <- "v1.3"
 
-source("connect_database.R")
-source("functions.R")
-source("BFI-2-Names-EN.R")
+source("sources/connect_database.R")
+source("sources/functions.R")
+source("sources/BFI-2-Names-EN.R")
 
 # get data
 data <- tbl(con, "openai_analyzation") %>% 
@@ -24,14 +24,14 @@ all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
-source("aggregate_v1_BFI.R")
+source("sources/aggregate_v1_BFI.R")
 
 sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
-source("omega.R")
+source("sources/omega.R")
 sink()
 
 sink(paste("outputs/output_analyzation_", model_version, ".txt"))
 
-source("macros_v1.R")
+source("sources/macros_v1.R")
 
 sink()

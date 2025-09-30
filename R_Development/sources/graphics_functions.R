@@ -13,6 +13,10 @@ library(flextable)
 ## tables_output_folder
 ## raw_output_folder
 
+  
+
+
+
 # create all histogram plots of raw data for one essay
 # needs raw_data, not aggregated!
 create_essay_histograms <- function(data, model_version, essay_number)

@@ -1,11 +1,11 @@
 library(tidyverse)
 
-source("connect_database.R")
-source("graphics_functions.R")
-source("tables_functions.R")
-source("measurement_functions.R")
-source("output_folders.R")
-source("factor-names-EN.R")
+source("sources/connect_database.R")
+source("sources/graphics_functions.R")
+source("sources/tables_functions.R")
+source("sources/measurement_functions.R")
+source("sources/output_folders.R")
+source("sources/factor-names-EN.R")
 
 
 table_name <- "woolf"

@@ -6,11 +6,11 @@ library(writexl)
 
 root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
 
-source("output_folders.R")
+source("sources/output_folders.R")
 
-source("connect_database.R")
-source("transformation_functions.R")
-source("combined_names_EN.R")
+source("sources/connect_database.R")
+source("sources/transformation_functions.R")
+source("sources/combined_names_EN.R")
 
 essays <- tbl(con, "essays") %>% 
   filter(id <=250) %>% 
