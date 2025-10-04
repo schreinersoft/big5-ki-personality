@@ -1,6 +1,8 @@
 library(tidyverse)
 library(psych)
 library(flextable)
+library(corrr)
+library(Hmisc)
 
 # environmental variables:
 ## tables_output_folder

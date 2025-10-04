@@ -80,10 +80,13 @@ create_all_graphics(data_aggregated, model_version)
 
 
 ################################################# V1.1
-model_version <- "v1.1"
+model_version <- "v1.1b"
 data_aggregated <- data %>% 
-  select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
+  select(-ef1b, -af2b, -nf3b) %>% 
   aggregate_model()
+
+# war: select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
+  
 
 db_write_model(data_aggregated, model_version)
 
@@ -93,10 +96,13 @@ create_all_graphics(data_aggregated, model_version)
 
 
 ################################################# V1.2
-model_version <- "v1.2"
+model_version <- "v1.2b"
 data_aggregated <- data %>% 
-  select(-cf1b, -ef2b, -nf2b) %>% 
+  select(-cf3b, -ef2b, -nf3b) %>% 
   aggregate_model()
+
+# war: select(-cf1b, -ef2b, -nf2b) %>% 
+  
 
 db_write_model(data_aggregated, model_version)
 
