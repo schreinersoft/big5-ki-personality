@@ -192,7 +192,20 @@ create_all_graphics(data_aggregated, model_version)
 model_version <- "v2.3"
 
 data_aggregated <- data %>% 
-  select(-of3, -of4, -of6, -cf1, -cf4, -ef1, -ef3, -ef6, -af2, -af5, -nf2, -nf5) %>% 
+  select(-of3, -of4, -of6, -cf1, -cf4, -ef2, -ef3, -ef6, -af2, -af5, -nf2, -nf5) %>% 
+  aggregate_model()
+
+db_write_model(data_aggregated, model_version)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V2.3b
+model_version <- "v2.3b"
+
+data_aggregated <- data %>% 
+  select(-of3, -of4, -cf1, -ef2, -ef3, -ef6, -af2, -nf2, -nf5) %>% 
   aggregate_model()
 
 db_write_model(data_aggregated, model_version)
@@ -217,6 +230,8 @@ db_write_model(data_aggregated, model_version)
 
 analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
+
+
 
 
 ################################################# V4.0

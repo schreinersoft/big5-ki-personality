@@ -4,13 +4,13 @@ library(effectsize)
 library(tidyverse)
 library(writexl)
 
-root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
+root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 
 source("sources/output_folders.R")
 
 source("sources/connect_database.R")
 source("sources/transformation_functions.R")
-source("sources/combined_names_EN.R")
+source("sources/combined_names_EN_DE.R")
 
 essays <- tbl(con, "essays") %>%
   filter(id <=250) %>%
@@ -25,11 +25,11 @@ essays <- tbl(con, "essays") %>%
 
 models <- list()
 model_list <- c("noise", "liwc", "minej",
-                "v1.0","v1.1","v1.2",
+                "v1.0","v1.1b","v1.2b",
                 "v2.0","v2.1","v2.2","v2.3",
                 "v3.0",
-                "v4.000", "v4.002", "v4.004", "v4.006", "v4.008", "v4.010", "v4.1",
-                "v5.X", "v5.0", "v5.0n", "v5.1", "v5.1n")
+                "v4.1",
+                "v5.0")
 factor_names <- c("O", "C", "E", "A", "N")
 
 #model_list <- c("noise", "liwc")
@@ -166,11 +166,11 @@ for (model in model_list)
 }
 
 es <- extract_stats_anova(anova_results[["v1.0"]][["O"]])
-
+es
 kw <- extract_stats_kruskal(kruskal_wallis_results[["v1.0"]][["O"]])
-
+kw
 wc <- extract_stats_wilcoxon(wilcoxon_results[["noise"]][["O"]])
-
+wc
 wc$r
 
 
@@ -190,13 +190,13 @@ for(model in model_list) {
     
     # Statistiken formatieren
     row_data <- c(row_data,
-                  format_psych(sprintf("%.2f", stats$F)),
+                  format_psych(stats$F),
                   format_p_psych(stats$p),
-                  format_psych(sprintf("%.2f", stats$eta2)),
-                  format_psych(sprintf("%.2f", stats$d)),
-                  format_p_psych(sprintf("%.3f", stats$sw)),
-                  format_p_psych(sprintf("%.3f", stats$lev)),
-                  format_psych(sprintf("%.1f", mean(scores[[normrow]])))
+                  format_psych(stats$eta2),
+                  format_psych(stats$d),
+                  format_p_psych(stats$sw),
+                  format_p_psych(stats$lev),
+                  format_psych(mean(scores[[normrow]]))
                   )
   }
   anova_results_df <- rbind(anova_results_df, row_data, stringsAsFactors = FALSE)
@@ -216,10 +216,10 @@ for(model in model_list) {
     
     # Statistiken formatieren
     row_data <- c(row_data,
-                  format_psych(sprintf("%.2f", stats$chi2)),
+                  format_psych(stats$chi2),
                   format_p_psych(stats$p),
-                  format_psych(sprintf("%.3f", stats$eta2)),
-                  format_psych(sprintf("%.1f", mean(scores[[normrow]])))
+                  format_psych(stats$eta2),
+                  format_psych(mean(scores[[normrow]]))
                   )
   }
   kruskal_wallis_results_df <- rbind(kruskal_wallis_results_df, row_data, stringsAsFactors = FALSE)
@@ -245,10 +245,10 @@ for(model in model_list) {
     
     # Statistiken formatieren
     row_data <- c(row_data,
-                  format_psych(sprintf("%.0f", stats$W)),
+                  format_psych(stats$W),
                   format_p_psych(stats$p),
-                  format_psych(sprintf("%.3f", stats$r)),
-                  format_psych(sprintf("%.1f", mean(scores[[normrow]])))
+                  format_psych(stats$r),
+                  format_psych(mean(scores[[normrow]]))
     )
     
     i <- i + 1
@@ -327,11 +327,11 @@ write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/h-
 
 # U-Tests Auswertungen als Tabelle
 # Spaltennamen setzen
-colnames(wilcoxon_results_df) <- c("Modell", paste0(rep(factor_names, each = 4), "_", rep(c("W", "p", "r", "SC"), 5)), "SCORE")
+colnames(wilcoxon_results_df) <- c("Modell", paste0(rep(factor_names, each = 4), "_", rep(c("W", "p", "r", "SC"), 5)), "OSC")
 # flextable erstellen
 ft <- flextable(kruskal_wallis_results_df) %>%
   # Unterheader für Statistiken (wird zur zweiten Zeile)
-  add_header_row(values = c("Modell", rep(c("W", "p", "r", "SC"), 5), "SCORE"), colwidths = rep(1, 22)) %>%
+  add_header_row(values = c("Modell", rep(c("W", "p", "r", "SC"), 5), "OSC"), colwidths = rep(1, 22)) %>%
   # Hauptheader hinzufügen (wird zur ersten Zeile)
   add_header_row(values = c("", factor_names, "Ø"), colwidths = c(1, rep(4, 5), 1), 1) %>%
   # Erste Spalte in der ersten Zeile mit "Modell" füllen
