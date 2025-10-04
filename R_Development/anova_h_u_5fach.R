@@ -233,6 +233,10 @@ for(model in model_list) {
   
   scores <- create_scores_frame(models[[model]])
   
+  #rs <- create_factor_corr_values(models[[model]]) XXX
+  
+  i <- 1
+  
   for(factor in factor_names) {
     stats <- extract_stats_wilcoxon(wilcoxon_results[[model]][[factor]])
     
@@ -246,6 +250,8 @@ for(model in model_list) {
                   format_psych(sprintf("%.3f", stats$r)),
                   format_psych(sprintf("%.1f", mean(scores[[normrow]])))
     )
+    
+    i <- i + 1
   }
   wilcoxon_results_df <- rbind(wilcoxon_results_df, row_data, stringsAsFactors = FALSE)
 }

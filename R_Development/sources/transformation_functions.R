@@ -93,15 +93,37 @@ get_variable_name <- function(var) {
   deparse(substitute(var))
 }
 
-format_p_psych <- function(p_value) {
-  ifelse(p_value < 0.001, "<.001", format_psych(p_value, 3))
-}
+#format_p_psych <- function(p_value) {
+#  if(is.na(p_value)) return(p_value)
+#  if(p_value < 0.001) return ("<.001")
+#  if(p_value < 0.01) return ("<.01")
+#  if(p_value < 0.05) return ("<.05")
+#  return (format_psych(p_value, 2))
+#}#
+#
+#format_psych <- function(value, do_round=2) {
+#  if(is.na(value)) return(value)
+#  # Entferne führende "0" vor dem Dezimalkomma
+#  format <- sprintf(paste0("%.", do_round, "f"), value)
+#  gsub("^(-?)0\\.", "\\1.", format)
+#}
 
 format_psych <- function(value, do_round=2) {
-  # Entferne führende "0" vor dem Dezimalkomma
-  #'round(gsub("^(-?)0\\.", ".", as.character(value)), do_round)
-  format <- sprintf(paste0("%.", do_round, "f"), value)
-  gsub("^(-?)0\\.", ".", format)
+  # Vektorisierte NA-Behandlung
+  result <- ifelse(is.na(value), 
+                   NA_character_,
+                   gsub("^(-?)0\\.", "\\1.", sprintf(paste0("%.", do_round, "f"), value)))
+  return(result)
+}
+
+format_p_psych <- function(p_value) {
+  # Vektorisierte Version
+  result <- ifelse(is.na(p_value), NA_character_,
+                   ifelse(p_value < 0.001, "<.001",
+                          ifelse(p_value < 0.01, "<.01",
+                                 ifelse(p_value < 0.05, "<.05",
+                                        format_psych(p_value, 2)))))
+  return(result)
 }
 
 

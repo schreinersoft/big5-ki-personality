@@ -79,14 +79,26 @@ analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
 
+
+
 ################################################# V1.1
+model_version <- "v1.1"
+data_aggregated <- data %>% 
+  select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
+  aggregate_model()
+  
+
+db_write_model(data_aggregated, model_version)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V1.1b
 model_version <- "v1.1b"
 data_aggregated <- data %>% 
   select(-ef1b, -af2b, -nf3b) %>% 
   aggregate_model()
-
-# war: select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
-  
 
 db_write_model(data_aggregated, model_version)
 
@@ -96,13 +108,36 @@ create_all_graphics(data_aggregated, model_version)
 
 
 ################################################# V1.2
+model_version <- "v1.2"
+data_aggregated <- data %>% 
+  select(-cf1b, -ef2b, -nf2b) %>% 
+  aggregate_model()
+  
+
+db_write_model(data_aggregated, model_version)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
+
+################################################# V1.2b
 model_version <- "v1.2b"
 data_aggregated <- data %>% 
-  select(-cf3b, -ef2b, -nf3b) %>% 
+  select(-af3b, -nf3b) %>% 
   aggregate_model()
 
-# war: select(-cf1b, -ef2b, -nf2b) %>% 
-  
+db_write_model(data_aggregated, model_version)
+
+analyze_all(data_aggregated, model_version)
+create_all_graphics(data_aggregated, model_version)
+
+
+
+################################################# V1.3b
+model_version <- "v1.3b"
+data_aggregated <- data %>% 
+  select(-cf1b, -af3b, -nf3b) %>% 
+  aggregate_model()
 
 db_write_model(data_aggregated, model_version)
 

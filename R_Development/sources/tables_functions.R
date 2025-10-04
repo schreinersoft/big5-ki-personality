@@ -254,8 +254,7 @@ analyze_factor_loadings <- function(data, model_version)
   
   # Faktorenanalyse
   faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "pa", residuals=TRUE)
-  #faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "ml", residuals=TRUE)
-  
+
   sink(paste(stats_output_folder, "/factor_analysis_", model_version, ".txt", sep=""))
   print(faModel)
   
@@ -312,14 +311,20 @@ analyze_factor_loadings <- function(data, model_version)
       h2 = "h²"
     ) %>%
     theme_vanilla() %>%
+    set_formatter(PA1 = function(x) sapply(x, format_psych)) %>%
+    set_formatter(PA2 = function(x) sapply(x, format_psych)) %>%
+    set_formatter(PA3 = function(x) sapply(x, format_psych)) %>%
+    set_formatter(PA4 = function(x) sapply(x, format_psych)) %>%
+    set_formatter(PA5 = function(x) sapply(x, format_psych)) %>%
+    set_formatter(h2 = function(x) sapply(x, format_psych)) %>%
     autofit() %>%
     align(align = "center", part = "header") %>%
     align(j = 2:6, align = "center", part = "body") %>%
-    bold(i = ~ (PA1 > 0.3 & PA1 <= 1.0) | PA1 < -0.3, j = "PA1") %>%
-    bold(i = ~ (PA2 > 0.3 & PA2 <= 1.0) | PA2 < -0.3, j = "PA2") %>%
-    bold(i = ~ (PA3 > 0.3 & PA3 <= 1.0) | PA3 < -0.3, j = "PA3") %>%
-    bold(i = ~ (PA4 > 0.3 & PA4 <= 1.0) | PA4 < -0.3, j = "PA4") %>%
-    bold(i = ~ (PA5 > 0.3 & PA5 <= 1.0) | PA5 < -0.3, j = "PA5") %>% 
+    bold(i = ~ (PA1 >= 0.4 & PA1 <= 1.0) | PA1 <= -0.4, j = "PA1") %>%
+    bold(i = ~ (PA2 >= 0.4 & PA2 <= 1.0) | PA2 <= -0.4, j = "PA2") %>%
+    bold(i = ~ (PA3 >= 0.4 & PA3 <= 1.0) | PA3 <= -0.4, j = "PA3") %>%
+    bold(i = ~ (PA4 >= 0.4 & PA4 <= 1.0) | PA4 <= -0.4, j = "PA4") %>%
+    bold(i = ~ (PA5 >= 0.4 & PA5 <= 1.0) | PA5 <= -0.4, j = "PA5") %>% 
     align(j = 2, align="left") %>% 
     align(j = 7, align="center") %>% 
     italic(i = 1)
@@ -351,7 +356,8 @@ analyze_correlations <- function(data, model_version) {
   matrix <- create_corr_matrix(factor_matrix)
   ft <- matrix %>% 
     flextable() %>% 
-    theme_vanilla() %>% 
+    theme_vanilla() %>%
+    align(align="right", part="all") %>% 
     autofit()
   save_as_docx(ft, path = paste(tables_output_folder, "/corrs_factors_", model_version, ".docx", sep=""))
 
@@ -365,6 +371,7 @@ analyze_correlations <- function(data, model_version) {
   ft <- matrix %>% 
     flextable() %>% 
     theme_vanilla() %>% 
+    align(align="right", part="all") %>% 
     autofit()
   save_as_docx(ft, path = paste(tables_output_folder, "/corrs_facets_", model_version, ".docx", sep=""))
   
@@ -397,3 +404,36 @@ create_corr_matrix <- function(corrdata) {
   return (result_df)
 }
 
+
+
+
+
+
+
+# UNUSED !!! XXX
+create_factor_corr_values <- function(data){
+  all_factors <- data %>% select(
+    starts_with("o_"),
+    starts_with("c_"),
+    starts_with("e_"),
+    starts_with("a_"),
+    starts_with("n_")) %>% names()
+  
+  all_bins <- data %>% 
+    select(starts_with("bin_")) %>%
+    names()
+  
+  result <- numeric(0)  # Changed from list() to numeric vector
+  
+  for(i in 1:5) {
+    corresult <- rcorr(data[[all_factors[i]]], data[[all_bins[i]]])
+    
+    result <- c(result, corresult$r[2, 1])  # Changed indexing
+  }
+  
+  meanc <- mean(result)
+  result <- c(result, meanc)
+  names(result) <- c("O", "C", "E", "A", "N", "M")
+  
+  return(result)
+}
