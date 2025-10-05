@@ -24,7 +24,7 @@ essays <- tbl(con, "essays") %>%
   select(-text, -author, -all_of(ends_with("binary")))
 
 models <- list()
-model_list <- c("noise", "liwc", "minej",
+model_list <- c("noise", "liwc", "wang",
                 "v1.0","v1.1b","v1.2b",
                 "v2.0","v2.1","v2.2","v2.3",
                 "v3.0",
@@ -32,7 +32,7 @@ model_list <- c("noise", "liwc", "minej",
                 "v5.0")
 factor_names <- c("O", "C", "E", "A", "N")
 
-#model_list <- c("noise", "liwc")
+#model_list <- c("v1.0", "wang")
 
 # read all data of all models
 for (model in model_list) {
@@ -329,7 +329,7 @@ write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/h-
 # Spaltennamen setzen
 colnames(wilcoxon_results_df) <- c("Modell", paste0(rep(factor_names, each = 4), "_", rep(c("W", "p", "r", "SC"), 5)), "OSC")
 # flextable erstellen
-ft <- flextable(kruskal_wallis_results_df) %>%
+ft <- flextable(wilcoxon_results_df) %>%
   # Unterheader für Statistiken (wird zur zweiten Zeile)
   add_header_row(values = c("Modell", rep(c("W", "p", "r", "SC"), 5), "OSC"), colwidths = rep(1, 22)) %>%
   # Hauptheader hinzufügen (wird zur ersten Zeile)

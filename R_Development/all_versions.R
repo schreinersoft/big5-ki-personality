@@ -747,3 +747,15 @@ create_essay_histograms(data, model_version, 112)
 analyze_all(data_aggregated, model_version)
 create_all_graphics(data_aggregated, model_version)
 
+
+
+################################################# Wang
+model_version <- "wang"
+data_aggregated <- tbl(con, "wang_analyzation") %>% 
+  filter(classification_type == "truncated") %>% 
+  filter(essay_id <= 250) %>% 
+  collect()
+
+db_write_model(data_aggregated, model_version)
+
+
