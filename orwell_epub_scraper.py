@@ -201,7 +201,7 @@ if __name__ == "__main__":
                 if not entry.month:
                     entry.month = 6
                     entry.scrape_comment += "set to month 6 "
-                entry.author_age = int(((entry.year*12)+entry.month - (birth_year*12)+birth_month) / 12)
+                entry.author_age = int((((entry.year*12)+entry.month - ((birth_year*12)+birth_month))) / 12)
                 #oldhash = str(entry.hash)
                 entry = generate_hash(entry) # Ensure hash is generated
                 # if oldhash == entry.hash:

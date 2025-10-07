@@ -1,6 +1,7 @@
 library(tidyverse)
 library(corrr)
 library(psych)
+library(writexl)
 
 root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
 
@@ -18,7 +19,7 @@ birth_year <- 1903
 birth_month <- 6
 
 data <- data %>% 
-   mutate(author_age = round((((year*12)+month - ((birth_year*12)+birth_month)) / 12),0))
+   mutate(author_age = round((((year*12)+month - ((birth_year*12)+birth_month+1)) / 12),0))
 
 
 factors <- data %>% select(ends_with("llm")) %>% names()
@@ -42,7 +43,7 @@ stats <- data %>%
   group_modify(~ psych::describe(select(.x, ends_with("_llm"))) %>%
   as.data.frame() %>% 
   rownames_to_column("variable")) %>%
-  arrange(variable, author_age) %>% 
+  arrange(author_age, variable) %>% 
   ungroup()
 ft <- stats %>% 
   as.data.frame() %>% 
@@ -88,14 +89,14 @@ ereignisse <- data.frame(
   author_age = 
     c(30,
       34,
-      40,
+      39,
       42,
       44
       ),
   ereignis = 
-    c("Erstes Buch",
+    c("1. Buch",
       "Bürgerkrieg",
-      "Ende BBC",
+      "BBC",
       "Tod Ehefrau",
       "Schottland"
       )
@@ -122,7 +123,7 @@ trendlines <- stats %>%
   scale_fill_brewer(palette = "Set1") +
   facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = variable_names)) +
   geom_smooth(aes(group = variable), method = "loess", linetype = "solid", alpha = 0.2, se = TRUE, size = 0.6, fill="darkgrey") +
-  scale_y_continuous(limits = c(3.0, 7.5), breaks = 1:9) +
+  scale_y_continuous(limits = c(3.0, 7.8), breaks = 1:9) +
   scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2)) +
   labs(
     title = "",
@@ -154,7 +155,7 @@ trendlines_flat <- stats %>%
              color = "red", 
              linetype = "dashed", 
              alpha = 0.7) +
-  scale_y_continuous(limits = c(3.0, 7.5), breaks = 1:9) +
+  scale_y_continuous(limits = c(3.0, 7.8), breaks = 1:9) +
   scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2)) +
   geom_text(data = ereignisse,
             aes(x = author_age, y = 3, label = ereignis),
@@ -173,6 +174,45 @@ trendlines_flat <- stats %>%
 trendlines_flat
 ggsave(paste(graphics_output_folder,"/lines_flat_", corpus_name, ".jpg", sep = ""), 
        plot = trendlines_flat, dpi = 600, width = 8, height = 4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 trendlines_annotations <- stats %>% 

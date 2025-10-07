@@ -9,7 +9,7 @@ source("sources/tables_functions.R")
 source("sources/measurement_functions.R")
 source("sources/output_folders_measurement.R")
 source("sources/difference_functions.R")
-source("sources/combined_names_EN.R")
+source("sources/combined_names_EN_DE.R")
 
 corpus_name <- "woolf"
 data_woolf_raw <- consolidate_data(corpus_name)
@@ -38,10 +38,13 @@ data_all <- tbl(con, "data_all") %>% collect()
 results <- data.frame()
 
 # grafischer Vergleich
-violins <- create_factor_violins(data_all, "author_name")
+data_all_sorted <- data_all %>%
+  mutate(author_name = factor(author_name, levels = c("Virginia Woolf", "George Orwell")))
+
+violins <- create_factor_violins(data_all_sorted, "author_name")
 violins
-ggsave(paste(graphics_output_folder, "/comparison_violins_factors.png", sep=""),
-       plot = violins, dpi=300, width = 8, height = 6)
+ggsave(paste(graphics_output_folder, "/comparison_violins_factors.jpg", sep=""),
+       plot = violins, dpi=600, width = 7, height = 4)
 
 # ANOVA between Authors
 o_diff <- create_stats_anova(data_all, "o_llm", "author_name", "O ANOVA") 
@@ -77,6 +80,33 @@ ft <- results %>%
 ft
 save_as_docx(ft, path=paste(tables_output_folder, "/measure_u_test_woolf_orwell.docx",sep=""))
 write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/measure_u_test_woolf_orwell.xlsx",sep=""))
+
+
+
+results <- data_all %>% 
+  select(ends_with("llm")) %>% 
+  group_by(author_name) %>%
+  group_modify(~ psych::describe(.x) %>% 
+                 as.data.frame() %>%
+                 rownames_to_column("variable")) %>%
+  ungroup()
+  
+  
+ft <- results %>% 
+  flextable()
+ft
+save_as_docx(ft, path=paste(tables_output_folder, "/measure_u_test_woolf_orwell.docx",sep=""))
+write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/measure_u_test_woolf_orwell.xlsx",sep=""))
+
+
+
+
+
+
+
+
+
+
 
 
 ############# Messung der zeitlichen Konstanz

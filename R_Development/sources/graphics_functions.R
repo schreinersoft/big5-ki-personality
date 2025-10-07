@@ -346,6 +346,41 @@ create_factor_violins <- function(data, group, lim_down = 1, lim_up= 9)
     starts_with("a_"),
     starts_with("n_")) %>% names()
   
+  result <- data %>%
+    select(all_of(c(group, all_factors))) %>%  # Wähle group und alle Faktoren
+    pivot_longer(
+      cols = all_of(all_factors),
+      names_to = "variable",
+      values_to = "value"
+    ) %>%
+    mutate(variable = factor(variable, levels = all_factors)) %>% 
+    ggplot(aes(x = .data[[group]], y=value, fill=variable)) +
+    ylim(lim_down, lim_up) +
+    scale_color_brewer(palette = "Set1") +
+    scale_fill_brewer(palette = "Set1") +
+    geom_violin(alpha = 0.7) +
+    geom_boxplot(fill="white", width = 0.3)+
+    facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = variable_names)) +
+    labs(
+      title = "",
+      x = "",
+      y = "Skalenwert") +
+    guides(fill = "none") +
+    theme_minimal() 
+
+    return (result)
+}
+
+#################################################### measurement
+create_factor_violins_plots <- function(data, group, lim_down = 1, lim_up= 9)
+{
+  all_factors <- data %>% select(
+    starts_with("o_"),
+    starts_with("c_"),
+    starts_with("e_"),
+    starts_with("a_"),
+    starts_with("n_")) %>% names()
+  
   plots <- list()
   i <- 1
   for (factor in all_factors){
@@ -353,6 +388,7 @@ create_factor_violins <- function(data, group, lim_down = 1, lim_up= 9)
     plots[[i]] <- data %>%
       ggplot(aes(y = .data[[factor]], x=.data[[group]], fill=.data[[group]])) +
       ylim(lim_down, lim_up) +
+      scale_color_brewer(palette = "Set1") +
       geom_violin() +
       geom_boxplot(width = 0.3)+
       labs(
