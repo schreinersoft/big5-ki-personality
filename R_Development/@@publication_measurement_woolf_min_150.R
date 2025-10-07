@@ -7,8 +7,8 @@ source("sources/connect_database.R")
 source("sources/graphics_functions.R")
 source("sources/tables_functions.R")
 source("sources/measurement_functions.R")
-source("sources/output_folders_measurement.R")
-source("sources/factor-names-EN.R")
+source("sources/output_folders.R")
+source("sources/combined_names_EN_DE.R")
 
 
 corpus_name <- "woolf"
@@ -25,7 +25,7 @@ factors <- data %>% select(ends_with("llm")) %>% names()
 # DESCRIPTIVES
 stats <- data %>%
   group_by(author_age) %>%
-  group_modify(~ describe(select(.x, ends_with("_llm"))) %>%
+  group_modify(~ psych::describe(select(.x, ends_with("_llm"))) %>%
                  rownames_to_column("variable")) %>%
   arrange(variable, author_age) %>% 
   ungroup()
@@ -86,11 +86,19 @@ create_factor_densities(data, corpus_name)
 
 # Lebensereignisse definieren
 ereignisse <- data.frame(
-  author_age = c(43, 52, 58, 59),
-  ereignis = c("Liebesbeziehung Sackville-West", "Tod Roger Fry", "Bombenangriff auf London")
+  author_age = c(43, 
+                 52, 
+                 58),
+  ereignis = c("Liebesbeziehung", 
+               "Tod Freund", 
+               "Bombenangriff")
 )
 
 ### trendlines jährlich
+min_max <- stats %>% 
+  filter(author_age >34)
+min_age <- min(min_max$author_age)
+max_age <- max(min_max$author_age)
 
 trendlines <- stats %>% 
   filter(author_age >34) %>% 
@@ -101,19 +109,22 @@ trendlines <- stats %>%
   geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
   geom_line(size = 1.0, linejoin="round") +
   geom_point(size=1.2) +
-  facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = factor_names)) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = variable_names)) +
   geom_smooth(aes(group = variable), method = "loess", linetype = "solid", alpha = 0.2, se = TRUE, size = 0.6, fill="darkgrey") +
   scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
+  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2)) +
   labs(
     title = "",
     x = "Alter",
-    y = ""
+    y = "M (Skalenwert)"
   ) +
   theme_minimal() +
   theme(legend.position = "none")  
 trendlines
 ggsave(paste(graphics_output_folder,"/lines_with_trend_", corpus_name, ".jpg", sep = ""), 
-       plot = trendlines, dpi = 600, width = 6, height = 4)
+       plot = trendlines, dpi = 600, width = 7, height = 4)
 
 
 # alle zusammen
@@ -123,6 +134,8 @@ trendlines_flat <- stats %>%
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
   ggplot(aes(x = author_age, y = mean, color = variable, fill = variable)) +
+  scale_color_brewer(palette = "Set1", labels = variable_names) +
+  scale_fill_brewer(palette = "Set1") +
   geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
   geom_line(size = 1.0, linejoin="round") +
   geom_point(size=1.2) +
@@ -133,23 +146,65 @@ trendlines_flat <- stats %>%
              linetype = "dashed", 
              alpha = 0.7) +
   scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
-  scale_color_discrete(name="", labels=variable_names) +
+  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2)) +
   geom_text(data = ereignisse,
             aes(x = author_age, y = 8, label = ereignis),
-            angle = 0, vjust = -0.3, hjust = 1,
+            angle = 0, vjust = -0.3, hjust = 1.05,
             size = 3, color = "red",
             inherit.aes = FALSE) +
   guides(fill = "none") +
   labs(
     title = "",
     x = "Alter",
-    y = "M"
+    y = "M (Skalenwert)",
+    color = ""
   ) +
   theme_minimal() #+
   #theme(legend.position = "none")  # Remove legend since facets show the variables
 trendlines_flat
 ggsave(paste(graphics_output_folder,"/lines_flat_", corpus_name, ".jpg", sep = ""), 
-       plot = trendlines_flat, dpi = 600, width = 6, height = 4)
+       plot = trendlines_flat, dpi = 600, width = 7, height = 4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+d
+
+
+
+
+
+
+
+
+
+
 
 
 trendlines_annotations <- stats %>% 
@@ -168,6 +223,7 @@ trendlines_annotations <- stats %>%
              linetype = "dashed", 
              alpha = 0.7) +
   scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
+  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2)) +
   scale_color_discrete(name="", labels=variable_names) +
   geom_text(data = ereignisse,
             aes(x = author_age, y = 8, label = ereignis),
@@ -178,7 +234,7 @@ trendlines_annotations <- stats %>%
   labs(
     title = "",
     x = "Alter",
-    y = "M"
+    y = "M(Skalenwert)"
   ) +
   theme_minimal() #+
 #theme(legend.position = "none")  # Remove legend since facets show the variables

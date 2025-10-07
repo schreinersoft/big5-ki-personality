@@ -53,5 +53,6 @@ variable_names = c(
   'c_llm' = 'Gewissenhaftigkeit',
   'e_llm' = "Extraversion",
   'a_llm' = 'Verträglichkeit',
-  'n_llm' = 'Neurotizismus'
+  'n_llm' = 'Neurotizismus',
+  'variable' = 'Faktor'
 )

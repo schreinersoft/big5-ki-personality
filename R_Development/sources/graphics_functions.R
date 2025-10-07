@@ -149,8 +149,8 @@ create_factor_densities <- function(data, model_version)
       geom_density(color = "black",
                    fill = "orange") +   # XXX factor colors?
       labs(title = variable_names[[factor]] %||% factor,
-           #x = "Value",
-           y = "") +
+           x = "Skalenwert",
+           y = "Dichte") +
       stat_function(
         fun = dnorm,  # Normal distribution function
         args = list(mean = mean(data[[factor]], na.rm = TRUE), 
