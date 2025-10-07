@@ -14,6 +14,12 @@ source("sources/factor-names-EN.R")
 corpus_name <- "orwell"
 data <- consolidate_data(corpus_name)
 
+birth_year <- 1903
+birth_month <- 6
+
+data <- data %>% 
+   mutate(author_age = round((((year*12)+month - ((birth_year*12)+birth_month)) / 12),0))
+
 
 factors <- data %>% select(ends_with("llm")) %>% names()
 
@@ -80,12 +86,16 @@ create_factor_densities(data, corpus_name)
 # Lebensereignisse definieren
 ereignisse <- data.frame(
   author_age = 
-    c(40,
+    c(30,
+      34,
+      40,
       42,
       44
       ),
   ereignis = 
-    c("Ende BBC",
+    c("Erstes Buch",
+      "Bürgerkrieg",
+      "Ende BBC",
       "Tod Ehefrau",
       "Schottland"
       )
@@ -95,12 +105,12 @@ ereignisse <- data.frame(
 
 ### trendlines jährlich
 min_max <- stats %>% 
-  filter(author_age >34)
+  filter(author_age >28)
 min_age <- min(min_max$author_age)
 max_age <- max(min_max$author_age)
 
 trendlines <- stats %>% 
-  filter(author_age >34) %>% 
+  filter(author_age >28) %>% 
   mutate(
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
@@ -128,7 +138,7 @@ ggsave(paste(graphics_output_folder,"/lines_with_trend_", corpus_name, ".jpg", s
 
 # alle zusammen
 trendlines_flat <- stats %>% 
-  filter(author_age >34) %>% 
+  filter(author_age >28) %>% 
   mutate(
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
