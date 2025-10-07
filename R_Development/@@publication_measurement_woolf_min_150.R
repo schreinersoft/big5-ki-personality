@@ -95,13 +95,11 @@ ereignisse <- data.frame(
 )
 
 ### trendlines jährlich
-min_max <- stats %>% 
-  filter(author_age >34)
+min_max <- stats 
 min_age <- min(min_max$author_age)
 max_age <- max(min_max$author_age)
 
 trendlines <- stats %>% 
-  filter(author_age >34) %>% 
   mutate(
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
@@ -114,7 +112,7 @@ trendlines <- stats %>%
   facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = variable_names)) +
   geom_smooth(aes(group = variable), method = "loess", linetype = "solid", alpha = 0.2, se = TRUE, size = 0.6, fill="darkgrey") +
   scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
-  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2)) +
+  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(3)) +
   labs(
     title = "",
     x = "Alter",
@@ -129,7 +127,6 @@ ggsave(paste(graphics_output_folder,"/lines_with_trend_", corpus_name, ".jpg", s
 
 # alle zusammen
 trendlines_flat <- stats %>% 
-  filter(author_age >34) %>% 
   mutate(
     variable = factor(variable, 
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
@@ -146,7 +143,7 @@ trendlines_flat <- stats %>%
              linetype = "dashed", 
              alpha = 0.7) +
   scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
-  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2)) +
+  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2, offset=1)) +
   geom_text(data = ereignisse,
             aes(x = author_age, y = 8, label = ereignis),
             angle = 0, vjust = -0.3, hjust = 1.05,
