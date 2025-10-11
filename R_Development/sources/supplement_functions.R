@@ -4,11 +4,15 @@ library(flextable)
 library(corrr)
 library(Hmisc)
 
-# environmental variables:
-## tables_output_folder
+write_txt<- function(data, kind, instrument_version){
+  sink(paste(supplement_output_folder, "/", kind, "_", instrument_version, ".txt", sep=""))
+  summary(data)
+  sink()
+      
+}
 
 
-create_essay_item_statistics <- function(data, model_version, essay_number=NULL) {
+supp_analyse_essay_item <- function(data, model_instrument_version, essay_number=NULL) {
 
   if (is.null(essay_number)) {
     facets <- data %>% 
@@ -19,6 +23,7 @@ create_essay_item_statistics <- function(data, model_version, essay_number=NULL)
             starts_with(("nf")))
 
     essay_number <- "ALL"
+    kind <- paste("item_statistics_essay_", essay_number, sep="")
   } else {
     facets <- data %>% 
       filter(essay_id == essay_number) %>% 
@@ -27,120 +32,140 @@ create_essay_item_statistics <- function(data, model_version, essay_number=NULL)
              starts_with(("ef")),
              starts_with(("af")),
              starts_with(("nf")))
+      kind <- "item_statistics"
   }
 
   stats <- facets %>% 
     psych::describe() %>% 
-    round(2)
+    select(-mad, -trimmed, -range, -skew, -kurtosis, -se) %>% 
+    round(2) %>% 
+    as.data.frame()
+  
+
   ft <- stats %>% 
-    as.data.frame() %>% 
-    rownames_to_column("Variable") %>%
+    rownames_to_column("variable") %>%
+    mutate(
+      name = variable_names[variable]) %>% 
+    select(-vars) %>% 
+    relocate(name, .before=n) %>% 
     flextable() %>% 
-    theme_vanilla() %>% 
+    set_header_labels(
+      variable = "Facette",
+      name = "Name",
+      n = "N",
+      mean = "M",
+      sd = "SD", 
+      median = "Median",
+      min = "Min",
+      max = "Max"
+    ) %>%
+    theme_alafoli() %>%
+    italic(part = "header", j = c(3,4,5)) %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/item_raw_statistics_", model_version, "_essay_", essay_number, ".docx", sep=""))
+  
+  #save_as_docx(ft, path = paste(supplement_output_folder, kind, ".docx", sep=""))
+  #write_xlsx(stats, path=paste(supplement_output_folder, kind, ".xlsx",sep=""))
+  write_txt(stats, kind, model_instrument_version)
+  
+  return(ft)
 }
 
-
-analyze_alpha_omega <- function(data, model_version)
-{
-  data_o <- data %>% 
-    select(starts_with(("of")))
-  data_c <- data %>% 
-    select(starts_with(("cf")))
-  data_e <- data %>% 
-    select(starts_with(("ef")))
-  data_a <- data %>%
-    select(starts_with(("af")))
-  data_n <- data %>% 
-    select(starts_with(("nf")))
-  
-  omega_o <- omega(data_o, nfactors = 1, flip=FALSE, plot=FALSE)
-  omega_c <- omega(data_c, nfactors = 1, flip=FALSE, plot=FALSE)
-  omega_e <- omega(data_e, nfactors = 1, flip=FALSE, plot=FALSE)
-  omega_a <- omega(data_a, nfactors = 1, flip=FALSE, plot=FALSE)
-  omega_n <- omega(data_n, nfactors = 1, flip=FALSE, plot=FALSE)
-  fa_o <- fa(data_o)
-  fa_c <- fa(data_c)
-  fa_e <- fa(data_e)
-  fa_a <- fa(data_n)
-  fa_n <- fa(data_o)
-  alpha_o <- alpha(data_o)
-  alpha_c <- alpha(data_c)
-  alpha_e <- alpha(data_e)
-  alpha_a <- alpha(data_n)
-  alpha_n <- alpha(data_o)
-  
-  omega_results <- data.frame(
-    factor = c("O", "C", "E", "A", "N", "Mittelwert"),
-    alpha = c(
-      format_psych(alpha_o$total$raw_alpha, 2),
-      format_psych(alpha_c$total$raw_alpha, 2),
-      format_psych(alpha_e$total$raw_alpha, 2),
-      format_psych(alpha_a$total$raw_alpha, 2),
-      format_psych(alpha_n$total$raw_alpha, 2),
-      format_psych(mean(c(alpha_o$total$raw_alpha, 
-                          alpha_c$total$raw_alpha, 
-                          alpha_e$total$raw_alpha,
-                          alpha_a$total$raw_alpha,
-                          alpha_n$total$raw_alpha)), 2)),
-    omega = c(
-      format_psych(omega_o$omega.tot, 2),
-      format_psych(omega_c$omega.tot, 2),
-      format_psych(omega_e$omega.tot, 2),
-      format_psych(omega_a$omega.tot, 2),
-      format_psych(omega_n$omega.tot, 2),
-      format_psych(mean(c(omega_o$omega.tot, 
-                          omega_c$omega.tot,
-                          omega_e$omega.tot,
-                          omega_a$omega.tot,
-                          omega_n$omega.tot)),2))
-  ) %>% 
-    setNames(c("Faktor", "\u03B1", "\u03C9"))
-  
-  ft <- omega_results %>% 
-    flextable() %>% 
-    theme_vanilla() %>% 
-    autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/alpha_omega_", model_version, ".docx", sep=""))
-  
-  #print detailed outputs
-  sink(paste(stats_output_folder, "/alpha_omega_analyzation_", model_version, ".txt", sep=""))
-  print(omega_results)
-  
-  print("##### O Factor Analysis")
-  print(alpha_o)
-  print(omega_o)
-  print(fa_o)
-  
-  print("##### C Factor Analysis")
-  print(alpha_c)
-  print(omega_c)
-  print(fa_c)
-  
-  print("##### E Factor Analysis")
-  print(alpha_e)
-  print(omega_e)
-  print(fa_e)
-  
-  print("##### A Factor Analysis")
-  print(alpha_a)
-  print(omega_a)
-  print(fa_a)
-  
-  print("##### N Factor Analysis")
-  print(alpha_n)
-  print(omega_n)
-  print(fa_n)
-  sink()
-  
-return(omega_results)
-}
 
 
 ########################
 # descriptive statistics of all facets
-analyze_item_statistics <- function(data, model_version)
+supp_analyze_factors <- function(data, model_instrument_version, likert_max = 9)
+{
+  all_factors <- data %>% select(
+    starts_with("o_"),
+    starts_with("c_"),
+    starts_with("e_"),
+    starts_with("a_"),
+    starts_with("n_")) %>% names()
+
+  desc_factors <- data %>% 
+    select(all_of(all_factors)) %>% 
+    psych::describe() %>%
+    as.data.frame() %>%
+    select(-mad, -trimmed)
+
+  # analysiere jede faktorgruppe einzeln
+  additions_factors <- data.frame()
+
+  for (factor in all_factors) {
+    factor_items <- data %>% 
+      select(starts_with(paste0(substr(factor, 1, 1), "f"))) %>%
+      names()
+    
+    omega_result <- psych::omega(data[factor_items], nfactors = 1, flip=FALSE, plot=FALSE)
+    summary(omega_result)
+    alpha_result <- psych::alpha(data[factor_items])
+    summary(alpha_result)
+
+    factor_stats <- data.frame(
+      Variable = factor,
+      alpha = omega_result$alpha,
+      omega = omega_result$omega.tot
+      )
+    
+    additions_factors <- rbind(additions_factors, factor_stats)
+}
+
+  summary_factors <- desc_factors %>%
+    rownames_to_column("Variable") %>%
+    rowwise() %>%
+    mutate(Name = variable_names[Variable],
+           ks = suppressWarnings(ks.test(data[[Variable]], "pnorm", 
+                                         mean(data[[Variable]], na.rm = TRUE), 
+                                         sd(data[[Variable]], na.rm = TRUE))$p.value),
+           sw = shapiro.test(data[[Variable]])$p.value) %>% 
+    select(Variable, Name, n, mean, sd, median, range, ks, sw) %>%
+    mutate(
+      across(c(mean, sd, median, range), ~format_psych(.x)),
+      across(c(ks, sw), ~format_p_psych(.x))
+    )
+  
+  summary_factors <- summary_factors %>%
+    left_join(
+      additions_factors %>% 
+        mutate(
+          alpha = format_psych(alpha),
+          omega = format_psych(omega)
+        ),
+      by = "Variable"
+    )
+  
+  # Flextable erstellen
+  factor_table <- summary_factors %>%
+    select(-Variable) %>% 
+    flextable() %>%
+    set_header_labels(
+      #Variable = "Faktor",
+      Name = "Name",
+      n = "N",
+      mean = "M",
+      sd = "SD", 
+      median = "Median",
+      range = "Spannweite",
+      ks = "K/S",
+      sw = "S/W",
+      alpha = "\u03B1",
+      omega = "\u03C9"
+    ) %>%
+    theme_alafoli() %>%
+    italic(part = "header", j = c(3,4)) %>% 
+    align(j = 2:10, align = "center", part = "all") %>% 
+    
+    autofit()
+  
+  kind <- paste("/stats_facets_", model_instrument_version, sep="")
+  
+  write_txt(summary_factors, kind, model_instrument_version)
+  return (factor_table)
+}
+
+#################################################################### Facets
+supp_analyze_facets <- function(data, model_instrument_version, likert_max = 9)
 {
   all_factors <- data %>% select(
     starts_with("o_"),
@@ -156,43 +181,40 @@ analyze_item_statistics <- function(data, model_version)
   factor_facets_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
   all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
   
-  sink(paste(stats_output_folder, "/item_statistics_", model_version, ".txt", sep=""))
-  desc.stats <- data %>% 
-    select(all_of(all_facets), all_of(all_factors)) %>% 
-    psych::describe()
-  print(desc.stats)
-    
-  # analysiere jede faktorgruppe einzeln
-  item_analysis_results <- list()
+  desc_facets <- data %>% 
+    select(all_of(all_facets)) %>% 
+    psych::describe() %>% 
+    as.data.frame() %>% 
+    select(-mad, -trimmed)
+
+  additions_facets <- data.frame()
   
-  for(factor in all_factors) {
+  for (factor in all_factors) {
     factor_items <- data %>% 
       select(starts_with(paste0(substr(factor, 1, 1), "f"))) %>%
       names()
     
     alpha_result <- psych::alpha(data[factor_items])
-    print(alpha_result)
+    summary(alpha_result)
     
-    item_stats <- alpha_result$item.stats
-    item_stats$Variable <- rownames(item_stats)
-    item_analysis_results[[factor]] <- item_stats
+    facet_stats <- data.frame(
+      Variable = rownames(alpha_result$item.stats),
+      r.cor = alpha_result$item.stats$r.cor
+    )
+    
+    additions_facets <- rbind(additions_facets, facet_stats)
+    
   }
-
-  # Alle Item-Analyse-Ergebnisse zusammenfassen
-  all_item_stats <- do.call(rbind, item_analysis_results)
   
-  print(all_item_stats)
-  sink()
   
-  desc_df <- desc.stats %>%
-    as.data.frame() %>%
+  summary_facets <- desc_facets %>%
     rownames_to_column("Variable") %>%
     rowwise() %>%
     mutate(Name = variable_names[Variable],
-           difficulty = round((((mean-1) / 8)*100)), # assuming scale with 9 steps 
+           difficulty = round((((mean-1) / likert_max)*100)), 
            ks = suppressWarnings(ks.test(data[[Variable]], "pnorm", 
-                        mean(data[[Variable]], na.rm = TRUE), 
-                        sd(data[[Variable]], na.rm = TRUE))$p.value),
+                                         mean(data[[Variable]], na.rm = TRUE), 
+                                         sd(data[[Variable]], na.rm = TRUE))$p.value),
            sw = shapiro.test(data[[Variable]])$p.value) %>% 
     select(Variable, Name, n, mean, sd, median, min, max, ks, sw, difficulty) %>%
     mutate(
@@ -200,23 +222,21 @@ analyze_item_statistics <- function(data, model_version)
       across(c(ks, sw), ~format_p_psych(.x))
     )
   
-  desc_df <- desc_df %>%
+  summary_facets <- summary_facets %>%
     left_join(
-      all_item_stats %>% 
-        select(Variable, r.cor, r.drop) %>%
+      additions_facets %>% 
         mutate(
-          r.cor = format_psych(r.cor),
-          r.drop = format_psych(r.drop)
+          r.cor = format_psych(r.cor)
         ),
       by = "Variable"
     )
   
   # Flextable erstellen
-  psych_table <- desc_df %>%
+  facet_table <- summary_facets %>%
+    select(-Name) %>% 
     flextable() %>%
     set_header_labels(
-      Variable = "Variable",
-      Name = "Name",
+      Variable = "Facette",
       n = "N",
       mean = "M",
       sd = "SD", 
@@ -224,20 +244,24 @@ analyze_item_statistics <- function(data, model_version)
       min = "Min",
       max = "Max",
       r.cor = "TS",
-      r.drop = "TS/oh",
       difficulty = "IS",
-      ks = "KS",
-      sw = "SW"
+      ks = "K/S",
+      sw = "S/W"
     ) %>%
-    theme_vanilla() %>%
-    autofit() %>%
-    align(j = 3:12, align = "center", part = "all")
+    theme_alafoli() %>% 
+    italic(part = "header", j = c(3,4)) %>% 
+    align(j = 2:11, align = "center", part = "all") %>% 
+    autofit()
   
-  save_as_docx(psych_table, path = paste(tables_output_folder, "/stats_", model_version, ".docx", sep=""))
-  return (desc_df)
+  kind <- paste("/stats_facets_", model_instrument_version, sep="")
+  
+  write_txt(summary_facets, kind, model_instrument_version)
+  return (facet_table)
 }
 
-analyze_factor_loadings <- function(data, model_version)
+
+
+analyze_factor_loadings <- function(data, model_instrument_version)
 {
   o_facets <- data %>% select(starts_with(("of")))
   c_facets <- data %>% select(starts_with(("cf")))
@@ -255,7 +279,7 @@ analyze_factor_loadings <- function(data, model_version)
   # Faktorenanalyse
   faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "pa", residuals=TRUE)
 
-  sink(paste(stats_output_folder, "/factor_analysis_", model_version, ".txt", sep=""))
+  sink(paste(stats_output_folder, "/factor_analysis_", model_instrument_version, ".txt", sep=""))
   print(faModel)
   
   print("Residuals:")
@@ -302,7 +326,7 @@ analyze_factor_loadings <- function(data, model_version)
   ft <- flextable(loadings_df)
   ft <- ft %>%
     set_header_labels(
-      Item = model_version,
+      Item = model_instrument_version,
       PA1 = "FA 1",
       PA2 = "FA 2", 
       PA3 = "FA 3",
@@ -310,7 +334,7 @@ analyze_factor_loadings <- function(data, model_version)
       PA5 = "FA 5",
       h2 = "h²"
     ) %>%
-    theme_vanilla() %>%
+    theme_alafoli() %>%
     set_formatter(PA1 = function(x) sapply(x, format_psych)) %>%
     set_formatter(PA2 = function(x) sapply(x, format_psych)) %>%
     set_formatter(PA3 = function(x) sapply(x, format_psych)) %>%
@@ -328,7 +352,7 @@ analyze_factor_loadings <- function(data, model_version)
     align(j = 2, align="left") %>% 
     align(j = 7, align="center") %>% 
     italic(i = 1)
-  save_as_docx(ft, path = paste(tables_output_folder, "/loadings_", model_version, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/loadings_", model_instrument_version, ".docx", sep=""))
 
   # Generiere Scree Plot 
   scree_data <- data.frame(
@@ -345,10 +369,10 @@ analyze_factor_loadings <- function(data, model_version)
     ) +
     theme_minimal() +
     scale_x_continuous(breaks = 1:length(faModel$values))
-  ggsave(paste(graphics_output_folder, "/screeplot_" , model_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
+  ggsave(paste(graphics_output_folder, "/screeplot_" , model_instrument_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
 }
 
-analyze_correlations <- function(data, model_version) {
+analyze_correlations <- function(data, model_instrument_version) {
   # analyze factors
   factor_matrix <- data %>% 
     select(ends_with("_llm")) %>% 
@@ -359,7 +383,7 @@ analyze_correlations <- function(data, model_version) {
     theme_vanilla() %>%
     align(align="right", part="all") %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_factors_", model_version, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_factors_", model_instrument_version, ".docx", sep=""))
 
   facet_matrix <- data %>% 
     select(starts_with(("of")), 
@@ -373,7 +397,8 @@ analyze_correlations <- function(data, model_version) {
     theme_vanilla() %>% 
     align(align="right", part="all") %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_facets_", model_version, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_facets_", model_instrument_version, ".docx", sep=""))
+  write_xlsx(as.data.frame(matrix), path=paste(tables_output_folder, "/measure_anova_orwell_receivers.xlsx",sep=""))
   
   
 }
