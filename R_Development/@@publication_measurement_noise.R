@@ -31,10 +31,9 @@ db_write_model(model, "noise")
 # also possible: group_by(year, month) %>%
 # DESCRIPTIVES
 desc <- data %>% 
-  select(all_of(factors)) %>% 
-  describe() %>% 
+  psych::describe() %>% 
   as.data.frame() %>% 
-  round(3)
+  round(2)
 ft <- desc %>% 
   flextable()
 ft

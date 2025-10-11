@@ -8,14 +8,14 @@ source("sources/connect_database.R")
 source("sources/graphics_functions.R")
 source("sources/tables_functions.R")
 source("sources/measurement_functions.R")
-source("sources/output_folders_measurement.R")
+source("sources/output_folders.R")
 source("sources/difference_functions.R")
-source("sources/combined_names_EN.R")
+source("sources/combined_names_EN_DE.R")
 
 corpus_name <- "orwell"
 data_orwell_raw <- consolidate_data(corpus_name)
 data_orwell <- data_orwell_raw %>% 
-  filter(text_raw_numtokens >= 150) %>% 
+  #filter(text_raw_numtokens >= 150) %>% 
   select(author_name, author_age, receiver_sex,
          o_llm, c_llm, e_llm, a_llm, n_llm)
 
@@ -35,6 +35,22 @@ data_all %>%
   summarize(n = n())
 
 data_all <- data_all %>% mutate(receiver_sex = as.factor(receiver_sex))
+
+
+data_all %>% 
+  group_by(receiver_sex) %>% 
+  summarise(
+    M_O = mean(o_llm),
+    M_C = mean(c_llm),
+    M_E = mean(e_llm),
+    M_A = mean(a_llm),
+    M_N = mean(n_llm),
+    SD_O = sd(o_llm),
+    SD_C = sd(c_llm),
+    SD_E = sd(e_llm),
+    SD_A = sd(a_llm),
+    SD_N = sd(n_llm),
+    )
 
 
 # ANOVA between Receiver sexes

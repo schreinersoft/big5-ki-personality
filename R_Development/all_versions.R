@@ -1,6 +1,6 @@
 ### Collector for all models, data and analyzations
 
-root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
+root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 
 source("sources/connect_database.R")
 source("sources/graphics_functions.R")
@@ -717,6 +717,8 @@ model_version <- "noise"
 noise <- tbl(con, "noise") %>% 
   select(hash) %>% 
   collect()
+
+
 
 #generate essay ids
 gen_years <- function(from, to, total) {
