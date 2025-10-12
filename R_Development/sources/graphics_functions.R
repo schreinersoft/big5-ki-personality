@@ -14,9 +14,6 @@ library(flextable)
 ## raw_output_folder
 
 
-
-
-
 # create all histogram plots of raw data for one essay
 # needs raw_data, not aggregated!
 create_essay_histograms <- function(data, measurement_version, essay_number)
@@ -32,6 +29,8 @@ create_essay_histograms <- function(data, measurement_version, essay_number)
   facets_list <- c(names(o_facets), names(c_facets), names(e_facets), 
                    names(a_facets), names(n_facets))
 
+  combined_plots <- list()
+  
   for (i in 1:length(factor_names)) {
     factor_name <- factor_names[i]
     facets_df <- factor_facets_list[[i]]  # This is a data frame
@@ -64,10 +63,17 @@ create_essay_histograms <- function(data, measurement_version, essay_number)
     # Create and save combined plot for this factor
     combined_plot <- wrap_plots(plots, ncol = n_cols) + plot_annotation()
     
-  ggsave(
-    paste(graphics_output_folder,"/histograms_", measurement_version, "_", factor_names[[i]], "_essay_", essay_number, ".png", sep = ""),
-    plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
+    ggsave(
+      paste(graphics_output_folder,"/histograms_", measurement_version, "_", factor_names[[i]], "_essay_", essay_number, ".png", sep = ""),
+      plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
+    combined_plots[[i]] <- combined_plot
   }
+  combined_all <- wrap_plots(combined_plots, ncol = 1)
+  ggsave(
+    paste(graphics_output_folder,"/histograms_", measurement_version, "_essay_", essay_number, ".png", sep = ""),
+    plot = combined_all, dpi=300, width = 8, height = n_rows * 3 * 5)
+  
+  return (combined_all)
 }
 
 
@@ -128,6 +134,7 @@ create_facet_densities <- function(data, measurement_version)
   combined_all <- wrap_plots(combined_plots, ncol = 1)
   ggsave(paste(graphics_output_folder,"/density_", measurement_version, "_combined_facets.png", sep = ""), 
          plot = combined_all, dpi = 300, width = 8, height = combined_plot_rows * 2)
+  return (combined_all)
 }
 
 # plot OCEAN factors of all essays
@@ -170,102 +177,7 @@ create_factor_densities <- function(data, measurement_version)
   combined_plot
   ggsave(paste(graphics_output_folder, "/density_", measurement_version, "_factors.png", sep=""),
          plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
-}
-
-# plot OCEAN factors of all essays
-create_factor_densities_z <- function(data, measurement_version)
-{
-  all_factors <- data %>% select(
-    starts_with("o_"),
-    starts_with("c_"),
-    starts_with("e_"),
-    starts_with("a_"),
-    starts_with("n_")) %>% names()
-  
-  plots <- list()
-  i <- 1
-
-  for (factor in all_factors){
-    plots[[i]] <- data %>%
-      mutate(across(ends_with("_llm"), ~ as.numeric(scale(.x)))) %>% 
-      ggplot(aes(x = .data[[factor]])) +
-      xlim(-2.5, 2.5) +
-      geom_density(color = "black",
-                   fill = "orange") +   # XXX factor colors?
-      labs(title = variable_names[[factor]] %||% factor,
-           #x = "Value",
-           y = "") +
-      stat_function(
-        fun = dnorm,  # Normal distribution function
-
-        color = "blue", linewidth = 0.5, linetype = "dashed"
-      ) +
-      theme_minimal() 
-    i <- i + 1
-  }
-    
-  
-    
-  # Calculate layout dimensions after all plots are created
-  n_plots <- length(plots)
-  n_cols <- min(n_plots, 3)
-  n_rows <- ceiling(n_plots / n_cols)
-  
-  combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
-  combined_plot
-  ggsave(paste(graphics_output_folder, "/density_z_", measurement_version, "_factors.png", sep=""),
-         plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
-}
-
-# plot Q-Q-Plot of OCEAN factors
-create_q_q_plot <- function(data, measurement_version)
-{
-  all_factors <- data %>% select(
-    starts_with("o_"),
-    starts_with("c_"),
-    starts_with("e_"),
-    starts_with("a_"),
-    starts_with("n_")) %>% names()
-  
-  plots <- list()
-  i <- 1
-  for (factor in all_factors){
-    plots[[i]] <- data %>%
-      ggplot(aes(sample = .data[[factor]])) +
-      stat_qq() +
-      stat_qq_line(color = "red") +
-      labs(title = variable_names[[factor]] %||% factor, 
-           x = "", 
-           y = "") +
-      theme_minimal()
-    i <- i + 1
-  }
-  
-  # Calculate layout dimensions after all plots are created
-  n_plots <- length(plots)
-  n_cols <- min(n_plots, 3)
-  n_rows <- ceiling(n_plots / n_cols)
-  
-  combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
-  combined_plot
-  ggsave(paste(graphics_output_folder, "/q-q-plot_", measurement_version, "_factors.png", sep=""),
-         plot = combined_plot, dpi=300, width = 8, height = n_rows * 3)
-}
-
-# plot 5-times Q-Q-Plot
-q_q_plot <- function(vec)
-{
-  data <- data.frame(x=vec)
-  
-  plot <- data %>%
-      ggplot(aes(sample = x)) +
-      stat_qq() +
-      stat_qq_line(color = "red") +
-      labs(title = "", 
-           x = "", 
-           y = "") +
-      theme_minimal()
-  return(plot)
+  return (combined_plot)
 }
 
 

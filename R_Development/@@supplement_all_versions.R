@@ -1,7 +1,13 @@
 library(officer)
 ### Collector for all models, data and analyzations
 
+#root folder for graphics
+root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
+source("sources/output_folders.R")
+
+# root folder for supplement
 root_folder <- "supplement"
+
 
 source("sources/connect_database.R")
 source("sources/graphics_functions.R")
@@ -84,9 +90,14 @@ data_aggregated <- aggregate_model(data)
 ft_essay_42 <- supp_analyse_essay_item(data, measurement_version, 42)
 ft_factors <- supp_analyze_factors(data_aggregated, measurement_version)
 ft_facets <- supp_analyze_facets(data_aggregated, measurement_version)
-ft_loadings <- supp_analyze_factor_loadings_and_screeplot(data_aggregated, measurement_version)
+ft_loadings <- supp_analyze_factor_loadings(data_aggregated, measurement_version)
 ft_factor_correlations <- supp_analyze_factor_correlations(data_aggregated, measurement_version)
 ft_facet_correlations <- supp_analyze_facet_correlations(data_aggregated, measurement_version)
+gg_screeplot <- supp_analyze_screeplot(data_aggregated, measurement_version)
+gg_essay_42 <- create_essay_histograms(data, measurement_version, 42)
+gg_factors <- create_factor_densities(data_aggregated, measurement_version)
+gg_facets <- create_facet_densities(data_aggregated, measurement_version)
+
 
 
 # Add main supplement heading with "Anhang" style
@@ -95,12 +106,34 @@ doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_ve
 doc <- body_add_par(doc, "Statistiken Essay 42", style = "Zwischenüberschrift")
 doc <- body_add_flextable(doc, supp_format(ft_essay_42))
 
-doc <- body_add_par(doc, "Faktorstatistiken", style = "Zwischenüberschrift")
-doc <- body_add_flextable(doc, supp_format(ft_facets))
 
-doc <- body_add_par(doc, "Facettenstatistiken", style = "Zwischenüberschrift")
+doc <- body_add_par(doc, "Histogramme Essay 42", style = "Zwischenüberschrift")
+filename <- paste(supplement_output_folder,"/histograms_essay_42.jpg",sep="")
+width <- 180
+height <- 240
+ggsave(filename=filename, plot=gg_essay_42, dpi=300, width=height, height=width, units = "mm")
+doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
+
+
+doc <- body_add_par(doc, "Faktorstatistiken und Verteilungen", style = "Zwischenüberschrift")
+doc <- body_add_flextable(doc, supp_format(ft_facets))
+width <- 180
+height <- 240
+filename <- paste(supplement_output_folder,"/factor_densities.jpg",sep="")
+ggsave(filename=filename, plot=gg_factors, dpi=300, width=height, height=width, units = "mm")
+doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
+
+
+doc <- body_add_par(doc, "Facettenstatistiken und Verteilungen", style = "Zwischenüberschrift")
 doc <- body_add_par(doc, "K-S : Kolmogorov-Smirnov-Test, S-W : Shapiro-Wilk-Test", style="annotation text")
 doc <- body_add_flextable(doc, supp_format(ft_facets))
+width <- 180
+height <- 240
+filename <- paste(supplement_output_folder,"/facet_densities.jpg",sep="")
+ggsave(filename=filename, plot=gg_facets, dpi=300, width=height, height=width, units = "mm")
+doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
+
+
 
 doc <- body_add_par(doc, "Faktorkorrelationen", style = "Zwischenüberschrift")
 doc <- body_add_flextable(doc, supp_format(ft_factor_correlations))
@@ -108,22 +141,14 @@ doc <- body_add_flextable(doc, supp_format(ft_factor_correlations))
 doc <- body_add_par(doc, "Facettenkorrelationen", style = "Zwischenüberschrift")
 doc <- body_add_flextable(doc, supp_format(ft_facet_correlations))
 
-# Add first graphic with heading
+doc <- body_add_par(doc, "Faktorladungen und Kommunalitäten", style = "Zwischenüberschrift")
+doc <- body_add_flextable(doc, supp_format(ft_loadings))
 doc <- body_add_par(doc, "Scree Plot", style = "Zwischenüberschrift")
 doc <- body_add_img(doc, src = paste(supplement_output_folder, "/screeplot_", measurement_version, ".png", sep=""), width = 8, height = 5)
 
 
 
 
-
-
-create_essay_item_statistics(data, measurement_version)
-
-create_essay_item_statistics(data, measurement_version, 42)
-
-create_essay_histograms(data, measurement_version, 27)
-create_essay_histograms(data, measurement_version, 42)
-create_essay_histograms(data, measurement_version, 112)
 analyze_all(data_aggregated, measurement_version)
 create_all_graphics(data_aggregated, measurement_version)
 

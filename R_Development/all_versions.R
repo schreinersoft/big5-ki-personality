@@ -87,7 +87,7 @@ measurement_version <- "v1.1"
 data_aggregated <- data %>% 
   select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
   aggregate_model()
-  
+
 
 db_write_model(data_aggregated, measurement_version)
 
@@ -113,7 +113,7 @@ measurement_version <- "v1.2"
 data_aggregated <- data %>% 
   select(-cf1b, -ef2b, -nf2b) %>% 
   aggregate_model()
-  
+
 
 db_write_model(data_aggregated, measurement_version)
 

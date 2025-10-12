@@ -261,7 +261,7 @@ supp_analyze_facets <- function(data, model_instrument_version, likert_max = 9)
 
 
 
-supp_analyze_factor_loadings_and_screeplot <- function(data, model_instrument_version)
+supp_analyze_factor_loadings <- function(data, model_instrument_version)
 {
   o_facets <- data %>% select(starts_with(("of")))
   c_facets <- data %>% select(starts_with(("cf")))
@@ -355,8 +355,27 @@ supp_analyze_factor_loadings_and_screeplot <- function(data, model_instrument_ve
   #save_as_docx(ft, path = paste(supplement_output_folder, "/loadings_", model_instrument_version, ".docx", sep=""))
   #write_xlsx(stats, path=paste(supplement_output_folder, kind, ".xlsx",sep=""))
   
+  return (ft)
+}
+
+
+supp_analyze_screeplot <- function(data, model_instrument_version)
+{
+  o_facets <- data %>% select(starts_with(("of")))
+  c_facets <- data %>% select(starts_with(("cf")))
+  e_facets <- data %>% select(starts_with(("ef")))
+  a_facets <- data %>% select(starts_with(("af")))
+  n_facets <- data %>% select(starts_with(("nf")))
+  factor_names <- c("O", "C", "E", "A", "N")
+  factor_facets_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
   
+  facets_list <- c(names(o_facets), names(c_facets), names(e_facets), 
+                   names(a_facets), names(n_facets))
+  data_facets <- data %>% 
+    select(all_of(facets_list))
   
+  # Faktorenanalyse
+  faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "pa", residuals=TRUE)
   
   # Generiere Scree Plot 
   scree_data <- data.frame(
@@ -373,10 +392,22 @@ supp_analyze_factor_loadings_and_screeplot <- function(data, model_instrument_ve
     ) +
     theme_minimal() +
     scale_x_continuous(breaks = 1:length(faModel$values))
-  ggsave(paste(supplement_output_folder, "/screeplot_" , model_instrument_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
+  ggsave(paste(supplement_output_folder, "/screeplot_" , model_instrument_version, ".jpg", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
   
-  return (ft)
+  return (screePlot)
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 supp_analyze_factor_correlations <- function(data, model_instrument_version) {
   # analyze factors
