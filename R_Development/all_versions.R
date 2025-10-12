@@ -22,20 +22,20 @@ fetch_raw_data <- function(table_name)
   return (data_raw)
 }
 
-analyze_all <- function(data, model_version)
+analyze_all <- function(data, measurement_version)
 {
-  analyze_alpha_omega(data, model_version)
-  analyze_factor_loadings(data, model_version)
-  analyze_item_statistics(data, model_version)
-  analyze_correlations(data, model_version)
+  analyze_alpha_omega(data, measurement_version)
+  analyze_factor_loadings(data, measurement_version)
+  analyze_item_statistics(data, measurement_version)
+  analyze_correlations(data, measurement_version)
 }
 
-create_all_graphics <- function(data, model_version)
+create_all_graphics <- function(data, measurement_version)
 {
-  create_correlation_matrices(data, model_version)
-  create_facet_densities(data, model_version)
-  create_factor_densities(data, model_version)
-  create_q_q_plot(data, model_version)
+  create_correlation_matrices(data, measurement_version)
+  create_facet_densities(data, measurement_version)
+  create_factor_densities(data, measurement_version)
+  create_q_q_plot(data, measurement_version)
 }
 
 
@@ -43,7 +43,7 @@ create_all_graphics <- function(data, model_version)
 
 
 ################################################# V1.0
-model_version <- "v1.0"
+measurement_version <- "v1.0"
 data <- tbl(con, "openai_analyzation") %>% 
   select(-temperature) %>% 
   collect() %>% 
@@ -65,88 +65,88 @@ data <- tbl(con, "openai_analyzation") %>%
     nf3b = nf3
   )
 data_aggregated <- aggregate_model(data)
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
 
-create_essay_item_statistics(data, model_version)
+create_essay_item_statistics(data, measurement_version)
 
-create_essay_item_statistics(data, model_version, 42)
+create_essay_item_statistics(data, measurement_version, 42)
 
-create_essay_histograms(data, model_version, 27)
-create_essay_histograms(data, model_version, 42)
-create_essay_histograms(data, model_version, 112)
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+create_essay_histograms(data, measurement_version, 27)
+create_essay_histograms(data, measurement_version, 42)
+create_essay_histograms(data, measurement_version, 112)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
 
 ################################################# V1.1
-model_version <- "v1.1"
+measurement_version <- "v1.1"
 data_aggregated <- data %>% 
   select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
   aggregate_model()
   
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V1.1b
-model_version <- "v1.1b"
+measurement_version <- "v1.1b"
 data_aggregated <- data %>% 
   select(-ef1b, -af2b, -nf3b) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
 ################################################# V1.2
-model_version <- "v1.2"
+measurement_version <- "v1.2"
 data_aggregated <- data %>% 
   select(-cf1b, -ef2b, -nf2b) %>% 
   aggregate_model()
   
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V1.2b
-model_version <- "v1.2b"
+measurement_version <- "v1.2b"
 data_aggregated <- data %>% 
   select(-af3b, -nf3b) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
 ################################################# V1.3b
-model_version <- "v1.3b"
+measurement_version <- "v1.3b"
 data_aggregated <- data %>% 
   select(-cf1b, -af3b, -nf3b) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V2.0
-model_version <- "v2.0"
+measurement_version <- "v2.0"
 
 # v2 in publication is v3 in data XXX
 data <- tbl(con, "openai_analyzation_v3") %>% 
@@ -157,66 +157,66 @@ data <- tbl(con, "openai_analyzation_v3") %>%
 
 data_aggregated <- aggregate_model(data)
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V2.1
-model_version <- "v2.1"
+measurement_version <- "v2.1"
 
 data_aggregated <- data %>% 
   select(-of3, -of4, -cf1, -ef1, -ef3, -af2, -nf2, -nf5) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V2.2
-model_version <- "v2.2"
+measurement_version <- "v2.2"
 
 data_aggregated <- data %>% 
   select(-of3, -of4, -cf1, -ef1, -ef3, -ef6, -af2, -nf2, -nf5) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 ################################################# V2.3
-model_version <- "v2.3"
+measurement_version <- "v2.3"
 
 data_aggregated <- data %>% 
   select(-of3, -of4, -of6, -cf1, -cf4, -ef2, -ef3, -ef6, -af2, -af5, -nf2, -nf5) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V2.3b
-model_version <- "v2.3b"
+measurement_version <- "v2.3b"
 
 data_aggregated <- data %>% 
   select(-of3, -of4, -cf1, -ef2, -ef3, -ef6, -af2, -nf2, -nf5) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
 ################################################# V3.0
-model_version <- "v3.0"
+measurement_version <- "v3.0"
 
 # DANGER !!! v2 in publication is v3 XXX
 data <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>%
@@ -226,16 +226,16 @@ data <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>%
 data_aggregated <- data %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
 
 ################################################# V4.0
-model_version <- "v4.000"
+measurement_version <- "v4.000"
 data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
   filter(essay_id <= 50) %>% 
   collect() %>% 
@@ -244,73 +244,73 @@ data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
 data_temp0 <- data %>% 
   filter(temperature == 0)
 
-create_essay_histograms(data_temp0, model_version, 27)
-create_essay_histograms(data_temp0, model_version, 42)
-create_essay_histograms(data_temp0, model_version, 112)
+create_essay_histograms(data_temp0, measurement_version, 27)
+create_essay_histograms(data_temp0, measurement_version, 42)
+create_essay_histograms(data_temp0, measurement_version, 112)
 
 data_aggregated <- data %>% 
   filter(temperature == 0) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
+analyze_alpha_omega(data_aggregated, measurement_version)
+analyze_factor_loadings(data_aggregated, measurement_version)
+analyze_item_statistics(data_aggregated, measurement_version)
 
-create_all_graphics(data_aggregated, model_version)
+create_all_graphics(data_aggregated, measurement_version)
 
-model_version <- "v4.002"
+measurement_version <- "v4.002"
 data_aggregated <- data %>% 
   filter(temperature == 0.2) %>% 
   aggregate_model()
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
-model_version <- "v4.004"
+measurement_version <- "v4.004"
 data_aggregated <- data %>% 
   filter(temperature == 0.4) %>% 
   aggregate_model()
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_alpha_omega(data_aggregated, model_version)
-analyze_factor_loadings(data_aggregated, model_version)
-analyze_item_statistics(data_aggregated, model_version)
+analyze_alpha_omega(data_aggregated, measurement_version)
+analyze_factor_loadings(data_aggregated, measurement_version)
+analyze_item_statistics(data_aggregated, measurement_version)
 
-create_all_graphics(data_aggregated, model_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
-model_version <- "v4.006"
+measurement_version <- "v4.006"
 data_aggregated <- data %>% 
   filter(temperature == 0.6) %>% 
   aggregate_model()
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
-model_version <- "v4.008"
+measurement_version <- "v4.008"
 data_aggregated <- data %>% 
   filter(temperature == 0.8) %>% 
   aggregate_model()
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
-model_version <- "v4.010"
+measurement_version <- "v4.010"
 data_aggregated <- data %>% 
   filter(temperature == 1.0) %>% 
   aggregate_model()
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 data$temp <- as.factor(data$temperature)
 ## Grouped by temperature
@@ -458,12 +458,12 @@ plots[[6]] <- get_legend(temp_plot)
 combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plots[[6]] + plot_layout(ncol = 3)
 combined_plot
 
-ggsave(paste(graphics_output_folder, "/density_with_temperature_", model_version, ".png"), plot = combined_plot, dpi=300, width = 8, height = 5)
+ggsave(paste(graphics_output_folder, "/density_with_temperature_", measurement_version, ".png"), plot = combined_plot, dpi=300, width = 8, height = 5)
 
 
 
 ################################################# V4.1
-model_version <- "v4.1"
+measurement_version <- "v4.1"
 data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
   collect() %>% 
   drop_na("of1")
@@ -471,18 +471,18 @@ data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
 data_temp0 <- data %>% 
   filter(temperature == 0)
 
-create_essay_histograms(data_temp0, model_version, 27)
-create_essay_histograms(data_temp0, model_version, 42)
-create_essay_histograms(data_temp0, model_version, 112)
+create_essay_histograms(data_temp0, measurement_version, 27)
+create_essay_histograms(data_temp0, measurement_version, 42)
+create_essay_histograms(data_temp0, measurement_version, 112)
 
 data_aggregated <- data %>% 
   filter(temperature == 0) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
@@ -497,7 +497,7 @@ create_all_graphics(data_aggregated, model_version)
 
 
 ################################################# V5.X
-model_version <- "v5.X"
+measurement_version <- "v5.X"
 o_facets <- c("of3b", "of1", "of2", "of5")
 c_facets <- c("cf2b", "cf3b", "cf3", "cf5")
 e_facets <- c("ef2", "ef3b", "ef4", "ef5")
@@ -552,13 +552,13 @@ data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id"
   ) %>% 
   rename(essay_id = essay_idb)
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 ################################################# V5.0
-model_version <- "v5.0"
+measurement_version <- "v5.0"
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(-updated_at) %>%
   filter(model=="gpt-5-mini-2025-08-07") %>% 
@@ -586,20 +586,20 @@ summ <- data %>%
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
 m51 <- db_read_model("v5.0")
 
-create_essay_histograms(data, model_version, 27)
-create_essay_histograms(data, model_version, 42)
-create_essay_histograms(data, model_version, 112)
+create_essay_histograms(data, measurement_version, 27)
+create_essay_histograms(data, measurement_version, 42)
+create_essay_histograms(data, measurement_version, 112)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V5.0n
-model_version <- "v5.0n"
+measurement_version <- "v5.0n"
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(-updated_at) %>%
   filter(model=="gpt-5-nano-2025-08-07") %>% 
@@ -609,19 +609,19 @@ data <- tbl(con, "openai_analyzation_v5") %>%
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-create_essay_histograms(data, model_version, 27)
-create_essay_histograms(data, model_version, 42)
-create_essay_histograms(data, model_version, 112)
+create_essay_histograms(data, measurement_version, 27)
+create_essay_histograms(data, measurement_version, 42)
+create_essay_histograms(data, measurement_version, 112)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
 ################################################# V5.1
-model_version <- "v5.1"
+measurement_version <- "v5.1"
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(-updated_at) %>%
   select(-af1) %>% 
@@ -632,18 +632,18 @@ data <- tbl(con, "openai_analyzation_v5") %>%
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-create_essay_histograms(data, model_version, 27)
-create_essay_histograms(data, model_version, 42)
-create_essay_histograms(data, model_version, 112)
+create_essay_histograms(data, measurement_version, 27)
+create_essay_histograms(data, measurement_version, 42)
+create_essay_histograms(data, measurement_version, 112)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 ################################################# V5.1n
-model_version <- "v5.1n"
+measurement_version <- "v5.1n"
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(-updated_at) %>%
   select(-af1) %>% 
@@ -654,14 +654,14 @@ data <- tbl(con, "openai_analyzation_v5") %>%
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-create_essay_histograms(data, model_version, 27)
-create_essay_histograms(data, model_version, 42)
-create_essay_histograms(data, model_version, 112)
+create_essay_histograms(data, measurement_version, 27)
+create_essay_histograms(data, measurement_version, 42)
+create_essay_histograms(data, measurement_version, 112)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
@@ -676,17 +676,17 @@ corpus <- analyzation %>%
 aggregate_model_hash()
 
 des <- psych::describe(corpus)
-model_version <- "woolf"
+measurement_version <- "woolf"
 data <- corpus
 
-analyze_alpha_omega(data, model_version)
-analyze_factor_loadings(data, model_version)
-analyze_item_statistics(data, model_version)
-analyze_correlations(data, model_version)
-create_correlation_matrices(data, model_version)
-create_facet_densities(data, model_version)
-create_factor_densities(data, model_version)
-create_q_q_plot(data, model_version)
+analyze_alpha_omega(data, measurement_version)
+analyze_factor_loadings(data, measurement_version)
+analyze_item_statistics(data, measurement_version)
+analyze_correlations(data, measurement_version)
+create_correlation_matrices(data, measurement_version)
+create_facet_densities(data, measurement_version)
+create_factor_densities(data, measurement_version)
+create_q_q_plot(data, measurement_version)
 # -> sehr hohe Korrelationen!
 
 woolf <- tbl(con, "woolf") %>% 
@@ -697,7 +697,7 @@ data <- left_join(woolf, corpus, by = c("hash" = "hash")) %>%
 
 mintokens <- seq(0,500, 50)
 for (mintoken in mintokens) {
-  model_name <- paste(model_version, "_min_",mintoken, sep="")
+  model_name <- paste(measurement_version, "_min_",mintoken, sep="")
   data_min <- data %>% 
     filter(as.integer(text_raw_numtokens) > as.integer(mintoken))
   
@@ -713,7 +713,7 @@ data_min <- data %>%
 
 
 ################################################# Noise
-model_version <- "noise"
+measurement_version <- "noise"
 noise <- tbl(con, "noise") %>% 
   select(hash) %>% 
   collect()
@@ -740,24 +740,24 @@ data <- data %>%
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
-create_essay_histograms(data, model_version, 27)
-create_essay_histograms(data, model_version, 42)
-create_essay_histograms(data, model_version, 112)
+create_essay_histograms(data, measurement_version, 27)
+create_essay_histograms(data, measurement_version, 42)
+create_essay_histograms(data, measurement_version, 112)
 
-analyze_all(data_aggregated, model_version)
-create_all_graphics(data_aggregated, model_version)
+analyze_all(data_aggregated, measurement_version)
+create_all_graphics(data_aggregated, measurement_version)
 
 
 
 ################################################# Wang
-model_version <- "wang"
+measurement_version <- "wang"
 data_aggregated <- tbl(con, "wang_analyzation") %>% 
   filter(classification_type == "truncated") %>% 
   filter(essay_id <= 250) %>% 
   collect()
 
-db_write_model(data_aggregated, model_version)
+db_write_model(data_aggregated, measurement_version)
 
 

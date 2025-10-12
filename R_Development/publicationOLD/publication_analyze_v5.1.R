@@ -1,5 +1,5 @@
 # Model version for printing
-model_version <- "v5.1"
+measurement_version <- "v5.1"
 
 source("sources/connect_database.R")
 source("sources/functions.R")
@@ -41,11 +41,11 @@ data_factors <- data_aggregated %>%
 
 source("sources/ocean_plot.R")
 
-sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
+sink(paste("outputs/omega_analyzation_", measurement_version, ".txt"))
 source("sources/omega.R")
 sink()
 
-sink(paste("outputs/output_analyzation_", model_version, ".txt"))
+sink(paste("outputs/output_analyzation_", measurement_version, ".txt"))
 
 source("sources/macros_v5.R")
 
@@ -85,17 +85,17 @@ for (facet in all_facets){
   i <- i + 1
 }
 combined_plot <- (plots[[1]] | plots[[2]] | plots[[3]] | plots[[4]])
-ggsave(paste("graphics/density_", model_version, "_facets_", binary,"_O.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets_", binary,"_O.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <-  (plots[[5]] | plots[[6]] | plots[[7]] | plots[[8]])
-ggsave(paste("graphics/density_", model_version, "_facets", binary,"_C.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets", binary,"_C.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <-  (plots[[9]] | plots[[10]] | plots[[11]] | plots[[12]])
-ggsave(paste("graphics/density_", model_version, "_facets", binary,"_E.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets", binary,"_E.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <- (plots[[13]] | plots[[14]] | plots[[15]] | plots[[16]])
-ggsave(paste("graphics/density_", model_version, "_facets", binary,"_A.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets", binary,"_A.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <- (plots[[17]] | plots[[18]] | plots[[19]])
-ggsave(paste("graphics/density_", model_version, "_facets", binary,"_N.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets", binary,"_N.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 

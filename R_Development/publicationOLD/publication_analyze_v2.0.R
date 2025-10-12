@@ -1,5 +1,5 @@
 # Model version for printing
-model_version <- "v2.0"
+measurement_version <- "v2.0"
 
 source("sources/connect_database.R")
 source("sources/functions.R")
@@ -22,11 +22,11 @@ all_names <- facet_names[all_facets]
 
 source("sources/aggregate_v2_NEO.R")
 
-sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
+sink(paste("outputs/omega_analyzation_", measurement_version, ".txt"))
 source("sources/omega.R")
 sink()
 
-sink(paste("outputs/output_analyzation_", model_version, ".txt"))
+sink(paste("outputs/output_analyzation_", measurement_version, ".txt"))
 
 source("sources/macros_v2.R")
 

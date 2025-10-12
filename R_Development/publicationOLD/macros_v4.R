@@ -7,7 +7,7 @@ for (temp in temperatures)
   {
   sink(paste("outputs/output_analyzation_", "_temp", temp, ".txt"))
   
-  print(paste("Analyzation ",model_version))
+  print(paste("Analyzation ",measurement_version))
   print("")
   print("Using facets:")
   print(all_facets)
@@ -23,7 +23,7 @@ for (temp in temperatures)
   print(cor_matrix_rounded)
   
   # Plot correlation Matrix
-  png(paste("graphics/corrplot_", model_version, "_temp", temp, ".png"), width = 2400, height = 2400, res = 150)
+  png(paste("graphics/corrplot_", measurement_version, "_temp", temp, ".png"), width = 2400, height = 2400, res = 150)
   corrplot(cor_matrix_rounded, method = "color", type = "upper", 
            addCoef.col = "black", tl.cex = 0.8)
   dev.off()
@@ -86,7 +86,7 @@ for (temp in temperatures)
     width(j = 1, width = 1.5) %>%
     width(j = 2, width = 1) %>%
     width(j = 3, width = 1.8)
-  save_as_docx(ft, path = paste("tables/measures_", model_version, "_temp", temp, ".docx"))
+  save_as_docx(ft, path = paste("tables/measures_", measurement_version, "_temp", temp, ".docx"))
   
   
   # Generiere Faktorladungen Tabelle für Word
@@ -128,7 +128,7 @@ for (temp in temperatures)
     align(align = "center", part = "header") %>%
     align(j = 2:6, align = "center", part = "body") %>%
     bold(part = "header", i = 1)
-  save_as_docx(ft, path = paste("tables/loadings_", model_version, "_temp", temp, ".docx"))
+  save_as_docx(ft, path = paste("tables/loadings_", measurement_version, "_temp", temp, ".docx"))
   
   
   # Generiere Scree Plot 
@@ -147,7 +147,7 @@ for (temp in temperatures)
     ) +
     theme_minimal() +
     scale_x_continuous(breaks = 1:length(faModel$values))
-  ggsave(paste("graphics/screeplot_" , model_version, "_temp", temp, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)
+  ggsave(paste("graphics/screeplot_" , measurement_version, "_temp", temp, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)
   # collect all scree data for combined display at the end
   all_scree_data <- rbind(all_scree_data, scree_data)
   
@@ -170,4 +170,4 @@ screePlot <- all_scree_data %>%
   theme_minimal() +
   scale_x_continuous(breaks = 1:length(faModel$values))
 screePlot
-ggsave(paste("graphics/screeplot_combined_" , model_version, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)
+ggsave(paste("graphics/screeplot_combined_" , measurement_version, ".png"), plot = screePlot, dpi=300, width = 8, height = 5)

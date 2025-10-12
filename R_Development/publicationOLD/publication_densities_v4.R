@@ -1,5 +1,5 @@
 # Model version for printing
-model_version <- "v4.0"
+measurement_version <- "v4.0"
 
 source("sources/connect_database.R")
 source("sources/functions.R")
@@ -33,7 +33,7 @@ temperatures = data_aggregated$temperature %>% unique()
 
 for (temp in temperatures)
 {
-  sink(paste("outputs/output_desc_",model_version, "_temp", temp, ".txt"))
+  sink(paste("outputs/output_desc_",measurement_version, "_temp", temp, ".txt"))
   
   data_temp <- data_aggregated %>% filter(temperature == temp)
   
@@ -43,11 +43,11 @@ i <- 1
 for (facets in facets_list){
   plots[[i]] <- data_temp %>%
     verteilung_sechsfach(facets) + plot_annotation(title=paste(facets))
-  ggsave(paste("graphics/density_factor_", i, "_", model_version, "_temp", temp, "_facets.png"), plot = plots[[i]], dpi=300, width = 8, height = 6)
+  ggsave(paste("graphics/density_factor_", i, "_", measurement_version, "_temp", temp, "_facets.png"), plot = plots[[i]], dpi=300, width = 8, height = 6)
   i <- i + 1
 }
 combined_plot <- (plots[[1]] / plots[[2]] / plots[[3]] / plots[[4]] / plots[[5]])
-ggsave(paste("graphics/density_", model_version, "_temp", temp, "_facets.png"), plot = combined_plot, dpi=300, width = 8, height = 16)
+ggsave(paste("graphics/density_", measurement_version, "_temp", temp, "_facets.png"), plot = combined_plot, dpi=300, width = 8, height = 16)
 
 
 # descriptive statistics of all facets
@@ -75,7 +75,7 @@ psych_table <- desc_df %>%
   theme_vanilla() %>%
   autofit() %>%
   align(j = 2:7, align = "center", part = "all")
-save_as_docx(psych_table, path = paste("tables/desc_", model_version, "_temp", temp, "_facets.docx"))
+save_as_docx(psych_table, path = paste("tables/desc_", measurement_version, "_temp", temp, "_facets.docx"))
 
 # analyze OCEAN factors of all essays
 plots <- list()
@@ -86,7 +86,7 @@ for (factor in all_factors){
   i <- i + 1
 }
 combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
-ggsave(paste("graphics/density_", model_version, "_temp", temp, "_factors.png"), plot = combined_plot, dpi=300, width = 8, height = 6)
+ggsave(paste("graphics/density_", measurement_version, "_temp", temp, "_factors.png"), plot = combined_plot, dpi=300, width = 8, height = 6)
 
 # descriptive statistics of all facets
 desc.stats <- data_temp %>% 
@@ -113,7 +113,7 @@ psych_table <- desc_df %>%
   theme_vanilla() %>%
   autofit() %>%
   align(j = 2:7, align = "center", part = "all")
-save_as_docx(psych_table, path = paste("tables/desc_", model_version, "_temp", temp, "_factors.docx"))  # !!! ks-werte ergänzen!
+save_as_docx(psych_table, path = paste("tables/desc_", measurement_version, "_temp", temp, "_factors.docx"))  # !!! ks-werte ergänzen!
 
 ks.tests <- list()
 i <- 1
@@ -129,7 +129,7 @@ print(ks.tests)
 sink()
 }
 
-sink(paste("outputs/output_ANOVA_temperatures_",model_version, ".txt"))
+sink(paste("outputs/output_ANOVA_temperatures_",measurement_version, ".txt"))
 # ANOVA der temperaturen
 print("ANOVA of aggregated data, factor = temperature")
 model_oneway <- aov(o_llm ~ temp.factor, data = data_aggregated)

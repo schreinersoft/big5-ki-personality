@@ -1,4 +1,4 @@
-model_version <- "v4.1"
+measurement_version <- "v4.1"
 
 source("sources/connect_database.R")
 source("sources/functions.R")
@@ -30,12 +30,12 @@ for (facets in facets_list){
   plots[[i]] <- data %>%
     filter(essay_id == essay_number, temperature == 0.0) %>% 
     histogramm_sechsfach(facets) + plot_annotation(title=paste(facets))
-  ggsave(paste("graphics/histograms_", i, "_", model_version, "essay_", essay_number, ".png"), plot = plots[[i]], dpi=300, width = 8, height = 6)
+  ggsave(paste("graphics/histograms_", i, "_", measurement_version, "essay_", essay_number, ".png"), plot = plots[[i]], dpi=300, width = 8, height = 6)
   i <- i + 1
 }
 combined_plot <- (plots[[1]] / plots[[2]] / plots[[3]] / plots[[4]] / plots[[5]])
 combined_plot
-ggsave(paste("graphics/histograms_", model_version, "essay_", essay_number, ".png"), plot = combined_plot, dpi=300, width = 8, height = 8)
+ggsave(paste("graphics/histograms_", measurement_version, "essay_", essay_number, ".png"), plot = combined_plot, dpi=300, width = 8, height = 8)
 
 # descriptive statistics on one Essay
 desc.stats <- data %>% 

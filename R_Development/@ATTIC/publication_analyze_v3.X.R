@@ -1,5 +1,5 @@
 # Model version for printing
-model_version <- "v3.X"
+measurement_version <- "v3.X"
 
 source("sources/connect_database.R")
 source("sources/functions.R")
@@ -46,7 +46,7 @@ facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 all_names <- facet_names[all_facets]
 
 
-sink(paste("outputs/output_analyzation_", model_version, ".txt"))
+sink(paste("outputs/output_analyzation_", measurement_version, ".txt"))
 
 source("sources/macros_v3.X_all_measurements.R")
 
@@ -62,7 +62,7 @@ model <- '
   Nfactor =~ nf1 + nf2 + nf3 + nf4 + nf5 + nf6
 '
 
-sink(paste("outputs/output_cfa_", model_version, ".txt"))
+sink(paste("outputs/output_cfa_", measurement_version, ".txt"))
 fit <- cfa(model, data = data_facets, 
            estimator = "ML")
 

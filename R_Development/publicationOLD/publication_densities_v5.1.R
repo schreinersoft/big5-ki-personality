@@ -15,19 +15,19 @@ for (facet in all_facets){
   i <- i + 1
 }
 combined_plot <- (plots[[1]] | plots[[2]] | plots[[3]] | plots[[4]])
-ggsave(paste("graphics/density_", model_version, "_facets_O.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets_O.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <-  (plots[[5]] | plots[[6]] | plots[[7]] | plots[[8]])
-ggsave(paste("graphics/density_", model_version, "_facets_C.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets_C.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <-  (plots[[9]] | plots[[10]] | plots[[11]] | plots[[12]])
-ggsave(paste("graphics/density_", model_version, "_facets_E.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets_E.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <- (plots[[13]] | plots[[14]] | plots[[15]] | plots[[16]])
-ggsave(paste("graphics/density_", model_version, "_facets_A.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets_A.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 combined_plot <- (plots[[17]] | plots[[18]] | plots[[19]])
-ggsave(paste("graphics/density_", model_version, "_facets_N.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
+ggsave(paste("graphics/density_", measurement_version, "_facets_N.png"), plot = combined_plot, dpi=300, width = 8, height = 4)
 
 
 # descriptive statistics of all facets
@@ -56,7 +56,7 @@ psych_table <- desc_df %>%
   autofit() %>%
   align(j = 2:7, align = "center", part = "all")
 psych_table
-save_as_docx(psych_table, path = paste("tables/desc_", model_version, "_facets.docx"))
+save_as_docx(psych_table, path = paste("tables/desc_", measurement_version, "_facets.docx"))
 
 # descriptive statistics of all factors
 desc.stats <- data_aggregated %>% 
@@ -84,11 +84,11 @@ psych_table <- desc_df %>%
   autofit() %>%
   align(j = 2:7, align = "center", part = "all")
 psych_table
-save_as_docx(psych_table, path = paste("tables/desc_", model_version, "_factors.docx"))
+save_as_docx(psych_table, path = paste("tables/desc_", measurement_version, "_factors.docx"))
 
 
 # KS Values
-sink( paste("outputs/desc_", model_version, ".txt"))
+sink( paste("outputs/desc_", measurement_version, ".txt"))
 ks.tests <- list()
 i <- 1
 # Kolmogorov-Smirnov-Tests

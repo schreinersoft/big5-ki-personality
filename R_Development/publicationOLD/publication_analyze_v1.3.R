@@ -1,5 +1,5 @@
 # Model version for printing
-model_version <- "v1.3"
+measurement_version <- "v1.3"
 
 source("sources/connect_database.R")
 source("sources/functions.R")
@@ -26,11 +26,11 @@ facet_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
 
 source("sources/aggregate_v1_BFI.R")
 
-sink(paste("outputs/omega_analyzation_", model_version, ".txt"))
+sink(paste("outputs/omega_analyzation_", measurement_version, ".txt"))
 source("sources/omega.R")
 sink()
 
-sink(paste("outputs/output_analyzation_", model_version, ".txt"))
+sink(paste("outputs/output_analyzation_", measurement_version, ".txt"))
 
 source("sources/macros_v1.R")
 

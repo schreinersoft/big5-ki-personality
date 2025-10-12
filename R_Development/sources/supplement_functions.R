@@ -147,8 +147,8 @@ supp_analyze_factors <- function(data, model_instrument_version, likert_max = 9)
       sd = "SD", 
       median = "Median",
       range = "Spannweite",
-      ks = "K/S",
-      sw = "S/W",
+      ks = "K-S",
+      sw = "S-W",
       alpha = "\u03B1",
       omega = "\u03C9"
     ) %>%
@@ -245,8 +245,8 @@ supp_analyze_facets <- function(data, model_instrument_version, likert_max = 9)
       max = "Max",
       r.cor = "TS",
       difficulty = "IS",
-      ks = "K/S",
-      sw = "S/W"
+      ks = "K-S",
+      sw = "S-W"
     ) %>%
     theme_alafoli() %>% 
     italic(part = "header", j = c(3,4)) %>% 
@@ -261,7 +261,7 @@ supp_analyze_facets <- function(data, model_instrument_version, likert_max = 9)
 
 
 
-analyze_factor_loadings <- function(data, model_instrument_version)
+supp_analyze_factor_loadings_and_screeplot <- function(data, model_instrument_version)
 {
   o_facets <- data %>% select(starts_with(("of")))
   c_facets <- data %>% select(starts_with(("cf")))
@@ -279,7 +279,7 @@ analyze_factor_loadings <- function(data, model_instrument_version)
   # Faktorenanalyse
   faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "pa", residuals=TRUE)
 
-  sink(paste(stats_output_folder, "/factor_analysis_", model_instrument_version, ".txt", sep=""))
+  sink(paste(supplement_output_folder, "/factor_analysis_", model_instrument_version, ".txt", sep=""))
   print(faModel)
   
   print("Residuals:")
@@ -352,8 +352,12 @@ analyze_factor_loadings <- function(data, model_instrument_version)
     align(j = 2, align="left") %>% 
     align(j = 7, align="center") %>% 
     italic(i = 1)
-  save_as_docx(ft, path = paste(tables_output_folder, "/loadings_", model_instrument_version, ".docx", sep=""))
-
+  #save_as_docx(ft, path = paste(supplement_output_folder, "/loadings_", model_instrument_version, ".docx", sep=""))
+  #write_xlsx(stats, path=paste(supplement_output_folder, kind, ".xlsx",sep=""))
+  
+  
+  
+  
   # Generiere Scree Plot 
   scree_data <- data.frame(
     Component = 1:length(faModel$values),
@@ -369,22 +373,32 @@ analyze_factor_loadings <- function(data, model_instrument_version)
     ) +
     theme_minimal() +
     scale_x_continuous(breaks = 1:length(faModel$values))
-  ggsave(paste(graphics_output_folder, "/screeplot_" , model_instrument_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
+  ggsave(paste(supplement_output_folder, "/screeplot_" , model_instrument_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
+  
+  return (ft)
 }
 
-analyze_correlations <- function(data, model_instrument_version) {
+supp_analyze_factor_correlations <- function(data, model_instrument_version) {
   # analyze factors
   factor_matrix <- data %>% 
     select(ends_with("_llm")) %>% 
     setNames(c("O", "C", "E", "A", "N"))
   matrix <- create_corr_matrix(factor_matrix)
+  
+  sink(paste(supplement_output_folder, "/factor_correlations_", model_instrument_version, ".txt", sep=""))
+  print(matrix)
+  sink()
+  
   ft <- matrix %>% 
     flextable() %>% 
-    theme_vanilla() %>%
+    theme_alafoli() %>%
     align(align="right", part="all") %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_factors_", model_instrument_version, ".docx", sep=""))
+  
+  return (ft)
+}
 
+supp_analyze_facet_correlations <- function(data, model_instrument_version) {
   facet_matrix <- data %>% 
     select(starts_with(("of")), 
            starts_with(("cf")), 
@@ -392,16 +406,20 @@ analyze_correlations <- function(data, model_instrument_version) {
            starts_with(("af")),
            starts_with(("nf")))
   matrix <- create_corr_matrix(facet_matrix)
+  
+  sink(paste(supplement_output_folder, "/facet_correlations_", model_instrument_version, ".txt", sep=""))
+  print(matrix)
+  sink()
+  
   ft <- matrix %>% 
     flextable() %>% 
-    theme_vanilla() %>% 
+    theme_alafoli() %>% 
     align(align="right", part="all") %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_facets_", model_instrument_version, ".docx", sep=""))
-  write_xlsx(as.data.frame(matrix), path=paste(tables_output_folder, "/measure_anova_orwell_receivers.xlsx",sep=""))
-  
-  
+    
+  return (ft)  
 }
+
 
 
 create_corr_matrix <- function(corrdata) {
@@ -427,38 +445,4 @@ create_corr_matrix <- function(corrdata) {
     rename(" " = Variable)
   
   return (result_df)
-}
-
-
-
-
-
-
-
-# UNUSED !!! XXX
-create_factor_corr_values <- function(data){
-  all_factors <- data %>% select(
-    starts_with("o_"),
-    starts_with("c_"),
-    starts_with("e_"),
-    starts_with("a_"),
-    starts_with("n_")) %>% names()
-  
-  all_bins <- data %>% 
-    select(starts_with("bin_")) %>%
-    names()
-  
-  result <- numeric(0)  # Changed from list() to numeric vector
-  
-  for(i in 1:5) {
-    corresult <- rcorr(data[[all_factors[i]]], data[[all_bins[i]]])
-    
-    result <- c(result, corresult$r[2, 1])  # Changed indexing
-  }
-  
-  meanc <- mean(result)
-  result <- c(result, meanc)
-  names(result) <- c("O", "C", "E", "A", "N", "M")
-  
-  return(result)
 }

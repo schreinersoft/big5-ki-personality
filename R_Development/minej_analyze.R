@@ -105,7 +105,7 @@ for (factor in all_factors){
 }
 combined_plot <- plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]] + plots[[5]] + plot_layout(ncol = 3)
 combined_plot
-ggsave(paste("graphics/density_", model_version, "_temp", temp, "_factors.png"), plot = combined_plot, dpi=300, width = 8, height = 6)
+ggsave(paste("graphics/density_", measurement_version, "_temp", temp, "_factors.png"), plot = combined_plot, dpi=300, width = 8, height = 6)
 
 
 # descriptive statistics of all facets

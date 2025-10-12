@@ -30,9 +30,9 @@ con <- dbConnect(
 #  password = Sys.getenv("DB_PASSWORD")
 #)
 
-db_write_model <- function(data, model_version)
+db_write_model <- function(data, measurement_version)
 {
-  model_version <- gsub("\\.", "", model_version)
+  measurement_version <- gsub("\\.", "", measurement_version)
   data_for_table <- data %>%
     select(
     essay_id,
@@ -42,20 +42,20 @@ db_write_model <- function(data, model_version)
     starts_with("a_"),
     starts_with("n_")) %>% 
     rename_with(~ c("essay_id",
-                    paste("o_", model_version, sep=""),
-                    paste("c_", model_version, sep=""),
-                    paste("e_", model_version, sep=""),
-                    paste("a_", model_version, sep=""),
-                    paste("n_", model_version, sep="")
+                    paste("o_", measurement_version, sep=""),
+                    paste("c_", measurement_version, sep=""),
+                    paste("e_", measurement_version, sep=""),
+                    paste("a_", measurement_version, sep=""),
+                    paste("n_", measurement_version, sep="")
     ))
-  table_name <- paste("model_", model_version, sep="")
+  table_name <- paste("model_", measurement_version, sep="")
   dbWriteTable(con, table_name, data_for_table, overwrite = TRUE, row.names = FALSE)
 }
 
-db_read_model <- function(model_version)
+db_read_model <- function(measurement_version)
 {
-  model_version <- gsub("\\.", "", model_version)
-  table_name <- paste("model_", model_version, sep="")
+  measurement_version <- gsub("\\.", "", measurement_version)
+  table_name <- paste("model_", measurement_version, sep="")
   data <- tbl(con, table_name) %>%
     collect()
   return (data)

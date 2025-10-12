@@ -8,7 +8,7 @@ library(Hmisc)
 ## tables_output_folder
 
 
-create_essay_item_statistics <- function(data, model_version, essay_number=NULL) {
+create_essay_item_statistics <- function(data, measurement_version, essay_number=NULL) {
 
   if (is.null(essay_number)) {
     facets <- data %>% 
@@ -38,11 +38,11 @@ create_essay_item_statistics <- function(data, model_version, essay_number=NULL)
     flextable() %>% 
     theme_vanilla() %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/item_raw_statistics_", model_version, "_essay_", essay_number, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/item_raw_statistics_", measurement_version, "_essay_", essay_number, ".docx", sep=""))
 }
 
 
-analyze_alpha_omega <- function(data, model_version)
+analyze_alpha_omega <- function(data, measurement_version)
 {
   data_o <- data %>% 
     select(starts_with(("of")))
@@ -102,10 +102,10 @@ analyze_alpha_omega <- function(data, model_version)
     flextable() %>% 
     theme_vanilla() %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/alpha_omega_", model_version, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/alpha_omega_", measurement_version, ".docx", sep=""))
   
   #print detailed outputs
-  sink(paste(stats_output_folder, "/alpha_omega_analyzation_", model_version, ".txt", sep=""))
+  sink(paste(stats_output_folder, "/alpha_omega_analyzation_", measurement_version, ".txt", sep=""))
   print(omega_results)
   
   print("##### O Factor Analysis")
@@ -140,7 +140,7 @@ return(omega_results)
 
 ########################
 # descriptive statistics of all facets
-analyze_item_statistics <- function(data, model_version)
+analyze_item_statistics <- function(data, measurement_version)
 {
   all_factors <- data %>% select(
     starts_with("o_"),
@@ -156,7 +156,7 @@ analyze_item_statistics <- function(data, model_version)
   factor_facets_list <- list(o_facets, c_facets, e_facets, a_facets, n_facets)
   all_facets <- c(o_facets, c_facets, e_facets, a_facets, n_facets)
   
-  sink(paste(stats_output_folder, "/item_statistics_", model_version, ".txt", sep=""))
+  sink(paste(stats_output_folder, "/item_statistics_", measurement_version, ".txt", sep=""))
   desc.stats <- data %>% 
     select(all_of(all_facets), all_of(all_factors)) %>% 
     psych::describe()
@@ -233,11 +233,11 @@ analyze_item_statistics <- function(data, model_version)
     autofit() %>%
     align(j = 3:12, align = "center", part = "all")
   
-  save_as_docx(psych_table, path = paste(tables_output_folder, "/stats_", model_version, ".docx", sep=""))
+  save_as_docx(psych_table, path = paste(tables_output_folder, "/stats_", measurement_version, ".docx", sep=""))
   return (desc_df)
 }
 
-analyze_factor_loadings <- function(data, model_version)
+analyze_factor_loadings <- function(data, measurement_version)
 {
   o_facets <- data %>% select(starts_with(("of")))
   c_facets <- data %>% select(starts_with(("cf")))
@@ -255,7 +255,7 @@ analyze_factor_loadings <- function(data, model_version)
   # Faktorenanalyse
   faModel <- fa(data_facets, nfactors = 5, rotate = "varimax", fm = "pa", residuals=TRUE)
 
-  sink(paste(stats_output_folder, "/factor_analysis_", model_version, ".txt", sep=""))
+  sink(paste(stats_output_folder, "/factor_analysis_", measurement_version, ".txt", sep=""))
   print(faModel)
   
   print("Residuals:")
@@ -302,7 +302,7 @@ analyze_factor_loadings <- function(data, model_version)
   ft <- flextable(loadings_df)
   ft <- ft %>%
     set_header_labels(
-      Item = model_version,
+      Item = measurement_version,
       PA1 = "FA 1",
       PA2 = "FA 2", 
       PA3 = "FA 3",
@@ -328,7 +328,7 @@ analyze_factor_loadings <- function(data, model_version)
     align(j = 2, align="left") %>% 
     align(j = 7, align="center") %>% 
     italic(i = 1)
-  save_as_docx(ft, path = paste(tables_output_folder, "/loadings_", model_version, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/loadings_", measurement_version, ".docx", sep=""))
 
   # Generiere Scree Plot 
   scree_data <- data.frame(
@@ -345,10 +345,10 @@ analyze_factor_loadings <- function(data, model_version)
     ) +
     theme_minimal() +
     scale_x_continuous(breaks = 1:length(faModel$values))
-  ggsave(paste(graphics_output_folder, "/screeplot_" , model_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
+  ggsave(paste(graphics_output_folder, "/screeplot_" , measurement_version, ".png", sep=""), plot = screePlot, dpi=300, width = 8, height = 5)
 }
 
-analyze_correlations <- function(data, model_version) {
+analyze_correlations <- function(data, measurement_version) {
   # analyze factors
   factor_matrix <- data %>% 
     select(ends_with("_llm")) %>% 
@@ -359,7 +359,7 @@ analyze_correlations <- function(data, model_version) {
     theme_vanilla() %>%
     align(align="right", part="all") %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_factors_", model_version, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_factors_", measurement_version, ".docx", sep=""))
 
   facet_matrix <- data %>% 
     select(starts_with(("of")), 
@@ -373,7 +373,7 @@ analyze_correlations <- function(data, model_version) {
     theme_vanilla() %>% 
     align(align="right", part="all") %>% 
     autofit()
-  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_facets_", model_version, ".docx", sep=""))
+  save_as_docx(ft, path = paste(tables_output_folder, "/corrs_facets_", measurement_version, ".docx", sep=""))
   
   
 }

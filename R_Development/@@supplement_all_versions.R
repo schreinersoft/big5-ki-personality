@@ -7,6 +7,7 @@ source("sources/connect_database.R")
 source("sources/graphics_functions.R")
 source("sources/tables_functions.R")
 source("sources/transformation_functions.R")
+source("sources/supplement_functions.R")
 source("sources/output_folders.R")
 
 source("sources/combined_names_EN_DE.R")
@@ -42,6 +43,15 @@ doc <- body_remove(doc)
 # Save the document XXX
 print(doc, target = paste(root_folder, "/Supplements.docx", sep=""))
 
+main_versions = c("v1.0",
+                  "v2.0",
+                  "v3.0",
+                  "v4.1",
+                  "v5.0")
+sub_versions = c("v1.1",
+                 "v2.1","v2.2",
+                 "v4.1")
+
 
 
 ################################################# V1.0
@@ -74,6 +84,9 @@ data_aggregated <- aggregate_model(data)
 ft_essay_42 <- supp_analyse_essay_item(data, measurement_version, 42)
 ft_factors <- supp_analyze_factors(data_aggregated, measurement_version)
 ft_facets <- supp_analyze_facets(data_aggregated, measurement_version)
+ft_loadings <- supp_analyze_factor_loadings_and_screeplot(data_aggregated, measurement_version)
+ft_factor_correlations <- supp_analyze_factor_correlations(data_aggregated, measurement_version)
+ft_facet_correlations <- supp_analyze_facet_correlations(data_aggregated, measurement_version)
 
 
 # Add main supplement heading with "Anhang" style
@@ -86,30 +99,19 @@ doc <- body_add_par(doc, "Faktorstatistiken", style = "Zwischenüberschrift")
 doc <- body_add_flextable(doc, supp_format(ft_facets))
 
 doc <- body_add_par(doc, "Facettenstatistiken", style = "Zwischenüberschrift")
-doc <- body_add_par(doc, "K/S : Kolmogorov-Smirnov-Test, S/W : Shapiro-Wilk-Test", style="annotation text")
+doc <- body_add_par(doc, "K-S : Kolmogorov-Smirnov-Test, S-W : Shapiro-Wilk-Test", style="annotation text")
 doc <- body_add_flextable(doc, supp_format(ft_facets))
 
+doc <- body_add_par(doc, "Faktorkorrelationen", style = "Zwischenüberschrift")
+doc <- body_add_flextable(doc, supp_format(ft_factor_correlations))
 
+doc <- body_add_par(doc, "Facettenkorrelationen", style = "Zwischenüberschrift")
+doc <- body_add_flextable(doc, supp_format(ft_facet_correlations))
 
 # Add first graphic with heading
-doc <- body_add_par(doc, "Figure 1: Description", style = "Zwischenberschrift")
-doc <- body_add_img(doc, src = "path/to/graphic1.png", width = 6, height = 4)
+doc <- body_add_par(doc, "Scree Plot", style = "Zwischenüberschrift")
+doc <- body_add_img(doc, src = paste(supplement_output_folder, "/screeplot_", measurement_version, ".png", sep=""), width = 8, height = 5)
 
-# Add third table with heading
-doc <- body_add_par(doc, "Table 3: Description", style = "Zwischenberschrift")
-doc <- body_add_flextable(doc, ft3)
-
-# Add second graphic with heading
-doc <- body_add_par(doc, "Figure 2: Description", style = "Zwischenberschrift")
-doc <- body_add_img(doc, src = "path/to/graphic2.png", width = 6, height = 4)
-
-# Add fourth table with heading
-doc <- body_add_par(doc, "Table 4: Description", style = "Zwischenberschrift")
-doc <- body_add_flextable(doc, ft4)
-
-# Add third graphic with heading
-doc <- body_add_par(doc, "Figure 3: Description", style = "Zwischenberschrift")
-doc <- body_add_img(doc, src = "path/to/graphic3.png", width = 6, height = 4)
 
 
 
