@@ -10,6 +10,7 @@ source("sources/output_folders.R")
 
 #source("sources/combined_names_EN.R")
 source("sources/combined_names_EN_DE.R")
+source("sources/factor_colors.R")
 
 
 
@@ -22,20 +23,20 @@ fetch_raw_data <- function(table_name)
   return (data_raw)
 }
 
-analyze_all <- function(data, measurement_version)
+analyze_all <- function(data_aggregated, measurement_version)
 {
-  analyze_alpha_omega(data, measurement_version)
-  analyze_factor_loadings(data, measurement_version)
-  analyze_item_statistics(data, measurement_version)
-  analyze_correlations(data, measurement_version)
+  analyze_alpha_omega(data_aggregated, measurement_version)
+  analyze_factor_loadings(data_aggregated, measurement_version)
+  analyze_item_statistics(data_aggregated, measurement_version)
+  analyze_correlations(data_aggregated, measurement_version)
 }
 
-create_all_graphics <- function(data, measurement_version)
+create_all_graphics <- function(data_aggregated, measurement_version)
 {
-  create_correlation_matrices(data, measurement_version)
-  create_facet_densities(data, measurement_version)
-  create_factor_densities(data, measurement_version)
-  create_q_q_plot(data, measurement_version)
+  create_correlation_matrices(data_aggregated, measurement_version)
+  create_facet_densities(data_aggregated, measurement_version)
+  create_factor_densities(data_aggregated, measurement_version)
+  create_q_q_plot(data_aggregated, measurement_version)
 }
 
 

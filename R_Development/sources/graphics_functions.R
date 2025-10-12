@@ -13,7 +13,7 @@ library(flextable)
 ## tables_output_folder
 ## raw_output_folder
 
-  
+
 
 
 
@@ -46,7 +46,7 @@ create_essay_histograms <- function(data, measurement_version, essay_number)
         geom_histogram(breaks = seq(0.5, 9.5, by = 1),
                        bins = 9, 
                        boundary = 0.5,  # Ensures bins are centered on integers
-                       color = "black", fill = "lightblue") +
+                       color = "black", fill = factor_colors[factor_name]) +
         labs(title = variable_names[facet],
              #x = "Wert",
              y = "") +
@@ -98,7 +98,7 @@ create_facet_densities <- function(data, measurement_version)
         ggplot(aes(x = .data[[facet]])) +
         xlim(1, 9) +
         geom_density(color = "black",
-                     fill = "lightblue") +
+                     fill = factor_colors[factor_name]) +
         labs(title = variable_names[facet],
              y = "") +
         stat_function(
@@ -147,7 +147,7 @@ create_factor_densities <- function(data, measurement_version)
       ggplot(aes(x = .data[[factor]])) +
       xlim(1, 9) +
       geom_density(color = "black",
-                   fill = "orange") +   # XXX factor colors?
+                   fill = factor_colors[factor]) +   # XXX factor colors?
       labs(title = variable_names[[factor]] %||% factor,
            x = "Skalenwert",
            y = "Dichte") +
