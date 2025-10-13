@@ -2,19 +2,17 @@ library(officer)
 ### Collector for all models, data and analyzations
 
 #root folder for graphics
-root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
+root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 source("sources/output_folders.R")
 
 # root folder for supplement
 root_folder <- "supplement"
-
 
 source("sources/connect_database.R")
 source("sources/graphics_functions.R")
 source("sources/tables_functions.R")
 source("sources/transformation_functions.R")
 source("sources/supplement_functions.R")
-source("sources/output_folders.R")
 
 source("sources/combined_names_EN_DE.R")
 
@@ -32,7 +30,7 @@ supp_format <- function(ft){
   return (result)
 }
 
-publish_essays_histograms <- function() {
+publish_essays_histograms <- function(doc, data) {
   supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
   create_dir(supplement_output_folder)
 
@@ -41,19 +39,22 @@ publish_essays_histograms <- function() {
   doc <- body_add_flextable(doc, supp_format(ft_essay_42))
   
   doc <- body_add_par(doc, "Histogramme Essay 42", style = "Zwischenüberschrift")
-  filename <- paste(supplement_output_folder,"/histograms_essay_42.jpg",sep="")
   gg_essay_42 <- create_essay_histograms(data, measurement_version, 42)
-  width <- 130
-  height <- 170
+  width <- 180
+  #height <- 200
+  height <- 400
+  filename <- paste(supplement_output_folder,"/histograms_essay_42.jpg",sep="")
   ggsave(filename=filename, plot=gg_essay_42, dpi=300, width=width, height=height, units = "mm")
+  Sys.sleep(3)
   doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
   
+  return (doc)
 }
 
-publish_all <- function() {
+publish_all <- function(doc, data_aggregated) {
   supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
   create_dir(supplement_output_folder)
-  
+
   ft_factors <- supp_analyze_factors(data_aggregated, measurement_version)
   ft_facets <- supp_analyze_facets(data_aggregated, measurement_version)
   ft_loadings <- supp_analyze_factor_loadings(data_aggregated, measurement_version)
@@ -64,35 +65,54 @@ publish_all <- function() {
   gg_facets <- create_facet_densities(data_aggregated, measurement_version)
   
 
-  doc <- body_add_par(doc, "Faktorstatistiken und Verteilungen", style = "Zwischenüberschrift")
-  doc <- body_add_flextable(doc, supp_format(ft_facets))
-  width <- 180
-  height <- 120
-  filename <- paste(supplement_output_folder,"/factor_densities.jpg",sep="")
+  doc <- body_add_par(doc, "Faktorstatistiken", style = "Zwischenüberschrift")
+  doc <- body_add_par(doc, "K-S : Kolmogorov-Smirnov-Test, S-W : Shapiro-Wilk-Test", style="TabelleKlein")
+  doc <- body_add_flextable(doc, supp_format(ft_factors))
+  
+  doc <- body_add_par(doc, "Faktorverteilungen", style = "Zwischenüberschrift")
+  width <- 150
+  height <- 80
+  filename < paste(supplement_output_folder,"/factor_densities.jpg",sep="")
   ggsave(filename=filename, plot=gg_factors, dpi=300, width=width, height=height, units = "mm")
+  Sys.sleep(3)
   doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
   
   
-  doc <- body_add_par(doc, "Facettenstatistiken und Verteilungen", style = "Zwischenüberschrift")
-  doc <- body_add_par(doc, "K-S : Kolmogorov-Smirnov-Test, S-W : Shapiro-Wilk-Test", style="annotation text")
+  doc <- body_add_par(doc, "Facettenstatistiken", style = "Zwischenüberschrift")
+  doc <- body_add_par(doc, "K-S : Kolmogorov-Smirnov-Test, S-W : Shapiro-Wilk-Test", style="TabelleKlein")
   doc <- body_add_flextable(doc, supp_format(ft_facets))
+
+  doc <- body_add_par(doc, "Facettenverteilungen", style = "Zwischenüberschrift")
   width <- 180
-  height <- 240
+  #height <- 200
+  height <- 400
   filename <- paste(supplement_output_folder,"/facet_densities.jpg",sep="")
   ggsave(filename=filename, plot=gg_facets, dpi=300, width=width, height=height, units = "mm")
+  Sys.sleep(3)
   doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
   
   doc <- body_add_par(doc, "Faktorkorrelationen", style = "Zwischenüberschrift")
+  doc <- body_add_par(doc, "Dreieck rechts oben : r-Werte, Dreieck links unten: p-Werte", style="TabelleKlein")
   doc <- body_add_flextable(doc, supp_format(ft_factor_correlations))
   
   doc <- body_add_par(doc, "Facettenkorrelationen", style = "Zwischenüberschrift")
+  doc <- body_add_par(doc, "Dreieck rechts oben : r-Werte, Dreieck links unten: p-Werte", style="TabelleKlein")
   doc <- body_add_flextable(doc, supp_format(ft_facet_correlations))
   
   
   doc <- body_add_par(doc, "Faktorladungen und Kommunalitäten", style = "Zwischenüberschrift")
   doc <- body_add_flextable(doc, supp_format(ft_loadings))
+
+  
   doc <- body_add_par(doc, "Scree Plot", style = "Zwischenüberschrift")
-  doc <- body_add_img(doc, src = paste(supplement_output_folder, "/screeplot_", measurement_version, ".png", sep=""), width = 8, height = 5)
+  width <- 120
+  height <- 70
+  filename <- paste(supplement_output_folder,"/screeplot.jpg",sep="")
+  ggsave(filename=filename, plot=gg_screeplot, dpi=300, width=width, height=height, units = "mm")
+  Sys.sleep(3)
+  doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
+  
+  return (doc)
 }
 
 
@@ -118,6 +138,7 @@ doc <- body_remove(doc)
 
 ################################################# V1.0
 measurement_version <- "v1.0"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 
 data <- tbl(con, "openai_analyzation") %>% 
   select(-temperature) %>% 
@@ -142,41 +163,45 @@ data <- tbl(con, "openai_analyzation") %>%
 data_aggregated <- aggregate_model(data)
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_essays_histograms()
-publish_all()
+doc <- publish_essays_histograms(doc, data)
+doc <- publish_all(doc, data_aggregated)
 
 
 ################################################# V1.1
 measurement_version <- "v1.1"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 data_aggregated <- data %>% 
   select(-ef1b, -af2b, -nf3b) %>% 
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 
 ################################################# V1.2
 measurement_version <- "v1.2"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 data_aggregated <- data %>% 
   select(-af3b, -nf3b) %>% 
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 
 ################################################ V1.3
 measurement_version <- "v1.3"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 data_aggregated <- data %>% 
   select(-cf1b, -af3b, -nf3b) %>% 
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 ################################################# V2.0
 measurement_version <- "v2.0"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 
 # v2 in publication is v3 in data XXX
 data <- tbl(con, "openai_analyzation_v3") %>% 
@@ -185,13 +210,17 @@ data <- tbl(con, "openai_analyzation_v3") %>%
   collect() %>% 
   drop_na("of1")
 
+data_aggregated <- data %>% 
+  aggregate_model()
+
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_essays_histograms()
-publish_all()
+doc <- publish_all(doc, data_aggregated)
+doc <- publish_essays_histograms(doc, data)
 
 
 ################################################# V2.1
 measurement_version <- "v2.1"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 
 data_aggregated <- data %>% 
   select(-of3, -of4,
@@ -202,10 +231,11 @@ data_aggregated <- data %>%
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 ################################################# V2.2
 measurement_version <- "v2.2"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 
 data_aggregated <- data %>% 
   select(-of3, -of4,
@@ -216,11 +246,12 @@ data_aggregated <- data %>%
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 
 ################################################# V2.3
 measurement_version <- "v2.3"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 
 data_aggregated <- data %>% 
   select(-of3, -of4,
@@ -231,11 +262,12 @@ data_aggregated <- data %>%
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 
 ################################################# V3.0
 measurement_version <- "v3.0"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 
 # DANGER !!! v2 in publication is v3 XXX
 data <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>%
@@ -246,12 +278,14 @@ data_aggregated <- data %>%
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_essays_histograms()
-publish_all()
+doc <- publish_all(doc, data_aggregated)
+doc <- publish_essays_histograms(doc, data)
 
 
 ################################################# V4.1
 measurement_version <- "v4.1"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
+
 data <- tbl(con, "google_analyzation") %>% select(-updated_at) %>%
   collect() %>% 
   drop_na("of1")
@@ -261,12 +295,13 @@ data_aggregated <- data %>%
   aggregate_model()
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_essays_histograms()
-publish_all()
-
+doc <- publish_all(doc, data_aggregated)
+doc <- publish_essays_histograms(doc, data)
 
 ################################################# V5.X
 measurement_version <- "v5.X"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
+
 o_facets <- c("of3b", "of1", "of2", "of5")
 c_facets <- c("cf2b", "cf3b", "cf3", "cf5")
 e_facets <- c("ef2", "ef3b", "ef4", "ef5")
@@ -325,6 +360,8 @@ data_aggregated <- left_join(data_bfi, data_neo, by = c("essay_idb" = "essay_id"
 
 ################################################# V5.0
 measurement_version <- "v5.0"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
+
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(-updated_at) %>%
   filter(model=="gpt-5-mini-2025-08-07") %>% 
@@ -335,12 +372,14 @@ data_aggregated <- aggregate_model(data) %>%
   select(where(~ all(!is.na(.))))
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_essays_histograms()
-publish_all()
+doc <- publish_all(doc, data_aggregated)
+doc <- publish_essays_histograms(doc, data)
 
 
 ################################################# V5.1
 measurement_version <- "v5.1"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
+
 data <- tbl(con, "openai_analyzation_v5") %>% 
   select(-updated_at) %>%
   select(-af1) %>% 
@@ -352,11 +391,13 @@ data_aggregated <- aggregate_model(data) %>%
   select(where(~ all(!is.na(.))))
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 
 ################################################# Noise
 measurement_version <- "noise"
+supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
+
 noise <- tbl(con, "noise") %>% 
   select(hash) %>% 
   collect()
@@ -365,7 +406,7 @@ data_aggregated <- aggregate_model(data) %>%
   select(where(~ all(!is.na(.))))
 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-publish_all()
+doc <- publish_all(doc, data_aggregated)
 
 
 
