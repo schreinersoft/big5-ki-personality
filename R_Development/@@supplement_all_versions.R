@@ -27,48 +27,49 @@ create_dir <- function(new_dir) {
 
 supp_format <- function(ft){
   result <- ft%>% 
-    fontsize(size = 10, part = "all") %>%
+    fontsize(size = 9, part = "all") %>%
     color(color = "black", part="all")
   return (result)
 }
 
+publish_essays_histograms <- function() {
+  supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
+  create_dir(supplement_output_folder)
 
-publish_all <- function(data, data_aggreated, measurement_version){
+  doc <- body_add_par(doc, "Statistiken Essay 42", style = "Zwischenüberschrift")
+  ft_essay_42 <- supp_analyse_essay_item(data, measurement_version, 42)
+  doc <- body_add_flextable(doc, supp_format(ft_essay_42))
+  
+  doc <- body_add_par(doc, "Histogramme Essay 42", style = "Zwischenüberschrift")
+  filename <- paste(supplement_output_folder,"/histograms_essay_42.jpg",sep="")
+  gg_essay_42 <- create_essay_histograms(data, measurement_version, 42)
+  width <- 130
+  height <- 170
+  ggsave(filename=filename, plot=gg_essay_42, dpi=300, width=width, height=height, units = "mm")
+  doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
+  
+}
+
+publish_all <- function() {
   supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
   create_dir(supplement_output_folder)
   
-  ft_essay_42 <- supp_analyse_essay_item(data, measurement_version, 42)
   ft_factors <- supp_analyze_factors(data_aggregated, measurement_version)
   ft_facets <- supp_analyze_facets(data_aggregated, measurement_version)
   ft_loadings <- supp_analyze_factor_loadings(data_aggregated, measurement_version)
   ft_factor_correlations <- supp_analyze_factor_correlations(data_aggregated, measurement_version)
   ft_facet_correlations <- supp_analyze_facet_correlations(data_aggregated, measurement_version)
   gg_screeplot <- supp_analyze_screeplot(data_aggregated, measurement_version)
-  gg_essay_42 <- create_essay_histograms(data, measurement_version, 42)
   gg_factors <- create_factor_densities(data_aggregated, measurement_version)
   gg_facets <- create_facet_densities(data_aggregated, measurement_version)
   
-  # Add main supplement heading with "Anhang" style
-  doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
-  # Add first table with heading
-  doc <- body_add_par(doc, "Statistiken Essay 42", style = "Zwischenüberschrift")
-  doc <- body_add_flextable(doc, supp_format(ft_essay_42))
-  
-  
-  doc <- body_add_par(doc, "Histogramme Essay 42", style = "Zwischenüberschrift")
-  filename <- paste(supplement_output_folder,"/histograms_essay_42.jpg",sep="")
-  width <- 180
-  height <- 240
-  ggsave(filename=filename, plot=gg_essay_42, dpi=300, width=height, height=width, units = "mm")
-  doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
-  
-  
+
   doc <- body_add_par(doc, "Faktorstatistiken und Verteilungen", style = "Zwischenüberschrift")
   doc <- body_add_flextable(doc, supp_format(ft_facets))
   width <- 180
-  height <- 240
+  height <- 120
   filename <- paste(supplement_output_folder,"/factor_densities.jpg",sep="")
-  ggsave(filename=filename, plot=gg_factors, dpi=300, width=height, height=width, units = "mm")
+  ggsave(filename=filename, plot=gg_factors, dpi=300, width=width, height=height, units = "mm")
   doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
   
   
@@ -78,10 +79,8 @@ publish_all <- function(data, data_aggreated, measurement_version){
   width <- 180
   height <- 240
   filename <- paste(supplement_output_folder,"/facet_densities.jpg",sep="")
-  ggsave(filename=filename, plot=gg_facets, dpi=300, width=height, height=width, units = "mm")
+  ggsave(filename=filename, plot=gg_facets, dpi=300, width=width, height=height, units = "mm")
   doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
-  
-  
   
   doc <- body_add_par(doc, "Faktorkorrelationen", style = "Zwischenüberschrift")
   doc <- body_add_flextable(doc, supp_format(ft_factor_correlations))
@@ -89,17 +88,14 @@ publish_all <- function(data, data_aggreated, measurement_version){
   doc <- body_add_par(doc, "Facettenkorrelationen", style = "Zwischenüberschrift")
   doc <- body_add_flextable(doc, supp_format(ft_facet_correlations))
   
+  
   doc <- body_add_par(doc, "Faktorladungen und Kommunalitäten", style = "Zwischenüberschrift")
   doc <- body_add_flextable(doc, supp_format(ft_loadings))
   doc <- body_add_par(doc, "Scree Plot", style = "Zwischenüberschrift")
   doc <- body_add_img(doc, src = paste(supplement_output_folder, "/screeplot_", measurement_version, ".png", sep=""), width = 8, height = 5)
-  
 }
 
 
-# Create a new Word document from template with correct paragraph styles
-doc <- read_docx(paste(root_folder, "/Supplement_styletemplate.docx", sep=""))
-doc <- body_remove(doc)
 
 
 main_versions = c("v1.0",
@@ -111,6 +107,13 @@ sub_versions = c("v1.1",
                  "v2.1","v2.2",
                  "v4.1")
 
+
+
+
+# Create a new Word document from template with correct paragraph styles
+
+doc <- read_docx(paste(root_folder, "/Supplement_styletemplate.docx", sep=""))
+doc <- body_remove(doc)
 
 
 ################################################# V1.0
@@ -138,6 +141,9 @@ data <- tbl(con, "openai_analyzation") %>%
   )
 data_aggregated <- aggregate_model(data)
 
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_essays_histograms()
+publish_all()
 
 
 ################################################# V1.1
@@ -146,9 +152,8 @@ data_aggregated <- data %>%
   select(-ef1b, -af2b, -nf3b) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, measurement_version)
-
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
 
 
 ################################################# V1.2
@@ -157,9 +162,8 @@ data_aggregated <- data %>%
   select(-af3b, -nf3b) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, measurement_version)
-
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
 
 
 ################################################ V1.3
@@ -168,8 +172,8 @@ data_aggregated <- data %>%
   select(-cf1b, -af3b, -nf3b) %>% 
   aggregate_model()
 
-db_write_model(data_aggregated, measurement_version)
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
 
 ################################################# V2.0
 measurement_version <- "v2.0"
@@ -181,8 +185,9 @@ data <- tbl(con, "openai_analyzation_v3") %>%
   collect() %>% 
   drop_na("of1")
 
-data_aggregated <- aggregate_model(data)
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_essays_histograms()
+publish_all()
 
 
 ################################################# V2.1
@@ -196,7 +201,8 @@ data_aggregated <- data %>%
          -nf2, -nf5) %>% 
   aggregate_model()
 
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
 
 ################################################# V2.2
 measurement_version <- "v2.2"
@@ -209,22 +215,12 @@ data_aggregated <- data %>%
          -nf2, -nf5) %>% 
   aggregate_model()
 
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
+
 
 ################################################# V2.3
 measurement_version <- "v2.3"
-
-data_aggregated <- data %>% 
-  select(-of3, -of4, -of6,
-         -cf1, -cf4,
-         -ef2, -ef3, -ef6,
-         -af2, -af5,
-         -nf2, -nf5) %>% 
-  aggregate_model()
-
-
-
-################################################# V2.3b
-measurement_version <- "v2.3b"
 
 data_aggregated <- data %>% 
   select(-of3, -of4,
@@ -234,7 +230,8 @@ data_aggregated <- data %>%
          -nf2, -nf5) %>% 
   aggregate_model()
 
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
 
 
 ################################################# V3.0
@@ -248,7 +245,9 @@ data <- tbl(con, "openai_analyzation_v2") %>% select(-updated_at) %>%
 data_aggregated <- data %>% 
   aggregate_model()
 
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_essays_histograms()
+publish_all()
 
 
 ################################################# V4.1
@@ -261,6 +260,9 @@ data_aggregated <- data %>%
   filter(temperature == 0) %>% 
   aggregate_model()
 
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_essays_histograms()
+publish_all()
 
 
 ################################################# V5.X
@@ -329,26 +331,12 @@ data <- tbl(con, "openai_analyzation_v5") %>%
   filter(essay_id <= 250) %>% 
   collect()
 
-pre <- data %>% 
-  select(where(~ all(!is.na(.))))
-o_facets <- pre %>% select(starts_with(("of")))
-c_facets <- pre %>% select(starts_with(("cf")))
-e_facets <- pre %>% select(starts_with(("ef")))
-a_facets <- pre %>% select(starts_with(("af")))
-n_facets <- pre %>% select(starts_with(("nf")))
-
-all_facet_names <- c(names(o_facets), names(c_facets), names(e_facets), 
-                     names(a_facets), names(n_facets))
-summ <- data %>% 
-  select(where(~ all(!is.na(.)))) %>% 
-  group_by(essay_id) %>% 
-  summarize(across(all_of(all_facet_names), ~ sd(.x, na.rm = TRUE)),
-            .groups = "drop")
-
-
-
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
+
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_essays_histograms()
+publish_all()
 
 
 ################################################# V5.1
@@ -363,7 +351,8 @@ data <- tbl(con, "openai_analyzation_v5") %>%
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
 
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
 
 
 ################################################# Noise
@@ -375,7 +364,8 @@ noise <- tbl(con, "noise") %>%
 data_aggregated <- aggregate_model(data) %>% 
   select(where(~ all(!is.na(.))))
 
-
+doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
+publish_all()
 
 
 

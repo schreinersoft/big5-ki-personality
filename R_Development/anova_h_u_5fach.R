@@ -4,7 +4,7 @@ library(effectsize)
 library(tidyverse)
 library(writexl)
 
-root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
+root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen"
 
 source("sources/output_folders.R")
 
@@ -24,9 +24,9 @@ essays <- tbl(con, "essays") %>%
   select(-text, -author, -all_of(ends_with("binary")))
 
 models <- list()
-model_list <- c("noise", "liwc", "wang",
-                "v1.0","v1.1b","v1.2b",
-                "v2.0","v2.1","v2.2","v2.3",
+model_list <- c("liwc", 
+                "v1.0","v1.1","v1.2",
+                "v2.0","v2.1","v2.2",
                 "v3.0",
                 "v4.1",
                 "v5.0")
@@ -40,6 +40,7 @@ for (model in model_list) {
     rename(essay_id = id) %>% 
     drop_na()
 }
+
 
 
 
