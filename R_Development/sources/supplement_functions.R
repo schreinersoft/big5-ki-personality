@@ -4,6 +4,8 @@ library(flextable)
 library(corrr)
 library(Hmisc)
 
+source("sources/factor_colors.R")
+
 write_txt<- function(data, kind, instrument_version){
   sink(paste(supplement_output_folder, "/", kind, "_", instrument_version, ".txt", sep=""))
   summary(data)
@@ -63,9 +65,7 @@ supp_analyse_essay_item <- function(data, model_instrument_version, essay_number
     italic(part = "header", j = c(3,4,5)) %>% 
     autofit()
   
-  #save_as_docx(ft, path = paste(supplement_output_folder, kind, ".docx", sep=""))
-  #write_xlsx(stats, path=paste(supplement_output_folder, kind, ".xlsx",sep=""))
-  write_txt(stats, kind, model_instrument_version)
+  if (write_graphics_and_tables) { write_txt(stats, kind, model_instrument_version) }
   
   return(ft)
 }
