@@ -82,21 +82,9 @@ create_all_graphics(data_aggregated, measurement_version)
 
 
 
+
 ################################################# V1.1
 measurement_version <- "v1.1"
-data_aggregated <- data %>% 
-  select(-cf1b, -ef2b, -af3b, -nf3b) %>% 
-  aggregate_model()
-
-
-db_write_model(data_aggregated, measurement_version)
-
-analyze_all(data_aggregated, measurement_version)
-create_all_graphics(data_aggregated, measurement_version)
-
-
-################################################# V1.1b
-measurement_version <- "v1.1b"
 data_aggregated <- data %>% 
   select(-ef1b, -af2b, -nf3b) %>% 
   aggregate_model()
@@ -111,19 +99,6 @@ create_all_graphics(data_aggregated, measurement_version)
 ################################################# V1.2
 measurement_version <- "v1.2"
 data_aggregated <- data %>% 
-  select(-cf1b, -ef2b, -nf2b) %>% 
-  aggregate_model()
-
-
-db_write_model(data_aggregated, measurement_version)
-
-analyze_all(data_aggregated, measurement_version)
-create_all_graphics(data_aggregated, measurement_version)
-
-
-################################################# V1.2b
-measurement_version <- "v1.2b"
-data_aggregated <- data %>% 
   select(-af3b, -nf3b) %>% 
   aggregate_model()
 
@@ -134,8 +109,8 @@ create_all_graphics(data_aggregated, measurement_version)
 
 
 
-################################################# V1.3b
-measurement_version <- "v1.3b"
+################################################# V1.3
+measurement_version <- "v1.3"
 data_aggregated <- data %>% 
   select(-cf1b, -af3b, -nf3b) %>% 
   aggregate_model()
