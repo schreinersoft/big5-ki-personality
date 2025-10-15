@@ -149,13 +149,12 @@ supp_analyze_factors <- function(data, model_instrument_version, likert_max = 9)
       range = "Spannweite",
       ks = "K-S",
       sw = "S-W",
-      alpha = "\u03B1",
-      omega = "\u03C9"
+      #alpha = "\u03B1",
+      #omega = "\u03C9"
     ) %>%
     theme_alafoli() %>%
     italic(part = "header", j = c(3,4)) %>% 
-    align(j = 2:10, align = "center", part = "all") %>% 
-    
+    align(j = 2:10, align = "center", part = "all") %>%
     autofit()
   
   kind <- paste("/stats_facets_", model_instrument_version, sep="")

@@ -1,4 +1,5 @@
 library(tidyverse)
+library(scales)
 
 root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
 
@@ -32,7 +33,9 @@ stats <- data %>%
 
 ft <- stats %>% 
   as.data.frame() %>% 
-  flextable()
+  flextable() %>% 
+  theme_alafoli() %>% 
+  autofit()
 ft
 save_as_docx(ft, path = paste(tables_output_folder, "/desc_age_", corpus_name, ".docx", sep=""))
 write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/desc_age_", corpus_name, ".xlsx",sep=""))
@@ -40,11 +43,12 @@ write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/de
 
 
 stats_monthly <- data %>%
-  mutate(auhor_age_months = (author_age * 12)+month) %>% 
-  group_by(auhor_age_months) %>%
-  group_modify(~ describe(select(.x, ends_with("_llm"))) %>%
+  mutate(author_age_months = (author_age * 12)+month) %>% 
+  group_by(author_age_months) %>%
+  group_modify(~ psych::describe(select(.x, ends_with("_llm"))) %>%
+                 as.data.frame() %>% 
                  rownames_to_column("variable")) %>%
-  arrange(variable, auhor_age_months) %>% 
+  arrange(variable, author_age_months) %>% 
   ungroup()
 
 
@@ -105,8 +109,8 @@ trendlines <- stats %>%
                       levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
   ggplot(aes(x = author_age, y = mean, color = variable, fill = variable)) +
   geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
-  geom_line(size = 1.0, linejoin="round") +
-  geom_point(size=1.2) +
+  geom_line(size = 0.8, linejoin="round") +
+  geom_point(size=1.0) +
   scale_color_brewer(palette = "Set1") +
   scale_fill_brewer(palette = "Set1") +
   facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = variable_names)) +
@@ -116,7 +120,7 @@ trendlines <- stats %>%
   labs(
     title = "",
     x = "Alter",
-    y = "M (Skalenwert)"
+    y = "Skalenwert"
   ) +
   theme_minimal() +
   theme(legend.position = "none")  
@@ -124,6 +128,31 @@ trendlines
 ggsave(paste(graphics_output_folder,"/lines_with_trend_", corpus_name, ".jpg", sep = ""), 
        plot = trendlines, dpi = 600, width = 7, height = 4)
 
+
+thinner_trendlines <- stats %>% 
+  mutate(
+    variable = factor(variable, 
+                      levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
+  ggplot(aes(x = author_age, y = mean, color = variable, fill = variable)) +
+  geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
+  geom_line(size = 0.5, linejoin="round") +
+  geom_point(size=0.7) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~ variable, scales = "fixed", labeller = labeller(variable = variable_names)) +
+  geom_smooth(aes(group = variable), method = "loess", linetype = "dotted", alpha = 0.2, se = TRUE, size = 0.3, fill="darkgrey") +
+  scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
+  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(3)) +
+  labs(
+    title = "",
+    x = "Alter",
+    y = "Skalenwert"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")  
+trendlines
+ggsave(paste(graphics_output_folder,"/thinner_lines_with_trend_", corpus_name, ".jpg", sep = ""), 
+       plot = thinner_trendlines, dpi = 600, width = 7, height = 4)
 
 # alle zusammen
 trendlines_flat <- stats %>% 
@@ -163,6 +192,87 @@ ggsave(paste(graphics_output_folder,"/lines_flat_", corpus_name, ".jpg", sep = "
        plot = trendlines_flat, dpi = 600, width = 7, height = 4)
 
 
+
+
+# alle zusammen
+thinner_trendlines_flat <- stats %>% 
+  mutate(
+    variable = factor(variable, 
+                      levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm"))) %>% 
+  ggplot(aes(x = author_age, y = mean, color = variable, fill = variable)) +
+  scale_color_brewer(palette = "Set1", labels = variable_names) +
+  scale_fill_brewer(palette = "Set1") +
+  #geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
+  geom_line(size = 0.5, linejoin="round") +
+  geom_point(size=0.8) +
+  geom_smooth(aes(group = variable), method = "loess", linetype = "dotted", alpha = 0.4, se = TRUE, size = 0.4) +
+  geom_vline(data = ereignisse, 
+             aes(xintercept = author_age), 
+             color = "red", 
+             linetype = "dashed", 
+             alpha = 0.7) +
+  scale_y_continuous(limits = c(3.8, 8), breaks = 1:9) +
+  scale_x_continuous(limits = c(min_age, max_age), breaks = breaks_width(2, offset=1)) +
+  geom_text(data = ereignisse,
+            aes(x = author_age, y = 8, label = ereignis),
+            angle = 0, vjust = -0.3, hjust = 1.05,
+            size = 3, color = "red",
+            inherit.aes = FALSE) +
+  guides(fill = "none") +
+  labs(
+    title = "",
+    x = "Alter",
+    y = "Skalenwert",
+    color = ""
+  ) +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+
+thinner_trendlines_flat
+ggsave(paste(graphics_output_folder,"/thinner_lines_flat_", corpus_name, ".jpg", sep = ""), 
+       plot = thinner_trendlines_flat, dpi = 300, width = 7, height = 5)
+
+
+
+
+
+
+############################################ MONTHLY
+thinner_trendlines_flat_monthly <- stats_monthly %>% 
+  filter(author_age_months >= 52*12) %>% 
+  filter(author_age_months <= 56*12) %>% 
+  mutate(
+    variable = factor(variable, 
+                      levels = c("o_llm", "c_llm", "e_llm", "a_llm", "n_llm")),
+    author_age = author_age_months/12) %>% 
+  ggplot(aes(x = author_age_months, y = mean, color = variable, fill = variable)) +
+  scale_color_brewer(palette = "Set1", labels = variable_names) +
+  scale_fill_brewer(palette = "Set1") +
+  geom_ribbon(aes(ymin = mean - se, ymax = mean + se), alpha = 0.2, color = NA) +
+  geom_line(size = 0.5, linejoin="round") +
+  geom_point(size=0.8) +
+  geom_smooth(aes(group = variable), method = "loess", linetype = "dotted", alpha = 0.4, se = TRUE, size = 0.4) +
+  scale_y_continuous(limits = c(3.0, 7.8), breaks = 1:9) +
+  #scale_x_continuous(limits = c(min_age-0.5, max_age), breaks = breaks_width(2)) +
+  guides(fill = "none") +
+  labs(
+    title = "",
+    x = "Alter",
+    y = "Skalenwert",
+    color = ""
+  ) +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+
+thinner_trendlines_flat_monthly
+ggsave(paste(graphics_output_folder,"/thinner_lines_flat_", corpus_name, ".jpg", sep = ""), 
+       plot = thinner_trendlines_flat, dpi = 300, width = 7, height = 5)
+
+thinner_trendlines_flat_monthly <- stats_monthly %>% 
+  filter(author_age_months >= 52*12) %>% 
+  filter(author_age_months <= 56*12)
 
 
 
