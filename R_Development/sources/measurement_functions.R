@@ -4,6 +4,8 @@ source("sources/connect_database.R")
 source("sources/transformation_functions.R")
 
 
+
+
 consolidate_data <- function(table_name)
 {
   data_raw <- tbl(con, table_name) %>% 
@@ -11,8 +13,7 @@ consolidate_data <- function(table_name)
   
   analyzation <- tbl(con, "openai_analyzation_corpus") %>% 
     select(-cf2, -af5, -nf3) %>% 
-    collect() %>%
-    select(where(~ all(!is.na(.)))) %>% 
+    collect() %>% 
     aggregate_model_by_hash()
   
   data <- left_join(data_raw, analyzation, by = c("hash" = "hash")) %>%
