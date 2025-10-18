@@ -2,7 +2,7 @@ library(tidyverse)
 library(corrr)
 library(writexl)
 
-root_folder <- "C:/Users/Bernd Schreiner/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
+root_folder <- "C:/Users/bernd/OneDrive/@@@APOLLON/@@Thesis KI/Auswertungen/measurement"
 
 source("sources/connect_database.R")
 source("sources/graphics_functions.R")
@@ -87,6 +87,22 @@ ft <- results %>%
 ft
 save_as_docx(ft, path=paste(tables_output_folder, "/measure_u_test_orwell_receivers.docx",sep=""))
 write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/measure_u_test_orwell_receivers.xlsx",sep=""))
+
+
+o_diff <- create_stats_h_test(data_all, "o_llm", "receiver_sex", "O U-Test") 
+c_diff <- create_stats_h_test(data_all, "c_llm", "receiver_sex", "C U-Test") 
+e_diff <- create_stats_h_test(data_all, "e_llm", "receiver_sex", "E U-Test") 
+a_diff <- create_stats_h_test(data_all, "a_llm", "receiver_sex", "A U-Test") 
+n_diff <- create_stats_h_test(data_all, "n_llm", "receiver_sex", "N U-Test") 
+results <- rbind(o_diff, c_diff, e_diff, a_diff, n_diff) %>% 
+  as.data.frame() %>% 
+  mutate(across(everything(), ~ as.character(.)))
+ft <- results %>% 
+  flextable()
+ft
+save_as_docx(ft, path=paste(tables_output_folder, "/measure_h_test_orwell_receivers.docx",sep=""))
+write_xlsx(as.data.frame(ft$body$dataset), path=paste(tables_output_folder, "/measure_h_test_orwell_receivers.xlsx",sep=""))
+
 
 
 ############# Messung der zeitlichen Konstanz

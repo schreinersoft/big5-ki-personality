@@ -1,4 +1,5 @@
 library(officer)
+library(tidyverse)
 ### Collector for all models, data and analyzations
 
 #root folder for graphics
@@ -72,7 +73,7 @@ publish_all <- function(doc, data_aggregated) {
   doc <- body_add_par(doc, "Faktorverteilungen", style = "Zwischenüberschrift")
   width <- 150
   height <- 80
-  filename < paste(supplement_output_folder,"/factor_densities.jpg",sep="")
+  filename <- paste(supplement_output_folder,"/factor_densities.jpg",sep="")
   ggsave(filename=filename, plot=gg_factors, dpi=300, width=width, height=height, units = "mm")
   Sys.sleep(3)
   doc <- body_add_img(doc, src = filename, width=width, height=height, unit = "mm")
@@ -114,19 +115,6 @@ publish_all <- function(doc, data_aggregated) {
   
   return (doc)
 }
-
-
-
-
-main_versions = c("v1.0",
-                  "v2.0",
-                  "v3.0",
-                  "v4.1",
-                  "v5.0")
-sub_versions = c("v1.1",
-                 "v2.1","v2.2",
-                 "v4.1")
-
 
 
 
@@ -398,16 +386,23 @@ doc <- publish_all(doc, data_aggregated)
 measurement_version <- "noise"
 supplement_output_folder <- paste(root_folder, "/", measurement_version, sep="")
 
-noise <- tbl(con, "noise") %>% 
-  select(hash) %>% 
-  collect()
-
-data_aggregated <- aggregate_model(data) %>% 
-  select(where(~ all(!is.na(.))))
-
+data_aggregated <- db_read_model("noise") %>% 
+  rename(o_llm = o_noise,
+         c_llm = c_noise,
+         e_llm = e_noise,
+         a_llm = a_noise,
+         n_llm = n_noise,)
+ 
 doc <- body_add_par(doc, paste("Datenauswertung Version ", substr(measurement_version, 2, 100), sep=""), style = "Anhang")
 doc <- publish_all(doc, data_aggregated)
 
+factor_table <- summary_factors %>%
+  select(-Variable) %>% 
+  flextable() %>%
+  theme_alafoli() %>%
+  autofit()
+
+doc <- body_add_flextable(doc, supp_format(factor_table))
 
 
 # Save the document XXX
