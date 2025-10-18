@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 
 from database import *
-import openai_classifier
+import classifier_openai
 
 # Configure logging to write to both console and file
 logging.basicConfig(
@@ -59,20 +59,12 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
         with get_session() as db:
             excluded_hashes_query = db.query(OpenAIAnalyzationCorpus.hash)
 
-            entries = db.query(WoolfEntry)\
+            entries = db.query(WoolfEntry)
                 .filter(WoolfEntry.hash.is_not(None))\
                 .filter(~WoolfEntry.hash.in_(excluded_hashes_query))\
-                .filter(WoolfEntry.scrape_state < 10)\
                 .limit(1)\
                 .all()
 
-            # excluded_hashes = db.query(OpenAIAnalyzationCorpus.hash)\
-            #        .subquery()
-            # entries = db.query(WoolfEntry)\
-            #         .filter(~WoolfEntry.hash.in_(excluded_hashes))\
-            #         .filter(WoolfEntry.scrape_state < 10)\
-            #         .limit(1)\
-            #         .all()
             if not entries:
                 logging.info("DONE! All Entries processed.")
                 return
@@ -80,7 +72,10 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
                 logging.info(f"Corpus: Processing Entry {entry.id}... Exception Counter: {exc_counter}")
 
                 # mark for actual processing for parallel processing possibility
-                entry.scrape_state = entry.scrape_state + 10   
+                if not entry.scrape_state:
+                    entry.scrape_state = 11
+                else:
+                    entry.scrape_state = entry.scrape_state + 10   
                 db.commit()
                 db.refresh(entry)
 
@@ -92,7 +87,7 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
                                 entry_id = entry.id,
                                 hash = entry.hash)
 
-                        response, result = openai_classifier.classify(input_text=entry.text or entry.text_raw, system_prompt=system_prompt, service_tier=service_tier)
+                        response, result = classifier_openai.classify(input_text=entry.text or entry.text_raw, system_prompt=system_prompt, service_tier=service_tier)
                         new_openai.of3b = result['Creative Imagination']
                         new_openai.of1 = result['Fantasy']
                         new_openai.of2 = result['Aesthetics']
@@ -144,9 +139,6 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
                     if exc_counter > max_exceptions:
                         raise Exception(f"Excepetion Counter exceeded {max_exceptions}!")
                         
-
-
-                
 if __name__ == "__main__":
     process_openai_corpus(max_entries=500, repeats=3)
 

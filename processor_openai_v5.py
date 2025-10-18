@@ -1,6 +1,6 @@
 from database import *
-import openai_classifier_nano
-from sqlalchemy import or_
+import classifier_openai
+
 
 def make_system_prompt():
     facets = ['Creative Imagination', 'Fantasy', 'Aesthetics', 'Ideas',
@@ -29,12 +29,11 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
             # essays = db.query(Essay)\
             #         .outerjoin(OpenAIAnalyzationV5)\
             #         .filter(OpenAIAnalyzationV5.essay_id.is_(None))\
-            #         .filter(OpenAIAnalyzationV5.model != "gpt-5-mini")\
-            #         .filter(Essay.id <=1000)\
+            #         .filter(Essay.id <=250)\
             #         .limit(batch_size)\
             #         .all()
             excluded_essays = db.query(OpenAIAnalyzationV5.essay_id)\
-                   .filter(OpenAIAnalyzationV5.model.startswith("gpt-5-nano"))\
+                   .filter(OpenAIAnalyzationV5.model.startswith("gpt-5-mini"))\
                    .subquery()
             essays = db.query(Essay)\
                     .outerjoin(OpenAIAnalyzationV5)\
@@ -46,11 +45,11 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                 print("DONE! All Essays processed.")
                 return
             for essay in essays:
-                print(f"V5nano: Processing Essay {essay.id}...")
+                print(f"V5: Processing Essay {essay.id}...")
                 for repeat in range(repeats):
                     print(f"{repeat + 1}. Repeat")
                     try:
-                        response, result = openai_classifier_nano.classify(input_text=essay.text, system_prompt=system_prompt, temperature=0.0, service_tier=service_tier)
+                        response, result = classifier_openai.classify(input_text=essay.text, system_prompt=system_prompt, temperature=0.0, service_tier=service_tier)
                         new_openai = OpenAIAnalyzationV5(
                             essay_id = essay.id,
                             repeat = repeat,
@@ -80,10 +79,10 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                         
                         db.add(new_openai)
                     except KeyError:
-                        #db.commit()
+                        db.commit()
                         raise
                     except Exception as e:
-                        #db.commit()
+                        db.commit()
                         raise(e)
                         # Store error message
                         new_openai = OpenAIAnalyzationV5(
@@ -94,10 +93,11 @@ def process_openai_v3(batch_size: int, max_num: int, repeats: int=2, service_tie
                     finally:
                         i+=1
                 db.commit()
+                print("committed!")
 
                 
 if __name__ == "__main__":
-    process_openai_v3(1, 460, repeats=4) #, service_tier="flex")
+    process_openai_v3(1, 250, repeats=3) #, service_tier="flex")
 
 
 

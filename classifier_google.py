@@ -3,7 +3,7 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 from google import genai
-from openai_processor_v3 import make_system_prompt
+from processor_openai_v3 import make_system_prompt
 
 client = genai.Client()
 

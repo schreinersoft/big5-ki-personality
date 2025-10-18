@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 
 from database import *
-import openai_classifier
+import classifier_openai
 
 # Configure logging to write to both console and file
 logging.basicConfig(
@@ -30,6 +30,7 @@ def signal_handler(sig, frame):
 
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
+
 
 def make_system_prompt():
     facets = ['Creative Imagination', 'Fantasy', 'Aesthetics', 'Ideas',
@@ -58,10 +59,10 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
         with get_session() as db:
             excluded_hashes_query = db.query(OpenAIAnalyzationCorpus.hash)
 
-            entries = db.query(BenjaminEntry)\
-                .filter(BenjaminEntry.hash.is_not(None))\
-                .filter(~BenjaminEntry.hash.in_(excluded_hashes_query))\
-                .filter(BenjaminEntry.scrape_state < 10)\
+            entries = db.query(WoolfEntry)\
+                .filter(WoolfEntry.hash.is_not(None))\
+                .filter(~WoolfEntry.hash.in_(excluded_hashes_query))\
+                .filter(WoolfEntry.scrape_state < 10)\
                 .limit(1)\
                 .all()
 
@@ -91,7 +92,7 @@ def process_openai_corpus(max_entries = 1000, repeats: int=3, service_tier: str 
                                 entry_id = entry.id,
                                 hash = entry.hash)
 
-                        response, result = openai_classifier.classify(input_text=entry.text or entry.text_raw, system_prompt=system_prompt, service_tier=service_tier)
+                        response, result = classifier_openai.classify(input_text=entry.text or entry.text_raw, system_prompt=system_prompt, service_tier=service_tier)
                         new_openai.of3b = result['Creative Imagination']
                         new_openai.of1 = result['Fantasy']
                         new_openai.of2 = result['Aesthetics']

@@ -1,6 +1,6 @@
 from database import *
 
-import openai_classifier
+import classifier_openai
 
 def process_openai(batch_size: int, max_num: int, repeats: int=2, temperature: int = 0.0, service_tier: str = "flex"):
     with open("prompts\Prompt1_BFI2.txt", "rt") as file:
@@ -23,7 +23,7 @@ def process_openai(batch_size: int, max_num: int, repeats: int=2, temperature: i
                 for repeat in range(repeats):
                     print(f"{repeat + 1}. Repeat")
                     try:
-                        response, result = openai_classifier.classify(input_text=essay.text, system_prompt=system_prompt, temperature=0.0, service_tier=service_tier)
+                        response, result = classifier_openai.classify(input_text=essay.text, system_prompt=system_prompt, temperature=0.0, service_tier=service_tier)
                         new_openai = OpenAIAnalyzation(
                             essay_id = essay.id,
                             of1 = result['Intellectual Curiosity'],

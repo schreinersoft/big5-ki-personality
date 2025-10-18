@@ -1,5 +1,5 @@
 from database import *
-import liwc_classifier
+import classifier_liwc
 
 import json
 
@@ -18,7 +18,7 @@ def process_liwc(batch_size: int, max_num: int):
                 return
             for essay in essays:
                 print(f"Processing Essay {essay.id}...")
-                response, result = liwc_classifier.classify(essay.text)
+                response, result = classifier_liwc.classify(essay.text)
                 new_liwc = LIWCAnalyzation(
                     essay_id = essay.id,
                     o_liwc = result['O'],

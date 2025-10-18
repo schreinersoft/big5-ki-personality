@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from database.base import Base
 
 
-class GoogleAnalyzation(Base):
+class GoogleAnalyzationV4(Base):
     __tablename__ = 'google_analyzation'
     id = Column(Integer, primary_key=True, autoincrement=True)
     essay_id = Column(Integer, ForeignKey('essays.id'), nullable=False)

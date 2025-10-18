@@ -8,7 +8,7 @@ from .OpenAIAnalyzationV3 import OpenAIAnalyzationV3
 from .OpenAIAnalyzationV5 import OpenAIAnalyzationV5
 from .OpenAIAnalyzationCorpus import OpenAIAnalyzationCorpus
 from .MinejAnalyzation import MinejAnalyzation
-from .GoogleAnalyzation import GoogleAnalyzation
+from .GoogleAnalyzationV4 import GoogleAnalyzationV4
 from .BenjaminEntry import BenjaminEntry
 from .WoolfEntry import WoolfEntry
 from .NoiseEntry import NoiseEntry
@@ -27,7 +27,7 @@ __all__ = [
     'OpenAIAnalyzationV2',
     'OpenAIAnalyzationV3',
     'MinejAnalyzation',
-    'GoogleAnalyzation',
+    'GoogleAnalyzationV4',
     'OpenAIAnalyzationV5',
     'OpenAIAnalyzationCorpus',
     'BenjaminEntry',
